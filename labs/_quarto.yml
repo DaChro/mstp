@@ -1,0 +1,22 @@
+project:
+  title: "labs"
+  output-dir: "./outputs"
+  execute-dir: project
+  
+number-sections: true
+highlight-style: tango
+theme: [yeti, theme.scss]
+css: style.css
+code-block-bg: true
+code-block-border-left: "#7AB629"
+
+format: 
+  html:
+    self-contained: true
+    code-fold: false
+    smooth-scroll: true
+    toc: true
+    toc-location: left
+
+
+

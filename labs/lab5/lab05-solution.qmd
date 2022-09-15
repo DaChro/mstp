@@ -1,0 +1,685 @@
+---
+title: "Spatio-temporal Modelling, Lab 5, DD.MM.YYYY"
+editor: visual
+---
+
+# Spatial modelling: introductory matter
+
+## Data sets
+
+Besides data that are typed in, or data that are imported through import functions such as `read.csv`, some data are already available in packages. In package `gstat` for example, a data set called `meuse` is available. To copy this data set to the current working data base, use, e.g. for the `meuse` data
+
+```{r}
+library(gstat)
+library(sp)
+data(meuse)
+objects()
+```
+
+```{r}
+summary(meuse)
+```
+
+## meuse
+
+The meuse data set is a data set collected from the Meuse floodplain. The heavy metals analyzed are copper, cadmium, lead and zinc concentrations, extracted from the topsoil of a part of the Meuse floodplain, the area around Meers and Maasband (Limburg, The Netherlands). The data were collected during fieldwork in 1990 (Rikken and Van Rijn, 1993; Burrough and McDonnell, 1998).
+
+Load library `gstat` by
+
+```{r}
+library(gstat)
+```
+
+and read the documentation for the data set by `?meuse`
+
+## Models: the formula interface; linear regression
+
+Most statisticians (and many earth scientists as well) like to analyse data through models: models reflect the hypotheses we entertain, and from fitting models, analysing model output, and analysising graphs of fitted values and residuals we can learn from the data whether a given hypothesis was reasonable or not.
+
+Many models are variations of regression models. Here, we will illustrate an example of a simple linear regression model involving the heavy metal pollution data in `meuse`. We will entertain the hypothesis that zinc concentration, present in variable `zinc`, depends linearly on distance to the river, present in `dist`. We can express dependency of y on x by a formula, coded as y\~x. Formulas can have multiple right-hand sides for multiple linear regression, as y\~x1+x2; they also can contain expressions (transformations) of variables, as in log(y)\~sqrt(x). See `?formula` for a full description of the full functionality.
+
+To calculate a linear regression model for the meuse data:
+
+```{r}
+library(gstat)
+library(sp)
+data(meuse)
+zinc.lm = lm(zinc ~ dist, meuse)
+class(zinc.lm)
+```
+
+```{r}
+summary(zinc.lm)
+```
+
+Do the following yourself:
+
+```{r}
+par(mfrow=c(1,2)) #to get two plots in one row
+plot(zinc.lm)
+```
+
+Besides the variety of plots you now obtain, there are many further custom options you can set that can help analysing these data. When you ask help by `?plot`, it does not provide very helpful information. To get help on the plot method that is called when plotting an object of class `lm`, remember that the function called is `plot.lm`. Read the help of `plot.lm` by `?plot.lm` . You can customize the plot call, e.g. by
+
+```{r, warning=F}
+par(mfrow=c(1,2)) 
+plot(zinc.lm, add.smooth = FALSE)
+```
+
+In this call, the name of the second function argument is added because the argument panel is in a very rear position. Adding the `FALSE` as a positional argument, as in
+
+```{r,warning=F,eval=F}
+par(mfrow=c(1,2)) 
+ plot(zinc.lm, , , , , , , FALSE)
+```
+
+will not work as it comes after the ... argument, which may contain an arbitrary number of arguments that are passed to underlying plot routines. But the following two commands (search for the difference!) both work:
+
+```{r,warning=F}
+ par(mfrow=c(1,2)) 
+plot(zinc.lm, caption = c("Residuen ~ Modellierte Werte", "QQ-Plot mit Normalverteilung", 
+    " Standardisierte Residuen ~ Modellierte Werte", "Cook's Distanz", "Residuen vs Leverage", 
+    "Cook's Distanz vs Leverage"))
+```
+
+```{r,warning=F}
+par(mfrow=c(1,2)) 
+plot(zinc.lm, , c("Residuen ~ Modellierte Werte", "QQ-Plot mit Normalverteilung", 
+    " Standardisierte Residuen ~ Modellierte Werte", "Cook's Distanz", "Residuen vs Leverage", 
+    "Cook's Distanz vs Leverage"))
+```
+
+------------------------------------------------------------------------
+
+### *Exercise 5.1* {.unnumbered}
+
+*For this regression model, which of the following violated assumptions underlying linear regression are true (if any):*
+
+a)  none
+b)  residuals are heteroscedastic (i.e., their variance is not constant over the range of fitted values)
+c)  residuals are not normally distributed (their distribution is for example non-symmetric)
+d)  residuals are heteroscedastic and not normally distributed
+
+*and explain how you can tell that this is the case.*
+
+**Answer:** The correct answer is d).In the third plot (standardised residuals \~ fitted values) you can see that the residuals are heteroscedastic, i.e. their variance is not constant. In the second plot (QQ-Plot), you can see that the residuals are not normally distributed.
+
+------------------------------------------------------------------------
+
+## Spatial data in R (I): the sp package
+
+The R package `sp` provides classes and methods for spatial data; currently it can deal with points, grids, lines and polygons. It further provides interfaces to various GIS functions such as overlay, projection and reading and writing of external GIS formats.
+
+### Points
+
+Try:
+
+```{r,warning=F}
+library(sp)
+library(rgdal)
+meuse <- readOGR("./data/meuse.gpkg")
+class(meuse)
+```
+
+```{r, warning=F}
+summary(meuse)
+```
+
+```{r, warning=F}
+sp.theme(TRUE)
+spplot(meuse, "zinc", key.space = "right")
+```
+
+The plot now obtained shows points, but without reference where on earth they lie. You could e.g. add a reference by showing the coordinate system:
+
+```{r,warning=F}
+spplot(meuse, "zinc", key.space = "right", scales = list(draw = TRUE))
+```
+
+but this tells little about *what* we see. As another option, you can add geographic reference by e.g. lines of rivers, or administrative boundaries. In our example, we prepared a polygon of the Meuse river boundaries, and will add it as reference:
+
+```{r,warning=F}
+meuse.riv <- readOGR("./data/meuse_river.gpkg")
+```
+
+```{r,warning=F}
+meuse.lt = list("sp.polygons", meuse.riv, fill = "grey")
+spplot(meuse, "zinc", key.space = "right", sp.layout = meuse.lt)
+```
+
+The `sp.layout` argument contains map elements to be added to an `spplot` plot.
+
+Note that the points in the plot partly fall in the river; this may be attributed to one or more of the following reasons: (i) the river coordinates are not correct, (ii) the point coordinates are not correct, (iii) points were taken on the river bank when the water was low, whereas the river boundary indicates the high water extent of the river.
+
+### Grids
+
+Try:
+
+```{r,warning=F}
+library(rgdal)
+meuse.grid <- readGDAL("./data/meuse_grid.tif")
+class(meuse.grid)
+```
+
+```{r}
+names(meuse.grid) <- c("part.a","part.b","dist","soil","ffreq")
+```
+
+```{r,warning=F}
+summary(meuse.grid)
+```
+
+```{r,warning=F}
+meuse.lt = list(riv = list("sp.polygons", meuse.riv, fill = "grey"), pts = list("sp.points", 
+    meuse, pch = 3, cex = 0.5, col = "black"))
+spplot(meuse.grid, sp.layout = meuse.lt, key.space = "right")
+```
+
+For explanation on the `sp.layout` argument, read `?spplot`; much of the codes in them (`pch, cex, col`) are documented in `?par`.
+
+Note that `spplot` plots points on top of the grid, and the grid cells on top of the polygon with the river. (When printing to pdf, transparency options can be used to combine both.)
+
+## Import/export: rgdal
+
+R package `rgdal` provides several drivers for import/export of spatial data. We have used it above to read the vector and raster data `meuse`, `meuse.riv` and `meuse.grid`. An overview of available drivers for vector data (points, lines, polygons) can be obtained by
+
+```{r,warning=F}
+library(rgdal)
+```
+
+```{r,warning=F}
+ogrDrivers()
+```
+
+and for grid data by
+
+```{r,warning=F}
+gdalDrivers()
+```
+
+The full set of theoretically available drivers with documentation are given [here](http://www.gdal.org/formats_list.html) and [here](http://www.gdal.org/ogr_formats.html).
+
+Export the data set to KML
+
+```{r,warning=F,eval=F}
+ library(rgdal)
+ data(meuse)
+ coordinates(meuse) = ~x+y
+ proj4string(meuse) = CRS("+init=epsg:28992")
+ proj4string(meuse)
+ meuse.ll = spTransform(meuse, CRS("+proj=longlat"))
+ writeOGR(meuse.ll, "meuse.kml", "meuse.kml", driver="KML")
+```
+
+and import it in google earth.
+
+## Spatial data in R (II): the packages sf and stars
+
+### Points
+
+```{r}
+library(sf)
+meuse.sf <- st_read("./data/meuse.gpkg")
+plot(meuse.sf)
+```
+
+```{r}
+plot(meuse.sf["zinc"],axes=T)
+```
+
+```{r}
+meuse.riv.sf <- st_read("./data/meuse_river.gpkg")
+plot(meuse.sf["zinc"],axes=T,reset=F)
+plot(meuse.riv.sf,col='grey',add=T)
+```
+
+### Grids
+
+```{r}
+library(stars)
+meuse.grid.stars <- read_stars("./data/meuse_grid.tif")
+meuse.grid.stars
+```
+
+```{r}
+meuse.grid.stars <- split(meuse.grid.stars, "band")
+meuse.grid.stars
+```
+
+```{r}
+names(meuse.grid.stars) <- c("part.a","part.b","dist","soil","ffreq")
+meuse.grid.stars
+```
+
+```{r}
+plot(meuse.grid.stars[3], col=heat.colors(10))
+```
+
+## Visualizing spatial data with the tmap package
+
+```{r}
+library(tmap)
+tm_shape(meuse.grid)+tm_raster("dist")+tm_shape(meuse.riv.sf)+tm_polygons()
+```
+
+```{r}
+tm_shape(meuse.grid.stars)+tm_raster("dist")+tm_shape(meuse.riv)+tm_polygons()+tm_shape(meuse.sf)+tm_symbols(shape = 3,size = 0.3,col="black")
+```
+
+```{r}
+tmap_mode("view")
+tm_shape(meuse.grid.stars)+tm_raster("dist")+tm_shape(meuse.riv)+tm_polygons()
+tmap_mode("plot")
+```
+
+# Geostatistics
+
+The following practical exercises cover the use of geostatistical applications in environmental research. They give an introduction to exploratory data analysis, sample variogram calculation and variogram modelling and several spatial interpolation techniques. Interpolation methods described and applied are inverse distance interpolation, trend surface fitting, thiessen polygons, ordinary (block) kriging, stratified (block) kriging and indicator (block) kriging.
+
+The gstat R package is used for all geostatistical calculations. See:
+
+E.J. Pebesma, 2004. Multivariable geostatistics in S: the gstat package. Computers & Geosciences [30: 683-691.](http://www.stats.uwo.ca/faculty/kulperger/S9934a/Papers/Pebesma2004.pdf)
+
+## Exploratory data analysis
+
+If you set the parameter `identify=TRUE`, you can identify points in the plot and retrieve the zinc concentration. Copy the code below and execute it in your local R environment to identify the five largest zinc concentrations by clicking them on the plot:
+
+```{r,warning=F}
+library(sp)
+sp.theme(TRUE)
+
+```
+
+```{r,warning=F}
+sel = spplot(meuse, "zinc", identify = TRUE)
+sel
+```
+
+------------------------------------------------------------------------
+
+### *Exercise 5.2* {.unnumbered}
+
+*Which points have the largest zinc concentration:*
+
+a)  44 51 54 55 82
+b)  49 53 54 55 82
+c)  54 55 56 60 123
+d)  53 54 55 59 82
+
+**Answer:** The Points which have the highest zinc concentration are: 53,54,55,59,82. The correct answer is d).
+
+------------------------------------------------------------------------
+
+## Simple interpolation algorithms
+
+### Trend surface analysis
+
+Trend surface interpolation is multiple linear regression with polynomials of coordinates as independent, predictor variables. Although we could use `lm` to fit these models and predict them, it would require scaling of coordinates prior to prediction in most cases because higher powers of large coordinate values result in large numerical errors. The `krige` function in library `gstat` scales coordinates and computes trend surface up to degree 3, using scaled coordinates.
+
+```{r,warning=F}
+
+
+```
+
+::: panel-tabset
+## sp
+
+```{r}
+
+meuse.grid$tr1 = krige(log(zinc) ~ 1, meuse, meuse.grid, degree = 1)$var1.pred
+meuse.grid$tr2 = krige(log(zinc) ~ 1, meuse, meuse.grid, degree = 2)$var1.pred
+meuse.grid$tr3 = krige(log(zinc) ~ 1, meuse, meuse.grid, degree = 3)$var1.pred
+spplot(meuse.grid, c("tr1", "tr2", "tr3"), sp.layout = meuse.lt, main = "log(zinc), trend surface interpolation")
+
+```
+
+## sf and stars
+
+```{r}
+meuse.grid.stars$tr1 = krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, degree = 1)$var1.pred
+meuse.grid.stars$tr2 = krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, degree = 2)$var1.pred
+meuse.grid.stars$tr3 = krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, degree = 3)$var1.pred
+tm_shape(meuse.grid.stars)+tm_raster(c("tr1","tr2","tr3"))+tm_shape(meuse.riv.sf)+tm_polygons()+tm_shape(meuse)+tm_symbols(shape = 3,size = 0.3,col="black")+tm_layout(main.title = "log(zinc) trend surface interpolation",main.title.position = "center",main.title.size = 1.1)
+```
+:::
+
+Function `surf.ls` from library `spatial` (described in the MASS book) fits trends up to order 6 with scaled coordinates.
+
+As you can see, `?krige` does not provide help on argument `degree`. However, tells that any remaining arguments (...) are passed to function `gstat`, so look for argument `degree` on `?gstat`.
+
+------------------------------------------------------------------------
+
+### *Exercise 5.3* {.unnumbered}
+
+*The danger of extreme extrapolation values is likely to occur*
+
+-   
+
+    a)  for low trend orders
+
+-   
+
+    b)  for high trend orders
+
+-   
+
+    c)  for none of these models
+
+*Briefly explain why this is the case.*
+
+**Answer:** The correct answer is b). If you plot polynomials in one dimension, you can easily see that function values are more extreme for higher trend orders.
+
+```{r,warning=F}
+x = seq(-2, 2, 0.1)
+plot(x, x, type = "l", ylim = c(-2, 2), col = "green")  # 1. Ordnung (Gerade)
+abline(v = 0, h = 0)
+lines(x, x^2, col = "red")  # 2. Ordnung (Parabel)
+lines(x, x^3, col = "blue")  # 3. Ordnung
+```
+
+------------------------------------------------------------------------
+
+Local trends, i.e. trends in a local neighbourhood may also be fitted:
+
+```{r,warning=F}
+m = krige(log(zinc) ~ 1, meuse, meuse.grid, nmax = 10)
+```
+
+```{r,warning=F}
+spplot(m, "var1.pred", sp.layout = meuse.lt, main = "local 1st order trend")
+```
+
+### Inverse distance interpolation
+
+Inverse distance interpolation calculates a weighted average of points in the (by default global) neighbourhood, using weights inverse proportional to the distance of data locations to the prediction location raised to the power ( p ). This power is by default 2:
+
+```{r,warning=F}
+library(gstat)
+lzn.tp = idw(log(zinc) ~ 1, meuse, meuse.grid)
+```
+
+```{r,warning=F}
+spplot(lzn.tp, "var1.pred", sp.layout = meuse.lt, main = "log(zinc), inverse distance interpolation")
+```
+
+```{r,warning=F}
+meuse.grid$idp0.5 = idw(log(zinc) ~ 1, meuse, meuse.grid, idp = 0.5)$var1.pred
+```
+
+```{r,warning=F}
+meuse.grid$idp02 = idw(log(zinc) ~ 1, meuse, meuse.grid, idp = 2)$var1.pred
+```
+
+```{r,warning=F}
+meuse.grid$idp05 = idw(log(zinc) ~ 1, meuse, meuse.grid, idp = 5)$var1.pred
+```
+
+```{r,warning=F}
+meuse.grid$idp10 = idw(log(zinc) ~ 1, meuse, meuse.grid, idp = 10)$var1.pred
+```
+
+```{r,warning=F}
+spplot(meuse.grid, c("idp0.5", "idp02", "idp05", "idp10"), sp.layout = meuse.lt, 
+    main = "log(zinc), inverse distance interpolation")
+```
+
+The argument `set` is a list because other parameters can be passed to gstat using this list as well.
+
+------------------------------------------------------------------------
+
+### *Exercise 5.4* {.unnumbered}
+
+*With a larger inverse distance power (`idp`), the weight of the nearest data point*
+
+-   
+
+    a)  becomes larger
+
+-   
+
+    b)  becomes smaller
+
+-   
+
+    c)  does not change
+
+*explain in words why this is the case.*
+
+**Answer:** The correct answer is a). With a higher inverse distance power the weight of a data point decreases more quickly with increasing distance. $$\lambda_i = \frac{|s_i-s_0|^{-p}}{\sum_{i=1}^n |s_i-s_0|^{-p}}$$
+
+------------------------------------------------------------------------
+
+### Thiessen polygons
+
+Thiessen polygons can be constructed (as vector objects) using the functions in library `tripack`. Interpolation on a regular grid is simply obtained by using e.g. inverse distance interpolation and a neighbourhood size of one ( nmax = 1}). Combining the two:
+
+```{r,warning=F}
+library(gstat)
+library(sp)
+lzn.tp = krige(log(zinc) ~ 1, meuse, meuse.grid, nmax = 1)
+```
+
+```{r,warning=F}
+image(lzn.tp["var1.pred"])
+points(meuse, pch = "+", cex = 0.5)
+cc = coordinates(meuse)
+library(tripack)
+plot(voronoi.mosaic(cc[, 1], cc[, 2]), do.points = FALSE, add = TRUE)
+title("Thiessen (or Voronoi) polygon interpolation of log(zinc)")
+```
+
+# Spatial prediction with multiple linear regression
+
+In the data set `meuse` we have a large number of variables present that can be used to form predictive regression models for either of the heavy metal variables. If we want to use such a regression model for spatial prediction, we need the variables as a full spatial coverage, e.g. in the form of a regular grid covering the study area, as well.
+
+Only few variables are available for this in `meuse.grid`:
+
+```{r, warning=F}
+library(sp)
+sp.theme(TRUE)
+data(meuse)
+data(meuse.grid)
+names(meuse.grid)
+```
+
+Now try:
+
+```{r,warning=F}
+coordinates(meuse) = c("x", "y")
+coordinates(meuse.grid) = c("x", "y")
+gridded(meuse.grid) = TRUE
+lzn.lm = lm(log(zinc) ~ sqrt(dist), meuse)
+summary(lzn.lm)
+```
+
+```{r,warning=F}
+par(mfrow=c(1,2)) 
+plot(lzn.lm)
+```
+
+```{r,warning=F}
+plot(log(zinc) ~ sqrt(dist), meuse)
+abline(lzn.lm)
+```
+
+```{r, warning=F}
+lzn.pr = predict(lm(log(zinc) ~ sqrt(dist), meuse), meuse.grid, se.fit = TRUE)
+meuse.grid$lzn.fit = lzn.pr$fit
+spplot(meuse.grid, "lzn.fit")
+```
+
+```{r,warning=F}
+meuse.grid$se.fit = lzn.pr$se.fit
+spplot(meuse.grid, "se.fit")
+```
+
+------------------------------------------------------------------------
+
+### *Exercise 5.5* {.unnumbered}
+
+*Why are prediction standard errors on the log-scale largest for small and large distance to the river?*
+
+-   
+
+    a)  Because variability is smallest for intermediate distance to river
+
+-   
+
+    b)  because the uncertainty in the regression slope is most prevalent when the regressor *distance* takes extreme values
+
+-   
+
+    c)  because we have too few degrees of freedom for regression (i.e., too few observations) overall
+
+-   
+
+    d)  because we have too little data close to the river and far away from the river
+
+**Answer:** The correct answer is b). The uncertainty introduced by the slope of the regression model is highest for low and high distance values.
+
+------------------------------------------------------------------------
+
+We can use the prediction errors provided by `lm` to calculate regression prediction intervals:
+
+```{r,warning=F}
+plot(log(zinc) ~ sqrt(dist), meuse)
+x = 0:100/100
+lzn.lm = lm(log(zinc) ~ sqrt(dist), meuse)
+pr = predict(lzn.lm, data.frame(dist = x), interval = "prediction")
+abline(lzn.lm)
+lines(sqrt(x), pr[, 2], lty = "dashed", col = "red")
+lines(sqrt(x), pr[, 3], lty = "dashed", col = "red")
+pr = predict(lzn.lm, data.frame(dist = x), interval = "confidence")
+lines(sqrt(x), pr[, 2], lty = "dashed", col = "blue")
+lines(sqrt(x), pr[, 3], lty = "dashed", col = "blue")
+title("95% confidence intervals (blue) and prediction intervals (red)")
+```
+
+Next, we can make maps of the 95% prediction intervals:
+
+```{r,warning=F}
+pr = predict(lzn.lm, as.data.frame(meuse.grid), interval = "prediction")
+meuse.grid$fit = pr[, 1]
+meuse.grid$upper = pr[, 3]
+meuse.grid$lower = pr[, 2]
+spplot(meuse.grid, c("fit", "lower", "upper"), sp.layout = meuse.lt, layout = c(3, 
+    1))
+```
+
+Note that all these prediction intervals refer to prediction of single observations; confidence intervals for mean values (i.e., the regression line alone) are obtained by specifying interval = `"confidence"`.
+
+------------------------------------------------------------------------
+
+### *Exercise 5.6* {.unnumbered}
+
+*Compared to prediction intervals, the intervals obtained by interval = `"confidence"` are*
+
+-   
+
+    a)  wider
+
+-   
+
+    b)  narrower
+
+-   
+
+    c)  of approximately equal width
+
+**Answer:** The correct answer is b). The confidence intervals for **single observations** (prediction intervals) are wider than intervals obtained by `interval = confidence"` because the latter are for the regression line, i.e. confidence intervals of the **mean** for a certain distance.
+
+------------------------------------------------------------------------
+
+Another regression model is obtained by relating zinc to flood frequency, try
+
+```{r,warning=F}
+plot(log(zinc) ~ ffreq, meuse)
+```
+
+------------------------------------------------------------------------
+
+### *Exercise 5.7* {.unnumbered}
+
+*Why is a box-and whisker plot drawn for this plot, and not a scatter plot?*
+
+-   
+
+    a)  `ffreq` is a categorical variable with numeric levels
+
+-   
+
+    b)  `ffreq` has only three values, 1, 2 and 3
+
+-   
+
+    c)  flood frequency is allways expressed by boxes
+
+**Answer:** The correct answer is a).
+
+------------------------------------------------------------------------
+
+### *Exercise 5.8* {.unnumbered}
+
+*What do the boxes in a box-and whisker plot refer to?*
+
+-   
+
+    a)  the mean plus and minus one standard deviation of the group
+
+-   
+
+    b)  the 95 percent confidence interval for the mean
+
+-   
+
+    c)  the inter-quartile range (from 25-th to 75-th percentiles)
+
+**Answer:** The correct answer is c).
+
+------------------------------------------------------------------------
+
+### *Exercise 5.9* {.unnumbered}
+
+*What is needed for flood frequency to use it for mapping zinc?*
+
+-   
+
+    a)  it needs to be the number of times a grid cell floods
+
+-   
+
+    b)  it needs to be known at each prediction location (i.e., grid cells in `meuse.grid`)
+
+-   
+
+    c)  it needs to be independent of distance to the river
+
+**Answer:** The correct answer is b).
+
+------------------------------------------------------------------------
+
+Try the model in prediction mode:
+
+```{r,warning=F}
+lzn.lm2 = lm(log(zinc) ~ ffreq, meuse)
+summary(lzn.lm2)
+```
+
+```{r,warning=F}
+pr = predict(lzn.lm2, meuse.grid, interval = "prediction")
+meuse.grid$fit = pr[, 1]
+meuse.grid$upper = pr[, 3]
+meuse.grid$lower = pr[, 2]
+spplot(meuse.grid, c("fit", "lower", "upper"), sp.layout = meuse.lt, layout = c(3, 
+    1))
+```
+
+------------------------------------------------------------------------
+
+### *Exercise 5.10* {.unnumbered}
+
+*Why is the pattern obtained not smooth?*
+
+**Answer:** ffreq is a categorical variable so there are leaps in the map where the flood frequency changes.
+
+------------------------------------------------------------------------

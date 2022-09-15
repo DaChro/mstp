@@ -1,0 +1,7 @@
+---
+title: "labs"
+---
+
+## Spatio-temporal Modelling
+
+This project contains the lab sheets (and solutions) of the Lab in "Modellierung dynamischer räumlicher Prozesse"...
