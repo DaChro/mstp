@@ -1,0 +1,347 @@
+---
+title: "Spatio-temporal Modelling, Lab 3, YYYY-MM-DD"
+format: html
+editor: visual
+---
+
+## One-dimensional search with golden section
+
+The function `optimize` (or, for that sake, `optimise`) optimizes a one-dimensional function. It uses a combination of golden section search and another approach. Let us try to fit the phase of a sin function.
+
+```{r}
+phase = 1.23456789
+x = runif(10) * 2 * pi
+y = sin(x + phase)
+plot(x, y, pch = 3, xlim = c(0, 2 * pi), ylim = c(-1, 1))
+xx = seq(0, 2 * pi, length = 1000)
+lines(xx, sin(xx + phase), col = "red")
+```
+
+```{r}
+f = function(x, y, phase) sum((y - sin(x + phase))^2)
+optimize(f, c(0, pi), x = x, y = y)
+```
+
+The optimization looks quite good, but approximates.
+
+------------------------------------------------------------------------
+
+### *Exercise 3.1* {.unnumbered}
+
+*How many parameters were fitted?*
+
+**Answer**: Only `phase` hase been optimized. Though `x` and `y` are given as objective function arguments, they have been defined before and are passed to the `...` arguments of `optimize()`.
+
+------------------------------------------------------------------------
+
+The function `optimize` has a parameter `tol`. Let?s check whether more significant digits were fitted correctly, if we set the following value:
+
+```{r}
+out = optimize(f, c(0, pi), x = x, y = y, tol = 1e-08)
+print(out$minimum, digits = 10)
+```
+
+------------------------------------------------------------------------
+
+### *Exercise 3.2* {.unnumbered}
+
+*Is this fit better? Did optimize get the full 9 (or more) digits right?*
+
+**Answer**:
+
+If we check the help of the function `optimize` we can see, that the default tolerance is
+
+```{r}
+.Machine$double.eps^0.25
+```
+
+Now we used `1e-08` which is less. Thus, this fit is better, as we can see when printing the result with more digits:
+
+```{r}
+print(out$minimum, digits = 10)
+```
+
+------------------------------------------------------------------------
+
+### *Exercise 3.3(i)* {.unnumbered}
+
+*What is the other approach used? Search for the explanation of this method (English wikipedia), and briefly describe in your own words how it works.*
+
+**Answer**: The other approach is **successive parabolic interpolation**. The algorithm works as follows:
+
+1.  We start at three points $a_0,b_0,c_0$ with $a_0 < b_0 < c_0$ and $f(b_0) < f(c_0) \land f(b_0) < f(a_0)$ to make sure there is a minimum in $[a_0,c_0]$. Set $i=0$.
+
+2.  Compute a parabola through the points $\{(a_i,f(a_i)), (b_i,f(i)), (c_i,f(c_i))\}$ and compute its vertex / minimum $(x_i,f(x_i))$. (Both steps are computationally straightforward.)
+
+3.  if $x_i - b_i$ is less than a given tolerance, stop and return $\mathrm{argmin}(f(x_i), f(b_i))$. Else, repeat with point triple: $(a_{i+1},b_{i+1},c_{i+1}) = (b_{i},c_{i},x_i)$
+
+------------------------------------------------------------------------
+
+### *Exercise 3.4 (ii)* {.unnumbered}
+
+*Compare its properties to golden section search. What are the differences/similarities between both methods?*
+
+**Answer**:
+
+*Similarities*:
+
+Both methods
+
+-   work for unimodal, one-dimensional functions
+-   iteratively nest intervals
+-   do not need the derivative of the objective function
+
+*Differences*:
+
+-   SPI approximates the function by parabolas to compute new interval boundaries, GSS simply selects the best of two candidates that are located according to the golden ratio.
+
+------------------------------------------------------------------------
+
+### *Exercise 3.5 (iii)* {.unnumbered}
+
+*Explain why this method is used as well (hint: robustness/efficiency of optimization methods).*
+
+**Answer**: SPI computes approximations and thus works best (less iterations) for smooth objective functions. GSS might be more robust in general but slower for smooth functions. Combining both methods can often improve the robustness and speed.
+
+------------------------------------------------------------------------
+
+## Linear and non-linear least squares
+
+As a preparation, go through the course slides; if you missed the lecture you may want to go through the Gauss-Newton algorithm, e.g. on [English wikipedia](http://en.wikipedia.org/wiki/Gauss%E2%80%93Newton_algorithm).
+
+### Linear least squares: Step-By-Step
+
+First, we will try a step by step example using R. Consider the following data set:
+
+| $x_1$ | $x_2$ | $y$ |
+|:-----:|:-----:|:---:|
+|   0   |   0   |  5  |
+|   0   |   1   |  7  |
+|   0   |   2   |  6  |
+|   1   |   0   |  5  |
+
+and try to find the coefficients $b_0$, $b_1$ and $b_2$ of the linear regression equation (a trend surface in three dimensions).
+
+$$y = b_0 + b_1 x_1 + b_2 x_2 + e$$
+
+*Hint: Try to define the matrices X and the vector y and use the solve function for computing* $b_0$, $b_1$, and $b_2$.
+
+------------------------------------------------------------------------
+ 
+### *Exercise 3.6* {.unnumbered}
+
+*Report the values of the coeffients found and give the full equation; compute R (the sum of the squared residuals) ; report the steps used to compute R and the value found.*
+
+**Answer**:
+
+We need to solve the normal equations: $(X^TX)b = X^T y$. Therefore we first need to create $X$ and $y$ from the data:
+
+```{r, results='hide'}
+X = cbind(c(1, 1, 1, 1), c(0, 0, 0, 1), c(0, 1, 2, 0))
+y = c(5, 7, 6, 5)
+```
+
+Notice that we added a column of $1$s to include an intercept $b_0$ (rewrite $b_0$ as $b_0 \cdot 1$).
+
+We can use the `t()`, `%*%`, and `solve()` functions in R to transpose a matrix, multiply two matrices, and solve a linear equation system respectively:
+
+```{r}
+b = solve(t(X) %*% X, t(X) %*% y)
+b
+```
+
+The resulting trend model is: $$y = 5.5 - 0.5 x_1 + 0.5 x_2 + e$$
+
+To compute the sum of squared residuals, we can multiply $X$ with $b$ which yields the vector of predictions, subtract it from the vector of measured $y$, and compute its element-wise squared sum.
+
+```{r}
+lsq.ssr = sum((y - X %*% b)^2)
+lsq.ssr
+```
+
+------------------------------------------------------------------------
+
+### Linear least squares: by lm
+
+Fit the same model and check your results, found above:
+
+```{r}
+x1 = c(0, 0, 0, 1)
+x2 = c(0, 1, 2, 0)
+y = c(5, 7, 6, 5)
+d = data.frame(x1 = x1, x2 = x2, y = y)
+summary(lm(y ~ x1 + x2, d))
+```
+
+### Non-linear least squares: using nls
+
+Function nls uses a formula as its first argument, and a data frame as its second argument. In the [R introduction chapter 11](http://cran.r-project.org/doc/manuals/R-intro.html#Statistical-models-in-R), statistical models expressed as formula are explained. The general explanation here is on linear (and generalized linear) models.
+
+Function nls uses, just like lm, a formula to define a model. It differs from lm formulas in that coefficients need to be named explicitly. In linear models, the coefficients are implicit, e.g. linear regression uses the function lm (linear model). Look at the following example.
+
+```{r}
+load("./data/meteo.RData")
+lm(T.outside ~ hours, meteo)
+```
+
+```{r}
+summary(lm(T.outside ~ hours, meteo))
+```
+
+This fits and summarizes the linear regression model
+
+$$\textrm{T.outside} = \beta_0 + \beta_1 \textrm{hours} + e, $$
+
+Here, $\beta_0$ (intercept) and $\beta_1$(slope) are implicit, and not named in the formula.
+
+For non-linear models, we need to name coefficients explicitly, as they may in principle appear anywhere. In the example below, the now familiar sinus model is refitted using function nls, which uses Gauss-Newton optimization, and the coefficients are named a, b and c in the formula.
+
+### Initial conditions
+
+Try to fit the following two models:
+
+```{r}
+nls(T.outside ~ a + b * sin(pi * (hours + c)/12), meteo, c(a = 0, b = 1, c = 0))
+```
+
+```{r}
+nls(T.outside ~ a + b * sin(pi * (hours + c)/12), meteo, c(a = 0, b = 1, c = 2))
+```
+
+The two fits provide different outcomes.
+
+------------------------------------------------------------------------
+
+### *Exercise 3.7* {.unnumbered}
+
+*What does the third argument to nls contain, and why does it change the outcome?*
+
+**Answer**: The third argument defines the starting values for numerical optimization. Based on the starting values, the Gauss-Newton algorithm might find different (local) minima.
+
+------------------------------------------------------------------------
+
+### *Exercise 3.8* {.unnumbered}
+
+*Does one of the models give a better fit?*
+
+Results differ in estimation of the phase parameter $c$ and in the sign of $b$. However, both fits yield the same sum of squared errors. Having a closer look at the values shows that the difference of both estimations for $c$ is $1.604 - (-10.396) = 12$. Both fits are essentially the same models, recall that $\sin (a) = -\sin(a + \pi)$.
+
+------------------------------------------------------------------------
+
+The following fit:
+
+```{r,echo=TRUE,eval=FALSE}
+nls(T.outside ~ a + b * sin(pi * (hours + c)/12), meteo, c(a = 0, b = 0, c = 0))
+```
+
+gives an error message.
+
+------------------------------------------------------------------------
+
+### *Exercise 3.9* {.unnumbered}
+
+*Explain why the error occured.*
+
+Our parameter space is $\theta = (a,b,c)$ where the model is again
+
+$$y = a + b \sin(\pi  (x + c)/12) + e$$
+
+where $x$ is `meteo$hours` and $y$ is `meteo$T.outside`.
+
+For all our measurements $y_1,...,y_n$, we create residual functions with parameters as input and the prediction error as output:
+
+$$
+r_i(a,b,c) := y_i - (a + b \sin(\pi (x_i+c)/12)) = y_i - a - b \sin(\pi (x_i+c)/12)
+$$
+
+The partial derivative of $r_i$ for $c$ is $$
+\frac{\partial r_i}{\partial c} = \frac{-b \pi}{12} \cos\left(\frac{\pi*(x_i+c)}{12}\right) 
+$$
+
+If we set $b=0$ as a starting value, partial derivatives of all residual functions are $0$. The third column of the Jacobian that is 0 and the matrix then becomes singular (not invertible):
+
+$$
+J= 
+\begin{pmatrix}
+\frac{\partial r_1}{\partial a} & \frac{\partial r_1}{\partial b} & \frac{\partial r_1}{\partial c} \\
+\vdots & \vdots & \vdots \\
+\frac{\partial r_n}{\partial a} & \frac{\partial r_n}{\partial b} & \frac{\partial r_n}{\partial c}
+\end{pmatrix}
+\\
+=
+\begin{pmatrix}
+-1 & - \sin(\pi (x_1+c)/12) & \frac{-b \pi}{12} \cos\left(\frac{\pi (x_1+c)}{12}\right) \\
+\vdots & \vdots & \vdots \\
+-1 & - \sin(\pi (x_n+c)/12) & \frac{-b \pi}{12} \cos\left(\frac{\pi (x_n+c)}{12}\right)
+\end{pmatrix} 
+\\
+=
+\begin{pmatrix}
+-1 & - \sin(\pi (x_1+c)/12) & 0 \\
+\vdots & \vdots & \vdots \\
+-1 & - \sin(\pi (x_n+c)/12) & 0
+\end{pmatrix}
+$$
+
+However, the iteration step of Gauss Newton needs $(J^T J)^{-1}$ and $J^T J$ also has a zero column (and row).
+
+------------------------------------------------------------------------
+
+### *Exercise 3.10* {.unnumbered}
+
+*Compute the first three rows of the Jacobian matrix by hand.*
+
+**Answer:** We have seen that the Jacobian is: $$
+J = 
+\begin{pmatrix}
+-1 & - \sin(\pi (x_1+c)/12) & \frac{-b \pi}{12} \cos\left(\frac{\pi (x_1+c)}{12}\right) \\
+\vdots & \vdots & \vdots \\
+-1 & - \sin(\pi (x_n+c)/12) & \frac{-b \pi}{12} \cos\left(\frac{\pi (x_n+c)}{12}\right)
+\end{pmatrix}
+$$
+
+We need $x_1,x_2,x_3$:
+
+```{r}
+meteo$hours[1:3]
+```
+
+$$
+J = 
+\begin{pmatrix}
+-1 & - \sin(\pi (14.91667+c)/12) & \frac{-b \pi}{12} \cos\left(\frac{\pi (14.91667+c)}{12}\right) \\
+-1 & - \sin(\pi (14.93333+c)/12) & \frac{-b \pi}{12} \cos\left(\frac{\pi (14.93333+c)}{12}\right) \\
+-1 & - \sin(\pi (14.95000+c)/12) & \frac{-b \pi}{12} \cos\left(\frac{\pi (14.95000+c)}{12}\right) \\
+\vdots & \vdots & \vdots \\
+\end{pmatrix}
+$$
+
+Setting the starting values $a = b = c = 0$ yields:
+
+$$
+J_0 = 
+\begin{pmatrix}
+-1 & 0.6915137 & 0 \\
+-1 & 0.6946577 & 0 \\
+-1 & 0.6977905 & 0 \\
+\vdots & \vdots & \vdots \\
+\end{pmatrix}
+$$
+
+------------------------------------------------------------------------
+
+### Iteration
+
+The consecutive steps of the optimization are shown when a trace is requested.
+
+```{r}
+nls(T.outside ~ a + b * sin(pi * (hours + c)/12), meteo, c(a = 0, b = 1, c = 0), trace = TRUE)
+```
+
+------------------------------------------------------------------------
+
+### *Exercise 3.11* {.unnumbered}
+
+*What is the meaning of the four columns of additional output?*
+
+**Answer:** The first column prints values of the objective function whereas colums 2 to 4 show used parameter values. ---

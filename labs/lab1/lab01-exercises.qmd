@@ -1,0 +1,135 @@
+---
+title: "Spatio-temporal Modelling, Lab 1, YYYY-MM-DD"
+format: html
+editor: visual
+---
+
+## Allgemeine Informationen
+
+**Kontakt:**
+
+Christian Knoth
+
+-   Mail: [christianknoth\@uni-muenster.de](mailto:christianknoth@uni-muenster.de){.email}
+-   Raum: 137
+
+LearnWeb:
+
+Übungen:
+
+-   müssen nicht eingereicht werden
+-   werden nicht korrigiert
+
+ABER:
+
+-   sind wichtig um die Inhalte der Vorlesung besser zu verstehen
+-   zeigen wie man die Modelle, die in der Vorlesung behandelt werden, in der Praxis anwenden kann
+-   sind wichtig, um die Klausur zu bestehen
+
+Heute werden wir uns mit einigen Grundlagen von [R Studio](http://www.rstudio.com/ide/) beschäftigen.
+
+Im Anschluss werdet ihr an den ersten Übungen arbeiten, die sich um random walk Prozesse drehen.
+
+Wenn Ihr Eure R-Kenntnisse auffrischen oder etwas nachschlagen wollt, könnte dies hier nützlich für Euch sein: [R introduction](http://cran.r-project.org/doc/manuals/r-release/R-intro.html)
+
+## RStudio
+
+Schritte:
+
+1.  Ladet RStudio [hier](http://www.rstudio.com/ide/download/) herunter und installiert es.
+2.  Die Grundlagen von RStudio sind hier beschrieben: [documentation page](http://www.rstudio.com/ide/docs/). Bitte lest sie und pobiert zumindest den Abschnitt **Using RStudio**. Findet heraus wie man das Hilfe-Fenster verwendet.
+
+## Generierung von Random Walk Daten
+
+Für die erste Übung müssst Ihr Zufallszahlen generieren. Dieses Beispiel erstellt 10 Zufallszahlen aus der Standarnormalverteilung mit Hilfe der **rnorm** Funktion:
+
+```{r}
+xr = rnorm(10)
+xr
+```
+
+Das Ergebnis wird im unteren Fenster angezeigt. **norm** steht für die Normalverteilung und das **r**-Präfix für das Generieren von Zufallszahlen. Seht Euch die Hilfe zu **rnorm** im Hilfe-Fenster in RStudio an. Ihr könnt auch andere Präfixe für **norm** verwenden: **dnorm** liefert die Dichte für Quantile (Dichtefunktion), **pnorm** den Wert der Verteilungsfunktion für Quantile und **qnorm** die Quantile für Wahrscheinlichkeiten.
+
+Das folgende Beispiel plottet die Dichtefunktion der Standardnormalverteilung. Um die die Dichtewerte zu bekommen, verwenden wir die **seq**-Funktion, die die Quantile generiert. Wir übergeben dann die Werte (**x**) an die Dichtefunktion (**dnorm**) und schließlich die beiden Vektoren (**x**,**xd**) an die **plot**-Funktion. **type=l** bedeutet, dass eine Linie im Plot gezeichnet werden soll (lasst diesen Parameter weg und seht, was passiert)
+
+```{r fig.width=5, fig.height=4}
+x = seq(from=-4, to=4, by=0.1)
+xd = dnorm(x)
+plot(x,xd,type="l")
+```
+
+Wir können das gleiche auch mit der Verteilungsfunktion machen:
+
+```{r fig.width=5, fig.height=4}
+xp = pnorm(x)
+plot(x,xp,type="l")
+```
+
+Zurück zu unserer Übung: Wir können die **cumsum**-Funktion benutzen um die kumulative Summe zu berechnen. Diese kann dann benutzt werden um den Random Walk-Prozess zu generieren wie in Übung 1. Wir können die Ergebnisse auch plotten.
+
+```{r fig.width=5, fig.height=4}
+xr
+xcs = cumsum(xr)
+xcs
+plot(cumsum(rnorm(1000)),type='l')
+plot(cumsum(rnorm(10000)),type='l')
+```
+
+### *Übung 1.1* {.unnumbered}
+
+*Steigt der Random Walk Prozess generell an, fällt er ab oder hat er keine dominante Richtung?*
+
+### *Übung 1.2* {.unnumbered}
+
+    var(cumsum(rnorm(10)))
+    var(cumsum(rnorm(100)))
+    var(cumsum(rnorm(1000)))
+    var(cumsum(rnorm(10000)))
+    var(cumsum(rnorm(100000)))
+    var(cumsum(rnorm(1000000)))
+
+*Erklärt warum ein Random Walk eine Varianz hat, die mit der Zeit zunimmt!*
+
+## Generierung von AR-Prozessen
+
+Seht Euch die folgende Funktion zur Generierung eines AR-Prozesses an.
+
+```{r}
+generate.ar <- function(n, beta, sd=1)
+{
+  ar = rnorm(length(beta),0,sd)
+  for (t in (length(beta)+1):n) {
+    y <- sum(ar[(t-1):(t-length(beta))] * beta) + rnorm(1,0,sd)
+    ar = c(ar,y)
+  }
+  return(ar)
+}
+```
+
+Die Parameter können wie folgt beschrieben werden:
+
+-   `n` beschreibt die Länge der Zeitreihe, die erstellt werden soll
+-   `beta` ist ein Vektor mit AR-Koeffizienten, wobei `length(beta)` die Ordnung des AR-Prozesses bestimmt
+-   `sd` repräsentiert die Standardabweichung der normalverteilten Innovationen $\epsilon_i$.
+
+Der folgende Aufruf generiert und plottet einen AR(2)-Prozess mit den Koeffizienten $(0.5,0.2)$
+
+```{r fig.width=5, fig.height=4}
+plot(generate.ar(1000, c(0.5,0.2)), type="l")
+```
+
+### *Übung 1.3* {.unnumbered}
+
+*Welche Werte für `beta` kann man nutzen, um (i) weißes Rauschen (white noise) und (ii) 'random walk'- Prozesse zu erstellen?*
+
+### *Übung 1.4* {.unnumbered}
+
+*Betrachtet den AR(2) Prozess oben: Steigt seine Varianz mit der Länge an?*
+
+### *Übung 1.5* {.unnumbered}
+
+Die R-Funktionen `acf()` und `pacf()` erstellen einen Plot der empirischen (partiellen) Autokorrelation einer gegebenen Zeitreihe (siehe `?acf` und `?pacf` für mehr Details).
+
+*Generiert einige AR-Prozesse unterschiedlicher Ordnung und probiert verschiedenene Werte für `beta`. Plottet sowohl Autokorrelation als auch partielle Autokorrelation und beschreibt wie diese sich mit unterschiedlicher Länge und unterschiedlichen Parameterwerten verändern.*
+
+**Beachte:** Die Koeffizienten müssen vorsichtig gewählt werden um valide Prozesse zu generieren. Als Faustregel kann die Formel genutzt werden $\sum |\beta_i| < 1$.

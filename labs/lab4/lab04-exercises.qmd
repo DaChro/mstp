@@ -1,0 +1,288 @@
+---
+title: "Spatio-temporal Modelling, Lab 4, YYYY-MM-DD"
+format: html
+editor: visual
+---
+
+**This exercise will be discussed on YYYY-MM-DD.**
+
+## Fun with Metropolis
+
+The Metropolis algorithm is a simplified version of the Metropolis-Hastings algorithm (see [English wikipedia](https://en.wikipedia.org/wiki/Metropolis-Hastings_algorithm)), and provides a search algorithm for finding global optima, and sampling the (posterior) parameter distribution, given the data.
+
+Let $P(\theta)$ be the probability that parameter value $\theta$ has the right value, given the data.
+
+The metropolis algorithm considers proposal values $\theta'$ for the parameter vector, and accepts them if, given the current value $\theta_i$, the ratio $\alpha = \frac{P(\theta')}{P(\theta_i)}$ is
+
+-   larger than one (meaning $\theta'$ is an improvement), or
+-   larger than a random value drawn uniformly between 0 and 1, meaning that we accept worse parameters quite often if they're not too much worse.
+
+### An R function for Metropolis
+
+The following code block contains a self-written function that computes the Metropolis algorithm:
+
+```{r}
+Metropolis = function(theta0, sigma, y, fn, n = 1000) {
+    m = length(theta0)
+    out = matrix(NA, n, m)
+    out[1, ] = theta0  # starting value for the chain
+    lastRSS = sum((y - fn(theta0))^2)
+    accept = 0
+    for (i in 2:n) {
+        proposal = rnorm(m, out[i - 1, ], sigma)
+        residualSumSquaresProp = sum((y - fn(proposal))^2)
+        s2 = lastRSS/length(y)
+        # ratio = exp(-residualSumSquaresProp)/exp(-residualSumSquares0) THIS IS
+        # numerically unstable: therefor use
+        ratio = exp(-residualSumSquaresProp/(2 * s2) + lastRSS/(2 * s2))
+        if (ratio > 1 || runif(1) < ratio) {
+            # accept
+            out[i, ] = proposal
+            accept = accept + 1
+            if (ratio > 1) 
+                lastRSS = residualSumSquaresProp
+        } else out[i, ] = out[i - 1, ]
+    }
+    cat("acceptance rate: ", accept/(n - 1), "\n")
+    class(out) = c("Metropolis", "matrix")
+    out
+}
+```
+
+You don´t need to understand every detail of this function, but if you are interested in why the ratio $\alpha$ is computed like it is here, have a look at the [likelihood function for the normal distribution](https://en.wikipedia.org/wiki/Normal_distribution#Estimation_of_parameters). Also recall that using $\exp(a)/\exp(b) = \exp(a-b)$ is needed for numerical stability.
+
+Important to note here is the meaning of the parameters:
+
+-   `theta0` is a vector containg starting values for the parameters to be optimized
+-   `sigma` is the standard deviation of the proposal distribution, i.e. the normal distribution to draw parameter proposals from
+-   `y` is the data to fit the parameters to
+-   `fn` is the function to be fitted
+-   `n` is the number of iterations
+
+Insert the function in your working environment by copying and pasting the whole block. Let's try and see if it works. First we will recollect the non-linear least squares fit with nls and use that as a starting condition (i.e., we use the *fitted parameters* as starting values):
+
+```{r}
+load("./data/meteo.RData")
+t.nls = nls(T.outside ~ a + b * sin(pi * (hours + c)/12), meteo, c(a = 0, b = 1, c = 2))
+f = function(x) {
+    x[1] + x[2] * sin(pi * (hours + x[3])/12)
+}
+temp = meteo$T.outside
+hours = meteo$hours
+coef(t.nls)
+```
+
+```{r}
+out = Metropolis(coef(t.nls), c(0.1, 0.1, 0.1), temp, f, n = 5000)
+```
+
+```{r}
+out[1:10, ]
+```
+
+```{r}
+out[4990:5000, ]
+```
+
+We can try to see what happened to the three parameters if we plot them. For this we will make a little dedicated plot function, called `plot.Metropolis`. It will be automatically called for objects of class Metropolis
+
+```{r}
+class(out)
+```
+
+Here's the plot function:
+
+```{r}
+plot.Metropolis = function(x, ...) {
+    oldpar = par()
+    par(mfrow = c(ncol(x), 1), mar = rep(2, 4))
+    apply(x, 2, function(x) plot(x, type = "l", ...))
+    par(oldpar)  # restore previous settings
+}
+```
+
+that you should load in the environment, just like the metropolis function before. Try it with:
+
+```{r, warning=FALSE}
+plot(out)
+```
+
+Note that now your own plot.Metropolis has been called, because Metropolis is the class of out (we actively assigned the class "Metropolis" (and "matrix") to the output of objects created by our self-written function above when we did `class(out) = c("Metropolis", "matrix")`).
+
+------------------------------------------------------------------------
+
+### *Exercise 4.1* {.unnumbered}
+
+*Which percentage of the proposals was rejected, and how could you decrease this percentage?*
+
+------------------------------------------------------------------------
+
+Compare the values found with those obtained with `nls` e.g. by:
+
+```{r}
+confint(t.nls)
+```
+
+```{r}
+t(apply(out, 2, quantile, probs = c(0.025, 0.975)))
+```
+
+### The effect of sigma
+
+Let's first try a very small sigma.
+
+```{r, warning=F}
+out1 = Metropolis(coef(t.nls), rep(0.3, 3), temp, f, n = 5000)
+plot(out1)
+```
+
+```{r, warning=F}
+out2 = Metropolis(coef(t.nls), rep(0.1, 3), temp, f, n = 5000)
+plot(out2)
+```
+
+```{r, warning=F}
+out3 = Metropolis(coef(t.nls), rep(0.05, 3), temp, f, n = 5000)
+plot(out3)
+```
+
+```{r, warning=F}
+out4 = Metropolis(coef(t.nls), rep(0.01, 3), temp, f, n = 5000)
+plot(out4)
+```
+
+------------------------------------------------------------------------
+
+### *Exercise 4.2* {.unnumbered}
+
+*Which chain becomes stationary, meaning that it fluctuates sufficiently for a long time over the same area?*
+
+------------------------------------------------------------------------
+
+### *Exercise 4.3* {.unnumbered}
+
+*Which of the chains do not mix well?*
+
+------------------------------------------------------------------------
+
+### Computing summary statistics
+
+A useful function for doing something for each row or column is `apply()`. Read its help page, and try
+
+```{r}
+apply(out4, 2, summary)
+```
+
+Another way of looking into the results is by plotting them; one naive plot is
+
+```{r}
+plot(out4[, 1], out4[, 2])
+```
+
+It should however be reminded that a Metropolis chain contains by construction serial correlation; a plot that reveals that is the line plot
+
+```{r}
+plot(out4[, 1], out4[, 2], type = "l")
+```
+
+Univarite distribution plots can be obtained by `hist()` and `qnorm()`, e.g..
+
+```{r}
+qqnorm(out4[, 2])
+```
+
+------------------------------------------------------------------------
+
+### *Exercise 4.4* {.unnumbered}
+
+*Does parameter x\[1\] approximately follow a normal distribution?*
+
+------------------------------------------------------------------------
+
+### Initial values and Burn-in
+
+Above, we started a Metropolis chain using fitted values from `nls` now we will use arbitrary, much worse values:
+
+```{r, warning=F}
+out = Metropolis(c(0, 0, 0), rep(0.3, 3), temp, f, n = 5000)
+plot(out)
+```
+
+```{r, warning=F}
+out = Metropolis(c(0, 0, 0), rep(0.1, 3), temp, f, n = 5000)
+plot(out)
+```
+
+```{r, warning=F}
+out = Metropolis(c(0, 0, 0), rep(0.03, 3), temp, f, n = 5000)
+plot(out)
+```
+
+The burn-in period is the period that the chain needs to go from the initial values to the region where it becomes stationary.
+
+------------------------------------------------------------------------
+
+### *Exercise 4.5* {.unnumbered}
+
+*For the different values of sigma, how long does it take before the chain becomes stationary?*
+
+------------------------------------------------------------------------
+
+### *Exercise 4.6* {.unnumbered}
+
+*How do you compute (give the R command) the mean and summary statistics for a chain **ignoring** the burn-in values?*
+
+------------------------------------------------------------------------
+
+## Simulated Annealing
+
+Not surprisingly, numeric optimization is an area with many applications in statistics. An overview of all the optimization methods avaible in R and its contributed packages can be found in the [R Task View on optimization](https://cran.r-project.org/web/views/Optimization.html) (please note there is also a Task View on Spatial issues).
+
+Simulated annealing is available as a method provided by the generic optimization function `optim()`. Read the help page of this function and answer the following question.
+
+------------------------------------------------------------------------
+
+### *Exercise 4.7* {.unnumbered}
+
+*Why is simulated annealing not a generic-purpose optimization method?*
+
+------------------------------------------------------------------------
+
+Suppose we want to find the mean, scale and phase of the temperature data, and are looking for the model that best fits in terms of least absolute deviations. Define the function
+
+```{r}
+fmin = function(x) {
+    sum(abs(temp - (x[1] + x[2] * sin(pi * (hours + x[3])/12))))
+}
+optim(c(1, 1, 1), fmin, method = "SANN", control = list(trace = 1))
+```
+
+------------------------------------------------------------------------
+
+### *Exercise 4.8* {.unnumbered}
+
+*What do the various output elements mean?*
+
+------------------------------------------------------------------------
+
+Compare two runs of simulated annealing:
+
+```{r}
+x1 = optim(c(1, 1, 1), fmin, method = "SANN")
+x2 = optim(c(1, 1, 1), fmin, method = "SANN")
+x1$par - x2$par
+```
+
+------------------------------------------------------------------------
+
+### *Exercise 4.9* {.unnumbered}
+
+*Explain why the parameters are equal/not equal.*
+
+------------------------------------------------------------------------
+
+### *Exercise 4.10* {.unnumbered}
+
+*Use simulated annealing to find the least squares solution; give the function used, and compare the resulting parameter values with the least absolute error solution.*
+
+------------------------------------------------------------------------

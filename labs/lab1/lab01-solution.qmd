@@ -1,0 +1,226 @@
+---
+title: "Spatio-temporal Modelling, Lab 1, YYYY-MM-DD"
+format: html
+editor: visual
+---
+
+## Allgemeine Informationen
+
+**Kontakt:**
+
+Christian Knoth
+
+-   Mail: christianknoth\@uni-muenster.de
+-   Raum: 137
+
+LearnWeb:
+
+Übungen:
+
+-   müssen nicht eingereicht werden
+-   werden nicht korrigiert
+
+ABER:
+
+-   sind wichtig um die Inhalte der Vorlesung besser zu verstehen
+-   zeigen wie man die Modelle, die in der Vorlesung behandelt werden, in der Praxis anwenden kann
+-   sind wichtig, um die Klausur zu bestehen
+
+Heute werden wir uns mit einigen Grundlagen von [R Studio](http://www.rstudio.com/ide/) beschäftigen. Wenn Ihr R noch nicht kennt oder Eure Kenntnisse auffrischen wollt, könnte dies hier nützlich für Euch sein: [R introduction](http://cran.r-project.org/doc/manuals/r-release/R-intro.html)
+
+Im Anschluss werdet ihr an den ersten Übungen arbeiten, die sich mit random walk Prozessen beschäftigen.
+
+## RStudio
+
+Schritte:
+
+1.  Ladet RStudio [hier](http://www.rstudio.com/ide/download/) herunter und installiert es.
+2.  Die Grundlagen von RStudio sind hier beschrieben: [documentation page](http://www.rstudio.com/ide/docs/). Bitte lest sie und pobiert zumindest den Abschnitt **Using RStudio**. Findet heraus wie man das Hilfe-Fenster verwendet.
+
+## Generierung von Random Walk Daten
+
+Für die erste Übung müsst Ihr Zufallszahlen generieren. Dieses Beispiel erstellt 10 Zufallszahlen aus der Standarnormalverteilung mit Hilfe der **rnorm** Funktion:
+
+```{r}
+xr = rnorm(10)
+xr
+```
+
+Das Ergebnis wird im unteren Fenster angezeigt. **norm** steht für die Normalverteilung und das **r**-Präfix für das Generieren von Zufallszahlen. Seht Euch die Hilfe zu **rnorm** im Hilfe-Fenster in RStudio an. Ihr könnt auch andere Präfixe für **norm** verwenden: **dnorm** liefert die Dichte für Quantile (Dichtefunktion), **pnorm** den Wert der Verteilungsfunktion für Quantile und **qnorm** die Quantile für Wahrscheinlichkeiten.
+
+Das folgende Beispiel plottet die Dichtefunktion der Standardnormalverteilung. Um die die Dichtewerte zu bekommen, verwenden wir die **seq**-Funktion, die die Quantile generiert. Wir übergeben dann die Werte (**x**) an die Dichtefunktion (**dnorm**) und schließlich die beiden Vektoren (**x**,**xd**) an die **plot**-Funktion. **type=l** bedeutet, dass eine Linie im Plot gezeichnet werden soll (lasst diesen Parameter weg und seht, was passiert)
+
+```{r fig.width=5, fig.height=4}
+x = seq(from=-4, to=4, by=0.1)
+xd = dnorm(x)
+plot(x,xd,type="l")
+```
+
+Wir können das gleiche auch mit der Verteilungsfunktion machen:
+
+```{r fig.width=5, fig.height=4}
+xp = pnorm(x)
+plot(x,xp,type="l")
+```
+
+Zurück zu unserer Übung: Wir können die **cumsum**-Funktion benutzen um die kumulative Summe zu berechnen. Diese kann dann benutzt werden um den Random Walk-Prozess zu generieren wie in Übung 1. Wir können die Ergebnisse auch plotten.
+
+```{r fig.width=5, fig.height=4}
+xr
+xcs = cumsum(xr)
+xcs
+plot(cumsum(rnorm(1000)),type='l')
+plot(cumsum(rnorm(10000)),type='l')
+```
+
+### *Übung 1.1:* {.unnumbered}
+
+*Steigt der Random Walk Prozess generell an, fällt er ab oder hat er keine dominante Richtung?*
+
+**Antwort:**
+
+Es gibt keine dominante Richtung, der Mittelwert der Innovationen ist 0. Beachte als Beispiel die folgenden drei random walks.
+
+```{r}
+# Generiere und plotte drei unabhängige Realisierungen eines random walk Prozesses.
+f = cumsum(rnorm(1000))
+g = cumsum(rnorm(1000))
+h = cumsum(rnorm(1000))
+
+plot(f, type = "l", ylim=c(-60,60))
+lines(g, col = "red")
+lines(h, col = "blue")
+```
+
+### *Übung 1.2:* {.unnumbered}
+
+```{r}
+var(cumsum(rnorm(10)))
+var(cumsum(rnorm(100)))
+var(cumsum(rnorm(1000)))
+var(cumsum(rnorm(10000)))
+var(cumsum(rnorm(100000)))
+var(cumsum(rnorm(1000000)))
+```
+
+*Erklärt warum ein Random Walk eine Varianz hat, die mit der Zeit zunimmt!*
+
+**Antwort:**
+
+Random walk Prozesse können als Summen **unabhängiger** Zufallsvariablen $\epsilon_t, t=1,...n$ gesehen werden. Die Varianz ist per Definition immer positiv. Dadurch nimmt die Varianz der Zufallsvariablen $y_t = \sum_{i=1}^{t} \epsilon_i$ immer mit der Länge der Serie zu. Die empirische Varianz der kompletten Zeitreihe steigt daher ebenfalls mit der Länge der Serie.
+
+## Generierung von AR-Prozessen
+
+Seht Euch die folgende Funktion zur Generierung eines AR-Prozesses an.
+
+```{r}
+generate.ar <- function(n, beta, sd=1)
+{
+  innov<-rnorm(n,0,sd)
+  ar = innov[1:length(beta)]
+  for (i in (length(beta)+1):n) {
+    v <- sum(ar[(i-1):(i-length(beta))] * beta) + innov[i]
+    ar = c(ar,v)
+  }
+  return(ar)
+}
+```
+
+Die Parameter können wie folgt beschrieben werden:
+
+-   `n` beschreibt die Länge der Zeitreihe, die erstellt werden soll
+-   `beta` ist ein Vektor mit AR-Koeffizienten, wobei `length(beta)` die Ordnung des AR-Prozesses bestimmt
+-   `sd` repräsentiert die Standardabweichung der normalverteilten Innovationen $\epsilon_i$.
+
+Der folgende Aufruf generiert und plottet einen AR(2)-Prozess mit den Koeffizienten $(0.5,0.2)$
+
+```{r fig.width=5, fig.height=4}
+plot(generate.ar(1000, c(0.5,0.2)), type="l")
+```
+
+### *Übung 1.3:* {.unnumbered}
+
+*Welche Werte für `beta` kann man nutzen, um (i) weißes Rauschen (white noise) und (ii) 'random walk'- Prozesse zu erstellen?*
+
+**Antwort:**
+
+Wenn man für `beta` einen Vektor mit nur einer Zahl "0" einsetzt, erhält man einen AR-Prozess mit $\phi_1 = 0$ und damit: $y_t = 0*y_{t-1} + e_t$, also nichts anderes als weißes Rauschen: $y_t = e_t$
+
+```{r fig.width=5, fig.height=4}
+plot(generate.ar(1000, 0), type="l", main="Weißes Rauschen")
+```
+
+Wenn man für `beta` einen Vektor mit nur einer Zahl "1" einsetzt, erhält man einen AR-Prozess mit $\phi_1 = 1$ und damit: $y_t = 1*y_{t-1} + e_t$, also nichts anderes als einen ranrom walk: $y_t = y_{t-1} + e_t$
+
+```{r fig.width=5, fig.height=4}
+plot(generate.ar(1000, 1), type="l", main="Random walk")
+```
+
+### *Übung 1.4:* {.unnumbered}
+
+*Betrachtet den AR(2) Prozess oben: Steigt seine Varianz mit der Länge an?*
+
+**Antwort:**
+
+```{r}
+y <- generate.ar(10000,c(0.5,0.2))
+
+var(y[1:100])
+var(y[1:200])
+var(y[1:500])
+var(y[1:1000])
+var(y[1:5000])
+var(y[1:10000])
+
+ts.length = seq(from = 100,to=10000,by = 20)
+ts.var = sapply(ts.length,function(i) {var(y[1:i])})
+plot(x=ts.length, y=ts.var, type="l", ylab="Empricial Variance", xlab="Length of time series")
+```
+
+Nein. Prozesse mit dieser Eigenschaft werden auch manchmal als "(ko)-varianzstationär" bezeichnet, was bedeutet, dass die Variabilität des Prozesses nicht von $t$ abhängt.
+
+### *Übung 1.5:* {.unnumbered}
+
+Die R-Funktionen `acf()` und `pacf()` erstellen einen Plot der empirischen (partiellen) Autokorrelation einer gegebenen Zeitreihe (siehe `?acf` und `?pacf` für mehr Details).
+
+*Generiert einige AR-Prozesse unterschiedlicher Ordnung und probiert verschiedenene Werte für `beta`. Plottet sowohl Autokorrelation als auch partielle Autokorrelation und beschreibt wie diese sich mit unterschiedlicher Länge und unterschiedlichen Parameterwerten verändern.*
+
+**Beachte:** Die Koeffizienten müssen vorsichtig gewählt werden um valide Prozesse zu generieren. Als Faustregel kann die Formel genutzt werden $\sum |\beta_i| < 1$.
+
+**Antwort:**
+
+**Beispiel 1: AR1 mit beta = 0.1:**
+
+```{r}
+y <- generate.ar(10000,c(0.1))
+acf(y, main="AR1, beta=0.1")
+pacf(y, main="AR1, beta=0.1")
+```
+
+**Beispiel 2: AR1 mit beta = 0.9:**
+
+```{r}
+y <- generate.ar(10000,c(0.9))
+acf(y, main="AR1, beta=0.9")
+pacf(y, main="AR1, beta=0.9")
+```
+
+**Beispiel 3: AR5 mit beta = c(0.05,0.05,0.05,0.05,0.05):**
+
+```{r}
+y <- generate.ar(10000,c(0.05,0.05,0.05,0.05,0.05))
+acf(y, main="AR5, beta=c(0.05,0.05,0.05,0.05,0.05)")
+pacf(y, main="AR5, beta=c(0.05,0.05,0.05,0.05,0.05)")
+```
+
+**Beispiel 4: AR5 mit beta = c(0.3,0.2,0.2,0.1,0.1):**
+
+```{r}
+y <- generate.ar(10000,c(0.3,0.2,0.2,0.1,0.1))
+acf(y, main="AR5, beta=c(0.3,0.2,0.2,0.1,0.1)")
+pacf(y, main="AR5, beta=c(0.3,0.2,0.2,0.1,0.1)")
+```
+
+**Was können wir daraus lernen?**
+
+Die Ordnung eines AR-Prozesses beeinflusst die Autkorrelation und partielle Autokorrelation. Partielle Autokorrelation ist für gewöhnlich signifikant bis zu einer Anzahl an Lags gleich der AR-Ordnung. Die AR-Koeffizienten selbst beeinflusen zwar die Werte und Länge der ACF sowie die Werte der PACF, aber nicht die Länge der PACF.

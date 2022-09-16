@@ -1,0 +1,200 @@
+---
+title: "Spatio-temporal Modelling, Lab 3, YYYY-MM-DD"
+format: html
+editor: visual
+---
+
+**This excercise will be discussed on YYYY-MM-DD**
+
+------------------------------------------------------------------------
+
+## One-dimensional search with golden section
+
+The function `optimize` (or, for that sake, `optimise`) optimizes a one-dimensional function. It uses a combination of golden section search and another approach. Let us try to fit the phase of a sin function.
+
+```{r}
+phase = 1.23456789
+x = runif(10) * 2 * pi
+y = sin(x + phase)
+plot(x, y, pch = 3, xlim = c(0, 2 * pi), ylim = c(-1, 1))
+xx = seq(0, 2 * pi, length = 1000)
+lines(xx, sin(xx + phase), col = "red")
+```
+
+```{r}
+f = function(x, y, phase) sum((y - sin(x + phase))^2)
+optimize(f, c(0, pi), x = x, y = y)
+```
+
+The optimization looks quite good, but approximates.
+
+------------------------------------------------------------------------
+
+### *Exercise 3.1* {.unnumbered}
+
+*How many parameters were fitted?*
+
+------------------------------------------------------------------------
+
+The function `optimize` has a parameter `tol` . Let?s check whether more significant digits were fitted correctly, if we set the following value:
+
+```{r}
+out = optimize(f, c(0, pi), x = x, y = y, tol = 1e-08)
+print(out$minimum, digits = 10)
+```
+
+------------------------------------------------------------------------
+
+### *Exercise 3.2* {.unnumbered}
+
+*Is this fit better? Did optimize get the full 9 (or more) digits right?*
+
+------------------------------------------------------------------------
+
+### *Exercise 3.3(i)* {.unnumbered}
+
+*What is the other approach used? Search for the explanation of this method (English wikipedia), and briefly describe in your own words how it works.*
+
+------------------------------------------------------------------------
+
+### *Exercise 3.4 (ii)* {.unnumbered}
+
+*Compare its properties to golden section search. What are the differences/similarities between both methods?*
+
+------------------------------------------------------------------------
+
+### *Exercise 3.5 (iii)* {.unnumbered}
+
+*Explain why this method is used as well (hint: robustness/efficiency of optimization methods).*
+
+------------------------------------------------------------------------
+
+## Linear and non-linear least squares
+
+As a preparation, go through the course slides; if you missed the lecture you may want to go through the Gauss-Newton algorithm, e.g. on [English wikipedia](https://en.wikipedia.org/wiki/Gauss-Newton_algorithm).
+
+### Linear least squares: Step-By-Step
+
+First, we will try an example step by step using Rs. Consider the following data set:
+
+| $x_1$ | $x_2$ | $y$ |
+|:-----:|:-----:|:---:|
+|   0   |   0   |  5  |
+|   0   |   1   |  7  |
+|   0   |   2   |  6  |
+|   1   |   0   |  5  |
+
+and try to find the coefficients $b_0$, $b_1$ and $b_2$ of the linear regression equation
+
+$$y = b_0 + b_1 x_1 + b_2 x_2 + e$$
+
+(a trend surface in three dimensions), using the step-by-step example in the course slides. *Hint: Try to define the matrices X and the vector y and use the solve function for computing* $b_0$, $b_1$, and $b_2$.
+
+------------------------------------------------------------------------
+
+### *Exercise 3.6* {.unnumbered}
+
+*Report the values of the coeffients found and give the full equation; compute R (the sum of the squared residuals) ; report the steps used to compute R and the value found.*
+
+------------------------------------------------------------------------
+
+### Linear least squares: by lm
+
+Fit the same model and check your results, found above:
+
+```{r}
+x1 = c(0, 0, 0, 1)
+x2 = c(0, 1, 2, 0)
+y = c(5, 7, 6, 5)
+d = data.frame(x1 = x1, x2 = x2, y = y)
+summary(lm(y ~ x1 + x2, d))
+```
+
+### Non-linear least squares: using nls
+
+Function nls uses a formula as its first argument, and a data frame as its second argument. In the [R introduction chapter 11](http://cran.r-project.org/doc/manuals/R-intro.html#Statistical-models-in-R), statistical models expressed as formula are explained. The general explanation here is on linear (and generalized linear) models.
+
+Function nls uses, just like lm, a formula to define a model. It differs from lm formulas in that coefficients need to be named explicitly. In linear models, the coefficients are implicit, e.g. linear regression uses the function lm (linear model). Look at the following example.
+
+```{r}
+load("./data/meteo.RData")
+lm(T.outside ~ hours, meteo)
+```
+
+```{r}
+summary(lm(T.outside ~ hours, meteo))
+```
+
+This fits and summarized the linear regression model.
+
+$$\textrm{T.outside} = \beta_0 + \beta_1 \textrm{hours} + e, $$
+
+Here, $\beta_0$ (intercept) and $\beta_1$(slope) are implicit, and not named in the formula.
+
+For non-linear models, we need to name coefficients explicitly, as they may in principle appear anywhere. In the example below, the now familiar sinus model is refitted using function nls, which uses Gauss-Newton optimization, and the coefficients are named a, b and c in the formula.
+
+### Initial conditions
+
+Try to fit the following two models:
+
+```{r}
+nls(T.outside ~ a + b * sin(pi * (hours + c)/12), meteo, c(a = 0, b = 1, c = 0))
+```
+
+```{r}
+nls(T.outside ~ a + b * sin(pi * (hours + c)/12), meteo, c(a = 0, b = 1, c = 2))
+```
+
+The two fits provide different outcomes.
+
+------------------------------------------------------------------------
+
+### *Exercise 3.7* {.unnumbered}
+
+*What does the third argument to nls contain, and why does it change the outcome?*
+
+------------------------------------------------------------------------
+
+### *Exercise 3.8* {.unnumbered}
+
+*Does one of the models give a better fit?*
+
+------------------------------------------------------------------------
+
+The following fit:
+
+```{r,echo=TRUE,eval=FALSE}
+nls(T.outside ~ a + b * sin(pi * (hours + c)/12), meteo, c(a = 0, b = 0, c = 0))
+```
+
+gives an error message.
+
+------------------------------------------------------------------------
+
+### *Exercise 3.9* {.unnumbered}
+
+*Explain why the error occured.*
+
+------------------------------------------------------------------------
+
+### *Exercise 3.10* {.unnumbered}
+
+*Compute the first three rows of the Jacobian matrix by hand.*
+
+------------------------------------------------------------------------
+
+### Iteration
+
+The consecutive steps of the optimization are shown when a trace is requested.
+
+```{r}
+nls(T.outside ~ a + b * sin(pi * (hours + c)/12), meteo, c(a = 0, b = 1, c = 0), trace = TRUE)
+```
+
+------------------------------------------------------------------------
+
+### *Exercise 3.11* {.unnumbered}
+
+*What is the meaning of the four columns of additional output?*
+
+------------------------------------------------------------------------
