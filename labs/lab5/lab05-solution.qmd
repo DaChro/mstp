@@ -157,12 +157,14 @@ Try:
 
 ```{r,warning=F}
 library(rgdal)
-meuse.grid <- readGDAL("./data/meuse_grid.tif")
+meuse.grid <- as(readGDAL("./data/meuse_grid.tif"),"SpatialPixelsDataFrame")
 class(meuse.grid)
 ```
 
 ```{r}
 names(meuse.grid) <- c("part.a","part.b","dist","soil","ffreq")
+meuse.grid$soil <- as.factor(meuse.grid$soil)
+meuse.grid$ffreq <- as.factor(meuse.grid$ffreq)
 ```
 
 ```{r,warning=F}
@@ -248,6 +250,8 @@ meuse.grid.stars
 
 ```{r}
 names(meuse.grid.stars) <- c("part.a","part.b","dist","soil","ffreq")
+meuse.grid.stars$soil <- as.factor(meuse.grid.stars$soil)
+meuse.grid.stars$ffreq <- as.factor(meuse.grid.stars$ffreq)
 meuse.grid.stars
 ```
 
@@ -334,7 +338,7 @@ spplot(meuse.grid, c("tr1", "tr2", "tr3"), sp.layout = meuse.lt, main = "log(zin
 
 ```
 
-## sf and stars
+## sf/stars
 
 ```{r}
 meuse.grid.stars$tr1 = krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, degree = 1)$var1.pred
@@ -383,7 +387,7 @@ m = krige(log(zinc) ~ 1, meuse, meuse.grid, nmax = 10)
 spplot(m, "var1.pred", sp.layout = meuse.lt, main = "local 1st order trend")
 ```
 
-## sf and stars
+## sf/stars
 
 ```{r}
 m = krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, nmax = 10)
@@ -419,7 +423,7 @@ spplot(meuse.grid, c("idp0.5", "idp02", "idp05", "idp10"), sp.layout = meuse.lt,
     main = "log(zinc), inverse distance interpolation")
 ```
 
-## sf and stars
+## sf/stars
 
 ```{r}
 lzn.tp = idw(log(zinc) ~ 1, meuse.sf, meuse.grid.stars)
@@ -464,18 +468,21 @@ Nearest neighbor interpolation on a regular grid (creating Thiessen Polygons) is
 
 :::panel-tabset
 
+## sp
+
 ```{r,warning=F}
 lzn.tp = krige(log(zinc) ~ 1, meuse, meuse.grid, nmax = 1)
 spplot(lzn.tp, "var1.pred", sp.layout = meuse.lt, main = "Thiessen (or Voronoi) polygon interpolation of log(zinc)")
 ```
 
-## sf and stars
+## sf/stars
 
 ```{r}
 lzn.tp = krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, nmax = 1)
 tm_shape(lzn.tp)+tm_raster("var1.pred",n=10)+tm_shape(meuse.riv.sf)+tm_polygons()+tm_shape(meuse)+tm_symbols(shape = 3,size = 0.2,col="black")
 ```
 
+:::
 
 
 # Spatial prediction with multiple linear regression
@@ -484,42 +491,83 @@ In the data set `meuse` we have a large number of variables present that can be 
 
 Only few variables are available for this in `meuse.grid`:
 
+:::panel-tabset
+
+## sp
+
 ```{r, warning=F}
-library(sp)
-sp.theme(TRUE)
-data(meuse)
-data(meuse.grid)
+meuse.grid <- as(readGDAL("./data/meuse_grid.tif"),"SpatialPixelsDataFrame") #reload original data set
+names(meuse.grid) <- c("part.a","part.b","dist","soil","ffreq")
+meuse.grid$soil <- as.factor(meuse.grid$soil)
+meuse.grid$ffreq <- as.factor(meuse.grid$ffreq)
 names(meuse.grid)
 ```
+## sf/stars
+```{r}
+meuse.grid.stars <- read_stars("./data/meuse_grid.tif") #reload original data set
+meuse.grid.stars <- split(meuse.grid.stars, "band")
+names(meuse.grid.stars) <- c("part.a","part.b","dist","soil","ffreq")
+meuse.grid.stars$soil <- as.factor(meuse.grid.stars$soil)
+meuse.grid.stars$ffreq <- as.factor(meuse.grid.stars$ffreq)
+names(meuse.grid.stars)
+```
+
+:::
+
 
 Now try:
 
-```{r,warning=F}
+:::panel-tabset
+
+## sp
+
+```{r}
+
 lzn.lm = lm(log(zinc) ~ sqrt(dist), meuse)
 summary(lzn.lm)
-```
 
-```{r,warning=F}
+
 par(mfrow=c(1,2)) 
 plot(lzn.lm)
-```
 
-```{r,warning=F}
 plot(log(zinc) ~ sqrt(dist), meuse)
 abline(lzn.lm)
-```
 
 
-```{r, warning=F}
 lzn.pr = predict(lm(log(zinc) ~ sqrt(dist), meuse), meuse.grid, se.fit = TRUE)
 meuse.grid$lzn.fit = lzn.pr$fit
 spplot(meuse.grid, "lzn.fit")
-```
 
-```{r,warning=F}
 meuse.grid$se.fit = lzn.pr$se.fit
 spplot(meuse.grid, "se.fit")
 ```
+
+## sf/stars
+
+```{r}
+
+lzn.lm = lm(log(zinc) ~ sqrt(dist), meuse.sf)
+summary(lzn.lm)
+
+
+par(mfrow=c(1,2)) 
+plot(lzn.lm)
+
+plot(log(zinc) ~ sqrt(dist), meuse.sf)
+abline(lzn.lm)
+
+
+lzn.pr = predict(lm(log(zinc) ~ sqrt(dist), meuse.sf), meuse.grid.stars, se.fit = TRUE)
+meuse.grid.stars$lzn.fit = lzn.pr$fit
+
+
+tm_shape(meuse.grid.stars)+tm_raster("lzn.fit")
+meuse.grid.stars$se.fit = lzn.pr$se.fit
+tm_shape(meuse.grid.stars)+tm_raster("se.fit")
+
+```
+
+:::
 
 ------------------------------------------------------------------------
 
@@ -538,6 +586,10 @@ d)  because we have too little data close to the river and far away from the riv
 
 We can use the prediction errors provided by `lm` to calculate regression prediction intervals:
 
+:::panel-tabset
+
+## sp
+
 ```{r,warning=F}
 plot(log(zinc) ~ sqrt(dist), meuse)
 x = 0:100/100
@@ -552,8 +604,30 @@ lines(sqrt(x), pr[, 3], lty = "dashed", col = "blue")
 title("95% confidence intervals (blue) and prediction intervals (red)")
 ```
 
+## sf/stars
+
+```{r}
+plot(log(zinc) ~ sqrt(dist), meuse.sf)
+x = 0:100/100
+lzn.lm = lm(log(zinc) ~ sqrt(dist), meuse.sf)
+pr = predict(lzn.lm, data.frame(dist = x), interval = "prediction")
+abline(lzn.lm)
+lines(sqrt(x), pr[, 2], lty = "dashed", col = "red")
+lines(sqrt(x), pr[, 3], lty = "dashed", col = "red")
+pr = predict(lzn.lm, data.frame(dist = x), interval = "confidence")
+lines(sqrt(x), pr[, 2], lty = "dashed", col = "blue")
+lines(sqrt(x), pr[, 3], lty = "dashed", col = "blue")
+title("95% confidence intervals (blue) and prediction intervals (red)")
+```
+:::
+
+
 Next, we can make maps of the 95% prediction intervals:
 
+
+:::panel-tabset
+
+## sp
 ```{r,warning=F}
 pr = predict(lzn.lm, as.data.frame(meuse.grid), interval = "prediction")
 meuse.grid$fit = pr[, 1]
@@ -562,6 +636,19 @@ meuse.grid$lower = pr[, 2]
 spplot(meuse.grid, c("fit", "lower", "upper"), sp.layout = meuse.lt, layout = c(3, 
     1))
 ```
+
+## sf/stars
+
+```{r}
+pr = predict(lzn.lm, as.data.frame(meuse.grid.stars), interval = "prediction")
+meuse.grid.stars$fit = pr[, 1]
+meuse.grid.stars$upper = pr[, 3]
+meuse.grid.stars$lower = pr[, 2]
+tm_shape(meuse.grid.stars)+tm_raster(c("fit", "lower", "upper"))+tm_shape(meuse.riv)+tm_polygons()+tm_shape(meuse.sf)+tm_symbols(size = 0.2,shape = 3,col = "black")
+```
+
+:::
+
 
 Note that all these prediction intervals refer to prediction of single observations; confidence intervals for mean values (i.e., the regression line alone) are obtained by specifying interval = `"confidence"`.
 
@@ -581,9 +668,22 @@ c)  of approximately equal width
 
 Another regression model is obtained by relating zinc to flood frequency, try
 
+:::panel-tabset
+
+## sp
+
 ```{r,warning=F}
 plot(log(zinc) ~ ffreq, meuse)
 ```
+
+
+## sf/stars
+```{r}
+plot(log(zinc) ~ ffreq, meuse.sf)
+
+```
+
+:::
 
 ------------------------------------------------------------------------
 
@@ -625,19 +725,34 @@ c)  it needs to be independent of distance to the river
 
 Try the model in prediction mode:
 
+:::panel-tabset
+
+## sp
+
 ```{r,warning=F}
 lzn.lm2 = lm(log(zinc) ~ ffreq, meuse)
 summary(lzn.lm2)
-```
 
-```{r,warning=F}
 pr = predict(lzn.lm2, meuse.grid, interval = "prediction")
 meuse.grid$fit = pr[, 1]
 meuse.grid$upper = pr[, 3]
 meuse.grid$lower = pr[, 2]
-spplot(meuse.grid, c("fit", "lower", "upper"), sp.layout = meuse.lt, layout = c(3, 
-    1))
+spplot(meuse.grid, c("fit", "lower", "upper"), sp.layout = meuse.lt, layout = c(3,1))
 ```
+
+## sf/stars
+```{r}
+lzn.lm2 = lm(log(zinc) ~ ffreq, meuse.sf)
+summary(lzn.lm2)
+
+pr = predict(lzn.lm2, meuse.grid.stars, interval = "prediction")
+meuse.grid.stars$fit = pr[, 1]
+meuse.grid.stars$upper = pr[, 3]
+meuse.grid.stars$lower = pr[, 2]
+tm_shape(meuse.grid.stars)+tm_raster(c("fit", "lower", "upper"))+tm_shape(meuse.riv)+tm_polygons()+tm_shape(meuse.sf)+tm_symbols(size = 0.2,shape = 3,col = "black")
+```
+
+:::
 
 ------------------------------------------------------------------------
 
