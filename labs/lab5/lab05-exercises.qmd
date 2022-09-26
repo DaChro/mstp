@@ -7,32 +7,21 @@ editor: visual
 
 # Spatial modelling: introductory matter
 
-## Data sets
-
-Besides data that are typed in, or data that are imported through import functions such as `read.csv`, some data are already available in packages. In package `gstat` for example, a data set called `meuse` is available. To copy this data set to the current working data base, use, e.g. for the `meuse` data
-
-```{r}
-library(gstat)
-library(sp)
-data(meuse)
-objects()
-```
-
-```{r}
-summary(meuse)
-```
 
 ## meuse
 
 The meuse data set is a data set collected from the Meuse floodplain. The heavy metals analyzed are copper, cadmium, lead and zinc concentrations, extracted from the topsoil of a part of the Meuse floodplain, the area around Meers and Maasband (Limburg, The Netherlands). The data were collected during fieldwork in 1990 (Rikken and Van Rijn, 1993; Burrough and McDonnell, 1998).
 
-Load library `gstat` by
 
 ```{r}
 library(gstat)
+library(sp)
+library(rgdal)
+meuse <- readOGR("./data/meuse.gpkg")
+summary(meuse)
+objects()
 ```
 
-and read the documentation for the data set by `?meuse`
 
 ## Models: the formula interface; linear regression
 
@@ -43,9 +32,6 @@ Many models are variations of regression models. Here, we will illustrate an exa
 To calculate a linear regression model for the meuse data:
 
 ```{r}
-library(gstat)
-library(sp)
-data(meuse)
 zinc.lm = lm(zinc ~ dist, meuse)
 class(zinc.lm)
 ```
@@ -115,9 +101,6 @@ The R package `sp` provides classes and methods for spatial data; currently it c
 Try:
 
 ```{r,warning=F}
-library(sp)
-library(rgdal)
-meuse <- readOGR("./data/meuse.gpkg")
 class(meuse)
 ```
 
@@ -185,9 +168,6 @@ Note that `spplot` plots points on top of the grid, and the grid cells on top of
 
 R package `rgdal` provides several drivers for import/export of spatial data. We have used it above to read the vector and raster data `meuse`, `meuse.riv` and `meuse.grid`. An overview of available drivers for vector data (points, lines, polygons) can be obtained by
 
-```{r,warning=F}
-library(rgdal)
-```
 
 ```{r,warning=F}
 ogrDrivers()
