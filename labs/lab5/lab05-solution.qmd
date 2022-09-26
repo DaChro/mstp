@@ -267,12 +267,20 @@ tm_shape(meuse.grid)+tm_raster("dist",n=10)+tm_shape(meuse.riv.sf)+tm_polygons()
 ```
 
 ```{r}
-tm_shape(meuse.grid.stars)+tm_raster("dist",n=10)+tm_shape(meuse.riv)+tm_polygons()+tm_shape(meuse.sf)+tm_symbols(shape = 3,size = 0.2,col="black")
+bpy.palette <- bpy.colors()
+tm_shape(meuse.grid.stars) + 
+  tm_raster("dist",n=10, palette = bpy.palette) + 
+  tm_shape(meuse.riv) + 
+  tm_polygons() + 
+  tm_shape(meuse.sf) + 
+  tm_symbols(shape = 3,size = 0.2,col="black")
 ```
 
 ```{r}
 tmap_mode("view")
-tm_shape(meuse.grid.stars)+tm_raster("dist",n=10)+tm_shape(meuse.riv)+tm_polygons()
+tm_shape(meuse.grid.stars) + 
+  tm_raster("dist",n=10) + 
+  tm_shape(meuse.riv)+tm_polygons()
 tmap_mode("plot")
 ```
 
@@ -344,7 +352,14 @@ spplot(meuse.grid, c("tr1", "tr2", "tr3"), sp.layout = meuse.lt, main = "log(zin
 meuse.grid.stars$tr1 = krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, degree = 1)$var1.pred
 meuse.grid.stars$tr2 = krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, degree = 2)$var1.pred
 meuse.grid.stars$tr3 = krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, degree = 3)$var1.pred
-tm_shape(meuse.grid.stars)+tm_raster(c("tr1","tr2","tr3"),n=20)+tm_shape(meuse.riv.sf)+tm_polygons()+tm_shape(meuse)+tm_symbols(shape = 3,size = 0.2,col="black")+tm_facets(ncol = 3,nrow=1,free.scales = FALSE)+tm_layout(main.title = "log(zinc) trend surface interpolation",main.title.position ="center",main.title.size = 1.1, legend.outside.size = 0.1)
+tm_shape(meuse.grid.stars) + 
+  tm_raster(c("tr1","tr2","tr3"),n=20,title = "prediction", palette = bpy.palette) + 
+  tm_shape(meuse.riv.sf)+tm_polygons() + 
+  tm_shape(meuse)+tm_symbols(shape = 3,size = 0.2,col="black") + 
+  tm_facets(ncol = 3,nrow=1,free.scales = FALSE) + 
+  tm_layout(legend.outside.size = 0.15, main.title = "log(zinc), trend surface interpolation", panel.labels = c("tr1","tr2","tr3"))
+
+
 ```
 
 :::
@@ -391,7 +406,11 @@ spplot(m, "var1.pred", sp.layout = meuse.lt, main = "local 1st order trend")
 
 ```{r}
 m = krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, nmax = 10)
-tm_shape(m)+tm_raster("var1.pred", n=10)+tm_shape(meuse.riv.sf)+tm_polygons()+tm_shape(meuse)+tm_symbols(shape = 3,size = 0.2,col="black")+tm_layout(main.title = "local 1st order trend")
+tm_shape(m) + 
+  tm_raster("var1.pred", n=10, title = "prediction", palette = bpy.palette) + 
+  tm_shape(meuse.riv.sf)+tm_polygons() + 
+  tm_shape(meuse)+tm_symbols(shape = 3,size = 0.2,col="black") + 
+  tm_layout(main.title = "local 1st order trend", legend.outside = TRUE)
 
 ```
 
@@ -428,7 +447,12 @@ spplot(meuse.grid, c("idp0.5", "idp02", "idp05", "idp10"), sp.layout = meuse.lt,
 ```{r}
 lzn.tp = idw(log(zinc) ~ 1, meuse.sf, meuse.grid.stars)
 
-tm_shape(m)+tm_raster("var1.pred")+tm_shape(meuse.riv.sf)+tm_polygons()+tm_layout(title = "log(zinc), inverse distance interpolation")
+tm_shape(m)+tm_raster("var1.pred", palette = bpy.palette, n=10) + 
+  tm_shape(meuse.riv.sf) + 
+  tm_polygons() + 
+  tm_shape(meuse) +
+  tm_symbols(shape = 3,size = 0.2,col="black") +
+  tm_layout(main.title = "log(zinc), inverse distance interpolation", legend.outside = TRUE, title = "prediction" )
 
 meuse.grid.stars$idp0.5 = idw(log(zinc) ~ 1, meuse, meuse.grid.stars, idp = 0.5)$var1.pred
 
@@ -438,7 +462,14 @@ meuse.grid.stars$idp05 = idw(log(zinc) ~ 1, meuse, meuse.grid.stars, idp = 5)$va
 
 meuse.grid.stars$idp10 = idw(log(zinc) ~ 1, meuse, meuse.grid.stars, idp = 10)$var1.pred
 
-tm_shape(meuse.grid.stars)+tm_raster(c("idp0.5","idp02","idp05","idp10"),n=10)+tm_shape(meuse.riv.sf)+tm_polygons()+tm_shape(meuse)+tm_symbols(shape = 3,size = 0.2,col="black")+tm_layout(main.title = "log(zinc) trend surface interpolation",main.title.position = "center",main.title.size = 1.1,legend.outside.size = 0.1)+tm_facets(nrow=1,free.scales = FALSE)
+tm_shape(meuse.grid.stars) +
+  tm_raster(c("idp0.5","idp02","idp05","idp10"),n=10, title = "prediction", palette = bpy.palette) +
+  tm_shape(meuse.riv.sf) + 
+  tm_polygons() + 
+  tm_shape(meuse) +
+  tm_symbols(shape = 3,size = 0.2,col="black") +
+  tm_facets(nrow=1,free.scales = FALSE) +
+  tm_layout(main.title = "log(zinc) trend surface interpolation",legend.outside.size = 0.15,panel.labels = c("idp0.5","idp02","idp05","idp10"))
 ```
 
 
@@ -479,7 +510,11 @@ spplot(lzn.tp, "var1.pred", sp.layout = meuse.lt, main = "Thiessen (or Voronoi) 
 
 ```{r}
 lzn.tp = krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, nmax = 1)
-tm_shape(lzn.tp)+tm_raster("var1.pred",n=10)+tm_shape(meuse.riv.sf)+tm_polygons()+tm_shape(meuse)+tm_symbols(shape = 3,size = 0.2,col="black")
+tm_shape(lzn.tp) + 
+  tm_raster("var1.pred",n=10,title="prediction", palette = bpy.palette) +
+  tm_shape(meuse.riv.sf)+tm_polygons() +
+  tm_shape(meuse) +
+  tm_symbols(shape = 3,size = 0.2,col="black")
 ```
 
 :::
@@ -561,9 +596,9 @@ lzn.pr = predict(lm(log(zinc) ~ sqrt(dist), meuse.sf), meuse.grid.stars, se.fit 
 meuse.grid.stars$lzn.fit = lzn.pr$fit
 
 
-tm_shape(meuse.grid.stars)+tm_raster("lzn.fit")
+tm_shape(meuse.grid.stars)+tm_raster("lzn.fit",n=10, palette = bpy.palette)
 meuse.grid.stars$se.fit = lzn.pr$se.fit
-tm_shape(meuse.grid.stars)+tm_raster("se.fit")
+tm_shape(meuse.grid.stars)+tm_raster("se.fit", n=10, palette = bpy.palette)
 
 ```
 
@@ -644,7 +679,12 @@ pr = predict(lzn.lm, as.data.frame(meuse.grid.stars), interval = "prediction")
 meuse.grid.stars$fit = pr[, 1]
 meuse.grid.stars$upper = pr[, 3]
 meuse.grid.stars$lower = pr[, 2]
-tm_shape(meuse.grid.stars)+tm_raster(c("fit", "lower", "upper"))+tm_shape(meuse.riv)+tm_polygons()+tm_shape(meuse.sf)+tm_symbols(size = 0.2,shape = 3,col = "black")
+tm_shape(meuse.grid.stars) + 
+  tm_raster(c("fit","lower","upper"),n=20,title = "prediction", palette = bpy.palette) + 
+  tm_shape(meuse.riv.sf)+tm_polygons() + 
+  tm_shape(meuse)+tm_symbols(shape = 3,size = 0.2,col="black") +
+  tm_facets(ncol = 3,nrow=1,free.scales = FALSE) + 
+  tm_layout(legend.outside.size = 0.15, panel.labels = c("tr1","tr2","tr3"))
 ```
 
 :::
@@ -674,28 +714,33 @@ Another regression model is obtained by relating zinc to flood frequency, try
 
 ```{r,warning=F}
 plot(log(zinc) ~ ffreq, meuse)
+meuse$ffreq <- as.factor(meuse$ffreq)
+plot(log(zinc) ~ ffreq, meuse)
 ```
 
 
 ## sf/stars
 ```{r}
 plot(log(zinc) ~ ffreq, meuse.sf)
+meuse.sf$ffreq <- as.factor(meuse.sf$ffreq)
+plot(log(zinc) ~ ffreq, meuse.sf)
 
 ```
 
 :::
 
+
 ------------------------------------------------------------------------
 
 ### *Exercise 5.7* {.unnumbered}
 
-*Why is a box-and whisker plot drawn for this plot, and not a scatter plot?*
+*Why is a box-and whisker plot drawn for the second plot, and not a scatter plot?*
 
-a)  `ffreq` is a categorical variable with numeric levels
-b)  `ffreq` has only three values, 1, 2 and 3
-c)  flood frequency is allways expressed by boxes
+a)  `ffreq` has been turned into a categorical variable with numeric levels
+b)  `ffreq` has been turned into a variable with only three values, 1, 2 and 3
+c)  flood frequency is always expressed by boxes
 
-**Answer:** The correct answer is a).
+**Answer:** The correct answer is a). Flood frequency in our data set has numbers as labels, but can actually be seen as a categorical variable with the number of floodings being the categories. By using `as.factor()` we explicitly turn this variable into a factor, R´s representation of categorical variables. When plotting such a variable, a more meaningful representation (box plots) is automatically used.
 
 ------------------------------------------------------------------------
 
@@ -749,7 +794,13 @@ pr = predict(lzn.lm2, meuse.grid.stars, interval = "prediction")
 meuse.grid.stars$fit = pr[, 1]
 meuse.grid.stars$upper = pr[, 3]
 meuse.grid.stars$lower = pr[, 2]
-tm_shape(meuse.grid.stars)+tm_raster(c("fit", "lower", "upper"))+tm_shape(meuse.riv)+tm_polygons()+tm_shape(meuse.sf)+tm_symbols(size = 0.2,shape = 3,col = "black")
+tm_shape(meuse.grid.stars) + 
+  tm_raster(c("fit", "lower", "upper"), palette = bpy.palette, title = "", n=20) + 
+  tm_shape(meuse.riv)+tm_polygons() + 
+  tm_shape(meuse.sf) + 
+  tm_symbols(size = 0.2,shape = 3,col = "black") + 
+  tm_facets(free.scales = FALSE) +
+  tm_layout(legend.outside.size = 0.15, panel.labels = c("fit","lower","upper"))
 ```
 
 :::
