@@ -7,11 +7,9 @@ editor: visual
 
 # Spatial modelling: introductory matter
 
-
 ## meuse
 
 The meuse data set is a data set collected from the Meuse floodplain. The heavy metals analyzed are copper, cadmium, lead and zinc concentrations, extracted from the topsoil of a part of the Meuse floodplain, the area around Meers and Maasband (Limburg, The Netherlands). The data were collected during fieldwork in 1990 (Rikken and Van Rijn, 1993; Burrough and McDonnell, 1998).
-
 
 ```{r}
 library(gstat)
@@ -21,7 +19,6 @@ meuse <- readOGR("./data/meuse.gpkg")
 summary(meuse)
 objects()
 ```
-
 
 ## Models: the formula interface; linear regression
 
@@ -168,7 +165,6 @@ Note that `spplot` plots points on top of the grid, and the grid cells on top of
 
 R package `rgdal` provides several drivers for import/export of spatial data. We have used it above to read the vector and raster data `meuse`, `meuse.riv` and `meuse.grid`. An overview of available drivers for vector data (points, lines, polygons) can be obtained by
 
-
 ```{r,warning=F}
 ogrDrivers()
 ```
@@ -298,7 +294,6 @@ b)  49 53 54 55 82
 c)  54 55 56 60 123
 d)  53 54 55 59 82
 
-
 ------------------------------------------------------------------------
 
 ## Simple interpolation algorithms
@@ -334,7 +329,7 @@ tm_shape(meuse.grid.stars) +
   tm_raster(c("tr1","tr2","tr3"),n=20,title = "prediction", palette = bpy.palette) + 
   tm_shape(meuse.riv.sf)+tm_polygons() + 
   tm_shape(meuse)+tm_symbols(shape = 3,size = 0.2,col="black") + 
-  tm_facets(ncol = 3,nrow=1,free.scales = FALSE) + 
+  tm_facets(free.scales = FALSE) + 
   tm_layout(legend.outside.size = 0.15, main.title = "log(zinc), trend surface interpolation", panel.labels = c("tr1","tr2","tr3"))
 
 
@@ -365,16 +360,16 @@ Local trends, i.e. trends in a local neighbourhood may also be fitted:
 ## sp
 
 ```{r}
-m = krige(log(zinc) ~ 1, meuse, meuse.grid, nmax = 10)
+m = krige(log(zinc) ~ 1, meuse, meuse.grid, degree=1, nmax = 10)
 spplot(m, "var1.pred", sp.layout = meuse.lt, main = "local 1st order trend")
 ```
 
 ## sf/stars
 
 ```{r}
-m = krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, nmax = 10)
+m = krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars,degree=1, nmax = 10)
 tm_shape(m) + 
-  tm_raster("var1.pred", n=10, title = "prediction", palette = bpy.palette) + 
+  tm_raster("var1.pred", n=20, title = "prediction", palette = bpy.palette) + 
   tm_shape(meuse.riv.sf)+tm_polygons() + 
   tm_shape(meuse)+tm_symbols(shape = 3,size = 0.2,col="black") + 
   tm_layout(main.title = "local 1st order trend", legend.outside = TRUE)
@@ -451,7 +446,6 @@ b)  becomes smaller
 c)  does not change
 
 *explain in words why this is the case.*
-
 
 ------------------------------------------------------------------------
 
@@ -571,7 +565,6 @@ b)  because the uncertainty in the regression slope is most prevalent when the r
 c)  because we have too few degrees of freedom for regression (i.e., too few observations) overall
 d)  because we have too little data close to the river and far away from the river
 
-
 ------------------------------------------------------------------------
 
 We can use the prediction errors provided by `lm` to calculate regression prediction intervals:
@@ -652,7 +645,6 @@ a)  wider
 b)  narrower
 c)  of approximately equal width
 
-
 ------------------------------------------------------------------------
 
 Another regression model is obtained by relating zinc to flood frequency, try
@@ -696,7 +688,6 @@ a)  the mean plus and minus one standard deviation of the group
 b)  the 95 percent confidence interval for the mean
 c)  the inter-quartile range (from 25-th to 75-th percentiles)
 
-
 ------------------------------------------------------------------------
 
 ### *Exercise 5.9* {.unnumbered}
@@ -706,7 +697,6 @@ c)  the inter-quartile range (from 25-th to 75-th percentiles)
 a)  it needs to be the number of times a grid cell floods
 b)  it needs to be known at each prediction location (i.e., grid cells in `meuse.grid`)
 c)  it needs to be independent of distance to the river
-
 
 ------------------------------------------------------------------------
 

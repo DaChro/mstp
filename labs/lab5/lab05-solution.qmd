@@ -337,7 +337,7 @@ tm_shape(meuse.grid.stars) +
   tm_raster(c("tr1","tr2","tr3"),n=20,title = "prediction", palette = bpy.palette) + 
   tm_shape(meuse.riv.sf)+tm_polygons() + 
   tm_shape(meuse)+tm_symbols(shape = 3,size = 0.2,col="black") + 
-  tm_facets(ncol = 3,nrow=1,free.scales = FALSE) + 
+  tm_facets(free.scales = FALSE) + 
   tm_layout(legend.outside.size = 0.15, main.title = "log(zinc), trend surface interpolation", panel.labels = c("tr1","tr2","tr3"))
 
 
