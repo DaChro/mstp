@@ -379,16 +379,16 @@ Local trends, i.e. trends in a local neighbourhood may also be fitted:
 
 ## sp
 ```{r}
-m = krige(log(zinc) ~ 1, meuse, meuse.grid, nmax = 10)
+m = krige(log(zinc) ~ 1, meuse, meuse.grid, degree=1, nmax = 10)
 spplot(m, "var1.pred", sp.layout = meuse.lt, main = "local 1st order trend")
 ```
 
 ## sf/stars
 
 ```{r}
-m = krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, nmax = 10)
+m = krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, degree=1, nmax = 10)
 tm_shape(m) + 
-  tm_raster("var1.pred", n=10, title = "prediction", palette = bpy.palette) + 
+  tm_raster("var1.pred", n=20, title = "prediction", palette = bpy.palette) + 
   tm_shape(meuse.riv.sf)+tm_polygons() + 
   tm_shape(meuse)+tm_symbols(shape = 3,size = 0.2,col="black") + 
   tm_layout(main.title = "local 1st order trend", legend.outside = TRUE)
@@ -450,7 +450,7 @@ tm_shape(meuse.grid.stars) +
   tm_shape(meuse) +
   tm_symbols(shape = 3,size = 0.2,col="black") +
   tm_facets(nrow=1,free.scales = FALSE) +
-  tm_layout(main.title = "log(zinc) trend surface interpolation",legend.outside.size = 0.15,panel.labels = c("idp0.5","idp02","idp05","idp10"))
+  tm_layout(main.title = "log(zinc), inverse distance interpolation",legend.outside.size = 0.15,panel.labels = c("idp0.5","idp02","idp05","idp10"))
 ```
 
 
