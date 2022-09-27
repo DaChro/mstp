@@ -1,0 +1,395 @@
+---
+title: "Spatio-temporal Modelling, Lab 6, YYYY-MM-DD"
+editor: visual
+---
+
+**This exercise will be discussed on YYY-MM-DD.**
+
+# Spatial modelling: introductory matter II - Spatial Correlation
+
+------------------------------------------------------------------------
+
+## Spatial correlation: the h-scatterplot
+
+Before we jump into h-scatterplots of spatial data, let us first (re-)consider lagged scatterplots for temporal data.
+
+------------------------------------------------------------------------
+
+### *Exercise 6.1:* {.unnumbered}
+
+*Create the lagged scatterplots for the T.outside variable in the meteo data set, one for lag 1 and one for lag 10. Compute and report the corresponding correlations. (To do the scatterplot, you simply need to plot each value of T.outside at time* $t$ against its counterpart at time $t-1$ or $t-10$, respectively)
+
+------------------------------------------------------------------------
+
+Read the help for function hscat in package gstat.
+
+We will use this function to compute $h$-scatterplots. An $h$-scatterplot plots data pairs $z(x_i), z(x_j)$ for selected pairs that have $|x_i - x_j|$ fall within a given interval. The intervals are given by the third argument, (breaks).
+
+
+:::panel-tabset
+
+## sp
+```{r, warning=FALSE}
+library(rgdal)
+library(gstat)
+library(sp)
+meuse <- readOGR("./data/meuse.gpkg")
+hscat(log(zinc) ~ 1, meuse, c(0, 30, 80, 100, 200, 300, 500, 1000))
+```
+
+## sf
+```{r}
+library(sf)
+meuse.sf <- st_read("./data/meuse.gpkg")
+hscat(log(zinc) ~ 1, meuse.sf, c(0, 30, 80, 100, 200, 300, 500, 1000))
+```
+
+:::
+
+------------------------------------------------------------------------
+
+### *Exercise 6.2:* {.unnumbered}
+
+*Why is there no distance interval* $0-30$ in the plot?
+
+------------------------------------------------------------------------
+
+### *Exercise 6.3:* {.unnumbered}
+
+*How many point pairs can you form from 155 observations?*
+
+------------------------------------------------------------------------
+
+:::panel-tabset
+
+## sp 
+
+```{r,warning=FALSE}
+hscat(log(zinc) ~ 1, meuse, c(0, 80, 120, 250, 500, 1200))
+```
+
+## sf
+
+```{r}
+hscat(log(zinc) ~ 1, meuse.sf, c(0, 80, 120, 250, 500, 1200))
+```
+
+:::
+
+------------------------------------------------------------------------
+
+### *Exercise 6.4:* {.unnumbered}
+
+*The correlation steadily drops with larger distance. Why?*
+
+------------------------------------------------------------------------
+
+:::panel-tabset
+
+## sp
+
+```{r,warning=F}
+hscat(log(zinc) ~ 1, meuse, c(0, 120, 300, 600, 1200))
+```
+
+## sf
+
+```{r}
+hscat(log(zinc) ~ 1, meuse.sf, c(0, 120, 300, 600, 1200))
+```
+
+:::
+
+
+
+------------------------------------------------------------------------
+
+### *Exercise 6.5:* {.unnumbered}
+
+*How would you interpret the negative correlation for the largest lag?*
+
+------------------------------------------------------------------------
+
+## Spatial correlation: the variogram cloud
+
+As you could see, the variogram cloud above was used to get $h$-scatterplots. The variogram cloud is basically the plot (or collection of plotted points) of
+
+$0.5(Z(x_i)-Z(x_j))^2$ against $h = |x_i-x_j|$
+
+in words: for each point pair $(x_i),z(x_j)$ half the squared difference in measured values against the spatial separation distance.
+
+Plot a variogram cloud for the `log(zinc)` data:
+
+
+:::panel-tabset
+
+## sp
+
+```{r,warning=F}
+plot(variogram(log(zinc) ~ 1, meuse, cloud = TRUE))
+```
+
+## sf
+
+```{r}
+plot(variogram(log(zinc) ~ 1, meuse.sf, cloud = TRUE))
+```
+
+:::
+
+
+------------------------------------------------------------------------
+
+### *Exercise 6.6:* {.unnumbered}
+
+*Why are both distance and semivariance non-negative?*
+
+------------------------------------------------------------------------
+
+### *Exercise 6.7:* {.unnumbered}
+
+*Why is there so much scatter in this plot?*
+
+------------------------------------------------------------------------
+ 
+### *Exercise 6.8:* {.unnumbered}
+
+*How many points does the variogram cloud contain if the separation distance is not limited?*
+
+------------------------------------------------------------------------
+
+## Spatial correlation: the variogram
+
+A variogram for the log-zinc data is computed, printed and plotted by
+
+:::panel-tabset
+
+## sp
+
+```{r,warning=F}
+v = variogram(log(zinc) ~ 1, meuse)
+v
+plot(v)
+```
+
+## sf
+
+```{r}
+v = variogram(log(zinc) ~ 1, meuse.sf)
+v
+plot(v)
+```
+
+:::
+
+
+### *Exercise 6.9:* {.unnumbered}
+
+*How is the variogram computed from the variogram cloud?*
+
+a)  semivariance is averaged for each distance
+b)  distance is averaged for each semivariance
+c)  distance is averaged for each semivariance class
+d)  semivariance and distance are averaged for each distance class
+e)  semivariance and distance are averaged for each semivariance class
+
+------------------------------------------------------------------------
+
+## Sample variogram and variogram model
+
+To detect, or model spatial correlation, we average the variogram cloud values over distance intervals (bins):
+
+:::panel-tabset
+
+## sp
+
+```{r,warning=F}
+lzn.vgm = variogram(log(zinc) ~ 1, meuse)
+lzn.vgm
+plot(lzn.vgm)
+```
+
+## sf
+
+```{r}
+lzn.vgm = variogram(log(zinc) ~ 1, meuse.sf)
+lzn.vgm
+plot(lzn.vgm)
+```
+
+:::
+
+For the maximum distance (cutoff) and bin width, sensible defaults are chosen as one-third the largest area diagonal and 15 bins, but we can modify this when needed by setting cutoff and width:
+
+
+:::panel-tabset
+
+## sp
+
+```{r,warning=FALSE}
+lzn.vgm = variogram(log(zinc) ~ 1, meuse, cutoff = 1000, width = 50)
+lzn.vgm
+plot(lzn.vgm)
+```
+
+## sf
+
+```{r}
+lzn.vgm = variogram(log(zinc) ~ 1, meuse.sf, cutoff = 1000, width = 50)
+lzn.vgm
+plot(lzn.vgm)
+```
+
+:::
+
+------------------------------------------------------------------------
+
+### *Exercise 6.10:* {.unnumbered}
+
+*What is the problem if we set width to e.g. a value of 5?*
+
+a)  we get too many semivariance estimates
+b)  the semivariance values are too large
+c)  the semivariance values are too small
+d)  the variability of the semivariance values is too large
+
+------------------------------------------------------------------------
+
+### *Exercise 6.11:* {.unnumbered}
+
+*What is the problem if we set the cutoff value to e.g. a value of 500 and width to 50?*
+
+a)  we cannot see up to which distance the data are spatially correlated
+b)  the semivariance values are too large
+c)  the semivariance values are too small
+d)  we cannot see if data are spatially correlated
+
+------------------------------------------------------------------------
+
+For kriging, we need a suitable, statistically valid model fitted to the sample variogram. The reason for this is that kriging requires the specification of semivariances for any distance value in the spatial domain we work with. Simply connecting sample variogram points, as in
+
+:::panel-tabset
+
+## sp
+
+```{r,warning=FALSE}
+lzn.vgm = variogram(log(zinc) ~ 1, meuse, cutoff = 1000, width = 50)
+plot(gamma ~ dist, lzn.vgm)
+lines(c(0, lzn.vgm$dist), c(0, lzn.vgm$gamma))
+```
+
+## sf
+
+```{r}
+lzn.vgm = variogram(log(zinc) ~ 1, meuse.sf, cutoff = 1000, width = 50)
+plot(gamma ~ dist, lzn.vgm)
+lines(c(0, lzn.vgm$dist), c(0, lzn.vgm$gamma))
+```
+
+:::
+
+will *not* result in a valid model. Instead, we will fit a valid parametric model. Some of the valid parametric models are shown by e.g.
+
+```{r,warning=FALSE}
+show.vgms()
+```
+
+These models may be combined, and the most commonly used are Exponential or Spherical models combined with a Nugget model.
+
+We will try a spherical model:
+
+:::panel-tabset
+
+## sp
+
+```{r,warning=FALSE}
+lzn.vgm = variogram(log(zinc) ~ 1, meuse)
+plot(lzn.vgm)
+
+lzn.mod = vgm(0.6, "Sph", 1000, 0.05)
+plot(lzn.vgm, lzn.mod)
+```
+
+## sf
+
+```{r}
+lzn.vgm = variogram(log(zinc) ~ 1, meuse.sf)
+plot(lzn.vgm)
+
+lzn.mod = vgm(0.6, "Sph", 1000, 0.05)
+plot(lzn.vgm, lzn.mod)
+```
+
+:::
+
+------------------------------------------------------------------------
+
+### *Exercise 6.12:* {.unnumbered}
+
+*The range, 1000, relates to*
+
+a)  the semivariance value at distance (nearly) zero
+b)  the semivariance value reached when the variogram stops increasing
+c)  the distance value at which the variogram stops increasing
+
+------------------------------------------------------------------------
+
+### *Exercise 6.13:* {.unnumbered}
+
+*The sill, 0.6 + 0.05, relates to*
+
+a)  the semivariance value at distance (nearly) zero
+b)  the semivariance value reached when the variogram stops increasing
+c)  the distance value at which the variogram stops increasing
+
+------------------------------------------------------------------------
+
+### *Exercise 6.14:* {.unnumbered}
+
+*The nugget, 0.05, relates to*
+
+a)  the semivariance value at distance (nearly) zero
+b)  the semivariance value reached when the variogram stops increasing
+c)  the distance value at which the variogram stops increasing
+
+------------------------------------------------------------------------
+
+The variogram model (Sph for spherical) and the three parameters were chosen by eye. We can fit the three parameters also automatically:
+
+:::panel-tabset
+
+## sp
+
+```{r,warning=F}
+lzn.vgm = variogram(log(zinc) ~ 1, meuse)
+lzn.mod = fit.variogram(lzn.vgm, vgm(0.6, "Sph", 1000, 0.05))
+lzn.mod
+
+plot(lzn.vgm, lzn.mod)
+```
+
+## sf
+
+```{r}
+lzn.vgm = variogram(log(zinc) ~ 1, meuse.sf)
+lzn.mod = fit.variogram(lzn.vgm, vgm(0.6, "Sph", 1000, 0.05))
+lzn.mod
+
+plot(lzn.vgm, lzn.mod)
+```
+
+:::
+
+but we need to have good "starting" values, e.g. the following will not yield a satisfactory fit:
+
+```{r,warning=FALSE}
+lzn.misfit = fit.variogram(lzn.vgm, vgm(0.6, "Sph", 10, 0.05))
+
+plot(lzn.vgm, lzn.misfit)
+```
+
+------------------------------------------------------------------------
+
+### *Exercise 6.15:* {.unnumbered}
+
+*Compute the variogram for four different direction ranges (hint: look into argument alpha for function variogram) and plot it in a single plot. Is the zinc process anisotropic? Try to explain what you find in terms of what you know about the process.*
