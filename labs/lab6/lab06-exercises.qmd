@@ -25,10 +25,9 @@ Read the help for function hscat in package gstat.
 
 We will use this function to compute $h$-scatterplots. An $h$-scatterplot plots data pairs $z(x_i), z(x_j)$ for selected pairs that have $|x_i - x_j|$ fall within a given interval. The intervals are given by the third argument, (breaks).
 
-
-:::panel-tabset
-
+::: panel-tabset
 ## sp
+
 ```{r, warning=FALSE}
 library(rgdal)
 library(gstat)
@@ -38,12 +37,12 @@ hscat(log(zinc) ~ 1, meuse, c(0, 30, 80, 100, 200, 300, 500, 1000))
 ```
 
 ## sf
+
 ```{r}
 library(sf)
 meuse.sf <- st_read("./data/meuse.gpkg")
 hscat(log(zinc) ~ 1, meuse.sf, c(0, 30, 80, 100, 200, 300, 500, 1000))
 ```
-
 :::
 
 ------------------------------------------------------------------------
@@ -60,9 +59,8 @@ hscat(log(zinc) ~ 1, meuse.sf, c(0, 30, 80, 100, 200, 300, 500, 1000))
 
 ------------------------------------------------------------------------
 
-:::panel-tabset
-
-## sp 
+::: panel-tabset
+## sp
 
 ```{r,warning=FALSE}
 hscat(log(zinc) ~ 1, meuse, c(0, 80, 120, 250, 500, 1200))
@@ -73,7 +71,6 @@ hscat(log(zinc) ~ 1, meuse, c(0, 80, 120, 250, 500, 1200))
 ```{r}
 hscat(log(zinc) ~ 1, meuse.sf, c(0, 80, 120, 250, 500, 1200))
 ```
-
 :::
 
 ------------------------------------------------------------------------
@@ -84,8 +81,7 @@ hscat(log(zinc) ~ 1, meuse.sf, c(0, 80, 120, 250, 500, 1200))
 
 ------------------------------------------------------------------------
 
-:::panel-tabset
-
+::: panel-tabset
 ## sp
 
 ```{r,warning=F}
@@ -97,10 +93,7 @@ hscat(log(zinc) ~ 1, meuse, c(0, 120, 300, 600, 1200))
 ```{r}
 hscat(log(zinc) ~ 1, meuse.sf, c(0, 120, 300, 600, 1200))
 ```
-
 :::
-
-
 
 ------------------------------------------------------------------------
 
@@ -120,9 +113,7 @@ in words: for each point pair $(x_i),z(x_j)$ half the squared difference in meas
 
 Plot a variogram cloud for the `log(zinc)` data:
 
-
-:::panel-tabset
-
+::: panel-tabset
 ## sp
 
 ```{r,warning=F}
@@ -134,9 +125,7 @@ plot(variogram(log(zinc) ~ 1, meuse, cloud = TRUE))
 ```{r}
 plot(variogram(log(zinc) ~ 1, meuse.sf, cloud = TRUE))
 ```
-
 :::
-
 
 ------------------------------------------------------------------------
 
@@ -151,7 +140,7 @@ plot(variogram(log(zinc) ~ 1, meuse.sf, cloud = TRUE))
 *Why is there so much scatter in this plot?*
 
 ------------------------------------------------------------------------
- 
+
 ### *Exercise 6.8:* {.unnumbered}
 
 *How many points does the variogram cloud contain if the separation distance is not limited?*
@@ -162,8 +151,7 @@ plot(variogram(log(zinc) ~ 1, meuse.sf, cloud = TRUE))
 
 A variogram for the log-zinc data is computed, printed and plotted by
 
-:::panel-tabset
-
+::: panel-tabset
 ## sp
 
 ```{r,warning=F}
@@ -179,9 +167,7 @@ v = variogram(log(zinc) ~ 1, meuse.sf)
 v
 plot(v)
 ```
-
 :::
-
 
 ### *Exercise 6.9:* {.unnumbered}
 
@@ -199,8 +185,7 @@ e)  semivariance and distance are averaged for each semivariance class
 
 To detect, or model spatial correlation, we average the variogram cloud values over distance intervals (bins):
 
-:::panel-tabset
-
+::: panel-tabset
 ## sp
 
 ```{r,warning=F}
@@ -216,14 +201,11 @@ lzn.vgm = variogram(log(zinc) ~ 1, meuse.sf)
 lzn.vgm
 plot(lzn.vgm)
 ```
-
 :::
 
 For the maximum distance (cutoff) and bin width, sensible defaults are chosen as one-third the largest area diagonal and 15 bins, but we can modify this when needed by setting cutoff and width:
 
-
-:::panel-tabset
-
+::: panel-tabset
 ## sp
 
 ```{r,warning=FALSE}
@@ -239,7 +221,6 @@ lzn.vgm = variogram(log(zinc) ~ 1, meuse.sf, cutoff = 1000, width = 50)
 lzn.vgm
 plot(lzn.vgm)
 ```
-
 :::
 
 ------------------------------------------------------------------------
@@ -268,8 +249,7 @@ d)  we cannot see if data are spatially correlated
 
 For kriging, we need a suitable, statistically valid model fitted to the sample variogram. The reason for this is that kriging requires the specification of semivariances for any distance value in the spatial domain we work with. Simply connecting sample variogram points, as in
 
-:::panel-tabset
-
+::: panel-tabset
 ## sp
 
 ```{r,warning=FALSE}
@@ -285,7 +265,6 @@ lzn.vgm = variogram(log(zinc) ~ 1, meuse.sf, cutoff = 1000, width = 50)
 plot(gamma ~ dist, lzn.vgm)
 lines(c(0, lzn.vgm$dist), c(0, lzn.vgm$gamma))
 ```
-
 :::
 
 will *not* result in a valid model. Instead, we will fit a valid parametric model. Some of the valid parametric models are shown by e.g.
@@ -298,8 +277,7 @@ These models may be combined, and the most commonly used are Exponential or Sphe
 
 We will try a spherical model:
 
-:::panel-tabset
-
+::: panel-tabset
 ## sp
 
 ```{r,warning=FALSE}
@@ -319,7 +297,6 @@ plot(lzn.vgm)
 lzn.mod = vgm(0.6, "Sph", 1000, 0.05)
 plot(lzn.vgm, lzn.mod)
 ```
-
 :::
 
 ------------------------------------------------------------------------
@@ -356,8 +333,7 @@ c)  the distance value at which the variogram stops increasing
 
 The variogram model (Sph for spherical) and the three parameters were chosen by eye. We can fit the three parameters also automatically:
 
-:::panel-tabset
-
+::: panel-tabset
 ## sp
 
 ```{r,warning=F}
@@ -377,7 +353,6 @@ lzn.mod
 
 plot(lzn.vgm, lzn.mod)
 ```
-
 :::
 
 but we need to have good "starting" values, e.g. the following will not yield a satisfactory fit:
