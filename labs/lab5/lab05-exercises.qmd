@@ -302,10 +302,7 @@ d)  53 54 55 59 82
 
 Trend surface interpolation is multiple linear regression with polynomials of coordinates as independent, predictor variables. Although we could use `lm` to fit these models and predict them, it would require scaling of coordinates prior to prediction in most cases because higher powers of large coordinate values result in large numerical errors. The `krige` function in library `gstat` scales coordinates and computes trend surface up to degree 3, using scaled coordinates.
 
-```{r,warning=F}
 
-
-```
 
 ::: panel-tabset
 ## sp
@@ -609,6 +606,7 @@ Next, we can make maps of the 95% prediction intervals:
 ## sp
 
 ```{r,warning=F}
+lzn.lm = lm(log(zinc) ~ sqrt(dist), meuse)
 pr = predict(lzn.lm, as.data.frame(meuse.grid), interval = "prediction")
 meuse.grid$fit = pr[, 1]
 meuse.grid$upper = pr[, 3]
@@ -620,6 +618,7 @@ spplot(meuse.grid, c("fit", "lower", "upper"), sp.layout = meuse.lt, layout = c(
 ## sf/stars
 
 ```{r}
+lzn.lm = lm(log(zinc) ~ sqrt(dist), meuse.sf)
 pr = predict(lzn.lm, as.data.frame(meuse.grid.stars), interval = "prediction")
 meuse.grid.stars$fit = pr[, 1]
 meuse.grid.stars$upper = pr[, 3]
