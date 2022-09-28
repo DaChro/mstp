@@ -1,0 +1,341 @@
+---
+title: "Spatio-temporal Modelling, Lab 7, YYYY-MM-DD"
+editor: visual
+---
+
+**This exercise will be discussed on YYY-MM-DD.**
+
+## Simple and ordinary kriging
+
+------------------------------------------------------------------------
+
+Ordinary kriging is an interpolation method that uses weighted averages of all, or a defined set of neighbouring, observations. It calculates a weighted average, where weights are chosen such that (i) prediction error variance is minimal, and (ii) predictions are unbiased. The second requirement results in weights that sum to one. Simple kriging assumes the mean (or mean function) to be known; consequently it drops the second requirement and the weights do not have to sum to unity. Kriging assumes the variogram to be known; based on the variogram (or the covariogram, derived from the variogram) it calculates prediction variances.
+
+To load everything you need into your workspace do
+
+::: panel-tabset
+## sp
+
+```{r,warning=FALSE,eval=T}
+library(gstat)
+library(sp)
+library(rgdal)
+meuse <- readOGR("./data/meuse.gpkg")
+sp.theme(TRUE)
+meuse.riv <- readOGR("./data/meuse_river.gpkg")
+meuse.lt = list(riv = list("sp.polygons", meuse.riv, fill = "grey"), pts = list("sp.points", 
+    meuse, pch = 3, cex = 0.5, col = "black"))
+meuse.grid <- as(readGDAL("./data/meuse_grid.tif"),"SpatialPixelsDataFrame")
+names(meuse.grid) <- c("part.a","part.b","dist","soil","ffreq")
+meuse.grid$soil <- as.factor(meuse.grid$soil)
+meuse.grid$ffreq <- as.factor(meuse.grid$ffreq)
+lzn.vgm = variogram(log(zinc) ~ 1, meuse)
+lzn.mod = fit.variogram(lzn.vgm, vgm(0.6, "Sph", 1000, 0.05))
+```
+
+## sf/stars
+
+```{r}
+library(gstat)
+library(sf)
+library(stars)
+meuse.sf <- st_read("./data/meuse.gpkg")
+meuse.riv.sf <- st_read("./data/meuse_river.gpkg")
+meuse.grid.stars <- read_stars("./data/meuse_grid.tif")
+meuse.grid.stars <- split(meuse.grid.stars, "band")
+names(meuse.grid.stars) <- c("part.a","part.b","dist","soil","ffreq")
+meuse.grid.stars$soil <- as.factor(meuse.grid.stars$soil)
+meuse.grid.stars$ffreq <- as.factor(meuse.grid.stars$ffreq)
+lzn.vgm.sf = variogram(log(zinc) ~ 1, meuse.sf)
+lzn.mod.sf = fit.variogram(lzn.vgm.sf, vgm(0.6, "Sph", 1000, 0.05))
+bpy.palette=bpy.colors()
+```
+:::
+
+### Weights
+
+One main advantage of kriging compared to e.g. inverse distance weighting is that it cares about clustering of the points where the values for prediction come from.
+
+------------------------------------------------------------------------
+
+### Exercise 7.1
+
+*Imagine you want to predict a value by three others. All three points have the same distance from the point to predict, two of them are very close together and the third one is on the opposite side of the point to predict. Which weighting would you choose and why?*
+
+a)  Equal weights on all points
+b)  Put more weight on the single point than on the two clustered ones.
+c)  Put less weight on the single point than on the two clustered ones.
+
+------------------------------------------------------------------------
+
+### Exercise 7.2
+
+*Which of the following properties are true/false for inverse distance interpolation and for kriging, respectively?*
+
+a)  Points closer to the point to predict have more weight.
+b)  Clustered points have more weight.
+
+------------------------------------------------------------------------
+
+Download the [E{Z}-Kriging tool](https://www.uni-muenster.de/LearnWeb/learnweb2/mod/resource/view.php?id=1111161) to see how weighting is done by kriging. Use it to answer the following questions.
+
+------------------------------------------------------------------------
+
+### Influence of Variogram on Prediction
+
+Use E{Z}-Kriging. Place 7 points, some in a cluster and the others on different distances from the centre singularily.You may keep the values at the points.
+
+The first parameter we look at is the nugget effect. Put the partial sill ($c1$) to 0 and change the nugget effect ($c0$).
+
+------------------------------------------------------------------------
+
+### Exercise 7.3
+
+*What happens to the weights, to the prediction and to the prediction error?*
+
+------------------------------------------------------------------------
+
+Can you imagine how the interpolated map looks like? Try pure nugget effect kriging on the `log(zinc)` data from meuse:
+
+::: panel-tabset
+## sp
+
+```{r,warning=F}
+vgm.nugget = vgm(psill = 0, model = "Exp", range = 1, nugget = 0.64)
+lzn.krige.nugget = krige(log(zinc) ~ 1, meuse, meuse.grid, vgm.nugget)
+
+spplot(lzn.krige.nugget, main = "Kriging with pure nugget effect")
+```
+
+## sf/stars
+
+```{r}
+vgm.nugget = vgm(psill = 0, model = "Exp", range = 1, nugget = 0.64)
+lzn.krige.nugget.stars = krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, vgm.nugget)
+
+library(tmap)
+tm_shape(lzn.krige.nugget.stars) + 
+  tm_raster(c("var1.pred","var1.var"), n=10, palette = bpy.palette, title="") + 
+  tm_facets(free.scales = FALSE) + 
+  tm_layout(legend.outside.size = 0.15, main.title = "Kriging with pure nugget effect", panel.labels = c("var1.pred","var1.var"))
+ 
+```
+:::
+
+------------------------------------------------------------------------
+
+### Exercise 7.4
+
+*How are clustered points weighted? How important is the distance to the point to predict? Does pure nugget effect fit data with strong spatial correlation or data where values in different points are uncorrelated?*
+
+------------------------------------------------------------------------
+
+### Exercise 7.5
+
+*What are the predicted values? Explain why this makes sense here!*
+
+------------------------------------------------------------------------
+
+Next we explore the range. In E{Z}-Kriging put $c1$ back to a medium value (keep the exponential model). Try out different ranges.
+
+------------------------------------------------------------------------
+
+### Exercise 7.6
+
+*How is the influence of the range on weighting (compare very small, medium and very big range)?*
+
+------------------------------------------------------------------------
+
+Try kriging for different ranges on the $log(zinc)$ values.
+
+::: panel-tabset
+## sp
+
+```{r,warning=F}
+vgm.smallrange = fit.variogram(lzn.vgm, vgm(0.6, "Sph", 100, 0.05))
+lzn.krige.smallrange = krige(log(zinc) ~ 1, meuse, meuse.grid, vgm.smallrange)
+spplot(lzn.krige.smallrange, main = "Kriging with small range")
+```
+
+## sf/stars
+
+```{r}
+vgm.smallrange = fit.variogram(lzn.vgm, vgm(0.6, "Sph", 100, 0.05))
+lzn.krige.smallrange.stars = krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, vgm.smallrange)
+tm_shape(lzn.krige.smallrange.stars) + 
+  tm_raster(c("var1.pred","var1.var"), n=20, palette = bpy.palette, title="") + 
+  tm_shape(meuse.riv.sf) + 
+  tm_polygons() + 
+  tm_facets(free.scales = FALSE) + 
+  tm_layout(legend.outside.size = 0.15, main.title = "Kriging with small range", panel.labels = c("var1.pred","var1.var"))
+```
+:::
+
+Repeat for $range = 10000$ (true range is about $1000$).
+
+------------------------------------------------------------------------
+
+### Exercise 7.7
+
+*Describe the main differences of the kriged map for small/big range and compare the errors.*
+
+------------------------------------------------------------------------
+
+Given that lzn.mod contains a suitable variogram model (see above), we can apply ordinary kriging by
+
+::: panel-tabset
+## sp
+
+```{r,warning=F}
+lzn.ok = krige(log(zinc) ~ 1, meuse, meuse.grid, lzn.mod)
+spplot(lzn.ok, "var1.pred", main = "log(zinc), ordinary kriging")
+lzn = krige(log(zinc) ~ 1, meuse, meuse.grid, lzn.mod, beta = 5.9)
+lzn$sk = lzn$var1.pred
+lzn$ok = lzn.ok$var1.pred
+meuse.lt$pts$col = "green"
+spplot(lzn, c("ok", "sk"), sp.layout = meuse.lt, main = "log(zinc), ordinary and simple kriging predictions")
+```
+
+## sf/stars
+
+```{r}
+lzn.ok.stars = krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, lzn.mod)
+tm_shape(lzn.ok.stars) + 
+  tm_raster("var1.pred",n=10, palette = bpy.palette,title = "") + 
+  tm_layout(main.title = "log(zinc), ordinary kriging", legend.outside = TRUE)
+
+lzn.stars = krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, lzn.mod, beta = 5.9)
+lzn.stars$sk = lzn.stars$var1.pred
+lzn.stars$ok = lzn.ok.stars$var1.pred
+tm_shape(lzn.stars) + 
+  tm_raster(c("sk","ok"),n=10,title = "", palette = bpy.palette) + 
+  tm_shape(meuse.riv.sf)+tm_polygons() + 
+  tm_shape(meuse.sf)+tm_symbols(shape = 3,size = 0.2,col="green") + 
+  tm_facets(free.scales = FALSE) + 
+  tm_layout(legend.outside.size = 0.15, main.title = "log(zinc), ordinary and simple kriging predictions", panel.labels = c("ok","sk"))
+
+```
+:::
+
+------------------------------------------------------------------------
+
+Local kriging is obtained when, instead of all data points, only a subset of points nearest to the prediction location are selected. If we use only the nearest 5 points:
+
+::: panel-tabset
+## sp
+
+```{r,warning=F}
+lzn.lok = krige(log(zinc) ~ 1, meuse, meuse.grid, lzn.mod, nmax = 5)
+lzn$lok = lzn.lok$var1.pred
+spplot(lzn, c("lok", "ok"), main = "lok: local (n=5); ok: global")
+```
+
+## sf/stars
+
+```{r}
+lzn.lok.stars = krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, lzn.mod, nmax = 5)
+lzn.stars$lok = lzn.lok.stars$var1.pred
+tm_shape(lzn.stars) + 
+  tm_raster(c("lok","ok"), n=10, palette = bpy.palette, title="") + 
+  tm_facets(free.scales = FALSE) + 
+  tm_layout(legend.outside.size = 0.15, main.title =  "lok: local (n=5); ok: global", panel.labels = c("lok","ok"))
+```
+:::
+
+------------------------------------------------------------------------
+
+### Exercise 7.8
+
+*When we increase the value of nmax, the differences between the local and global kriging will*
+
+a)  become smaller
+b)  become larger
+c)  remain the same
+
+------------------------------------------------------------------------
+
+Another, commonly used strategy is to select a kriging neighbourhood based on spatial distance to prediction location. To exagerate the effect of distance-based neighbourhoods, a very small neighbourhood is chosen of 200 m:
+
+::: panel-tabset
+
+## sp
+
+```{r,warning=F}
+lzn.lok2 = krige(log(zinc) ~ 1, meuse, meuse.grid, lzn.mod, maxdist = 200)
+lzn.ok$lok2 = lzn.lok2$var1.pred
+lzn.ok$ok = lzn.ok$var1.pred
+spplot(lzn.ok, c("lok2", "ok"), main = "lok: local (maxdist=200); ok: global", 
+    sp.layout = meuse.lt, scales = list(draw = TRUE))
+```
+
+## sf/stars
+
+```{r}
+lzn.lok.stars2= krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, lzn.mod, maxdist = 200)
+lzn.ok.stars$lok2 = lzn.lok.stars2$var1.pred
+lzn.ok.stars$ok = lzn.ok.stars$var1.pred
+tm_shape(lzn.ok.stars) + 
+  tm_raster(c("lok2","ok"),n=10,title = "", palette = bpy.palette) + 
+  tm_shape(meuse.riv.sf)+tm_polygons() + 
+  tm_shape(meuse.sf)+tm_symbols(shape = 3,size = 0.2,col="green") + 
+  tm_facets(free.scales = FALSE) + 
+  tm_layout(legend.outside.size = 0.15, main.title = "lok: local (maxdist=200); ok: global", panel.labels = c("lok2","ok")) +
+  tm_grid(lines = FALSE,labels.format = list(big.mark = ""))
+```
+:::
+
+------------------------------------------------------------------------
+
+### Exercise 7.9
+
+*How can the gaps that now occur in the local neighbourhood kriging map be explained? At these prediction locations*
+
+a)  the kriging neighbourhood is empty
+b)  the kriging neighbourhood only contains a single observation
+c)  the kriging neighbourhood contains less than 2 observations
+
+------------------------------------------------------------------------
+
+::: panel-tabset
+
+## sp
+
+```{r,warning=F}
+lzn.sok2 = krige(log(zinc) ~ 1, meuse, meuse.grid, lzn.mod, maxdist = 200, beta = 5.9)
+lzn.ok$sok2 = lzn.sok2$var1.pred
+spplot(lzn.ok, c("lok2", "sok2"), main = "local kriging (maxdist=200); left: ordinary, right: simple", 
+    sp.layout = meuse.lt, scales = list(draw = TRUE))
+```
+
+## sf/stars
+
+```{r}
+lzn.sok.stars2 = krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, lzn.mod, maxdist = 200, beta = 5.9)
+lzn.ok.stars$sok2 = lzn.sok.stars2$var1.pred
+tm_shape(lzn.ok.stars) + 
+  tm_raster(c("lok2","sok2"),n=10,title = "", palette = bpy.palette) + 
+  tm_shape(meuse.riv.sf)+tm_polygons() + 
+  tm_shape(meuse.sf)+tm_symbols(shape = 3,size = 0.2,col="green") + 
+  tm_facets(free.scales = FALSE) + 
+  tm_layout(legend.outside.size = 0.15, main.title = "local kriging (maxdist=200); left: ordinary, right: simple", panel.labels = c("lok2","sok2")) + 
+  tm_grid(lines=FALSE, labels.format = list(big.mark = ""))
+```
+:::
+
+Ordinary and simple kriging behave different in this latter aspect.
+
+------------------------------------------------------------------------
+
+### Exercise 7.10
+
+*In the areas with gaps in the ordinary kriging map, simple kriging yields*
+
+a)  the simple kriging mean value (5.9)
+b)  a compromise between the mean value (5.9) and the nearest observation
+c)  a compromise between the mean value (5.9) and the nearest two or more observations
+
+*Explain why this is the case.*
+
+------------------------------------------------------------------------
+
+Some texts advocate to choose search neighbourhood distances equal to the range of the variogram, however there is no theoretical nor a practical justification for this: weights of points beyond the correlation range are usually not zero. Choosing a local neighbourhood may save time and memory when kriging large data sets. In addition, the assumption of a global constant mean is weakened to that of a constant mean within the search neighbourhood.
