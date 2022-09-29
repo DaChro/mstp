@@ -1,0 +1,295 @@
+---
+title: "Spatio-temporal Modelling, Lab 8, YYYY-MM-DD"
+editor: visual
+---
+
+
+# Universal kriging
+
+------------------------------------------------------------------------
+
+Universal kriging
+
+Just like stratified kriging, universal kriging provides a less restrictive model than ordinary kriging. Suppose the model for ordinary kriging is written as $$Z(s)=m+e(s)$$ with $Z(s)$ the observed variable $Z$ at spatial location $s$, $m$ a constant but unknown mean value and $e(s)$ an intrinsically stationary residual, we can write stratified kriging as $j$ models
+
+$$Z_j(s)=m_j+e_j(s),$$
+
+$j$ referring to the stratum: each stratum has a different mean and different parameters describing the spatial correlation of $e_j$, and $e_j(s)$ and $e_k(s)$ are independent if $j!=k$.
+
+Universal kriging extends the ordinary kriging model by replacing the constant mean value by a non-constant mean function:
+
+$$Z(s)=\beta_0+\beta_1X_1(s)+...+\beta_pX_p(s)+e(s)$$ with $\beta_j$ the trend (i.e., regression) coefficients, and $X_j(s)$ $p$ known predictor functions (independent variables, regressors).
+
+The hope is that the predictor functions carry information in them that explains the variability of $Z(s)$ to a considerable extent, in which case the residual $e(s)$ will have lower variance and less spatial correlation compared to the ordinary kriging case. To see that this model extends ordinary kriging, take $p=0$ and note that for that case $\beta_0=m$. Another simplification is that if $e(s)$ is spatially independent, the universal kriging model reduces to a multiple linear regression model. One problem with universal kriging is that we need the variogram of the residuals, without having measured the residuals.
+
+As we've seen before, we can predict the zinc concentrations fairly well from the sqrt-transformed values of distance to river:
+
+::: panel-tabset
+## sp
+
+```{r,warning=F}
+library(gstat)
+library(sp)
+library(rgdal)
+sp.theme(TRUE)
+meuse <- readOGR("./data/meuse.gpkg")
+meuse.riv <- readOGR("./data/meuse_river.gpkg")
+meuse.lt = list(riv = list("sp.polygons", meuse.riv, fill = "grey"), pts = list("sp.points", 
+    meuse, pch = 3, cex = 0.5, col = "black"))
+meuse.grid <- as(readGDAL("./data/meuse_grid.tif"),"SpatialPixelsDataFrame")
+names(meuse.grid) <- c("part.a","part.b","dist","soil","ffreq")
+meuse.grid$soil <- as.factor(meuse.grid$soil)
+meuse.grid$ffreq <- as.factor(meuse.grid$ffreq)
+lzn.vgm = variogram(log(zinc) ~ 1, meuse)
+lzn.mod = fit.variogram(lzn.vgm, vgm(0.6, "Sph", 1000, 0.05))
+plot(log(zinc) ~ sqrt(dist), as.data.frame(meuse))
+lzn.lm = lm(log(zinc) ~ sqrt(dist), as.data.frame(meuse))
+summary(lzn.lm)
+abline(lzn.lm)
+```
+
+## sf/stars
+
+```{r}
+library(gstat)
+library(sf)
+library(stars)
+meuse.sf <- st_read("./data/meuse.gpkg")
+meuse.riv.sf <- st_read("./data/meuse_river.gpkg")
+meuse.grid.stars <- read_stars("./data/meuse_grid.tif")
+meuse.grid.stars <- split(meuse.grid.stars, "band")
+names(meuse.grid.stars) <- c("part.a","part.b","dist","soil","ffreq")
+meuse.grid.stars$soil <- as.factor(meuse.grid.stars$soil)
+meuse.grid.stars$ffreq <- as.factor(meuse.grid.stars$ffreq)
+bpy.palette=bpy.colors()
+lzn.vgm.sf = variogram(log(zinc) ~ 1, meuse.sf)
+lzn.mod.sf = fit.variogram(lzn.vgm.sf, vgm(0.6, "Sph", 1000, 0.05))
+plot(log(zinc) ~ sqrt(dist), as.data.frame(meuse.sf))
+lzn.lm.sf = lm(log(zinc) ~ sqrt(dist), as.data.frame(meuse.sf))
+summary(lzn.lm.sf)
+abline(lzn.lm.sf)
+```
+:::
+
+To compare the variograms from raw (but log-transformed) data and regression residuals, look at the conditioning plot obtained by
+
+::: panel-tabset
+## sp
+
+```{r,warning=F}
+g = gstat(id = "raw data", formula = log(zinc) ~ 1, data = meuse)
+g = gstat(g, id = "residuals", formula = log(zinc) ~ sqrt(dist), data = meuse)
+plot(variogram(g, cross = F), scales = list(relation = "same"), layout = c(2, 
+    1))
+```
+
+## sf/stars
+
+```{r}
+g.sf = gstat(id = "raw data", formula = log(zinc) ~ 1, data = meuse.sf)
+g.sf = gstat(g.sf, id = "residuals", formula = log(zinc) ~ sqrt(dist), data = meuse.sf)
+plot(variogram(g.sf, cross = F), scales = list(relation = "same"), layout = c(2, 
+    1))
+```
+:::
+
+------------------------------------------------------------------------
+
+### *Exercise 8.1* {.unnumbered}
+
+*How is the residual standard error from the regression model above (`lzn.lm`) related to the variogram of the residuals?*
+
+a)  it is half the mean semivariance of the raw data and that of the residuals
+b)  the square of the residual standard error (the residual variance) equals the sill of the residual variogram
+c)  it equals the range of the residual variogram
+d)  it equals the sill of the residual variogram
+e)  it equals the nugget of the residual variogram
+f)  the residual variance (approximately) equals the nugget of the variogram
+
+**Answer:**
+The correct answer is b). The squared residual error is the residual variance. The variance of a process can be derived from the variogram as the sill. When looking at the variogram of the residuals, the sill is the variance of the residuals, which equals the squared residual standard error.
+
+------------------------------------------------------------------------
+
+### *Exercise 8.2* {.unnumbered}
+
+*Why is the sill of the residual variogram much lower than the sill of the variogram for the raw data?*
+
+a)  residuals have less spatial correlation than original data
+b)  residuals vary less because here the regression model removed part of the total variability
+c)  the residuals have little in common with the (log) zinc data
+d)  residuals allways have much smaller variability than raw data
+
+**Answer:**
+The correct answer is b). The sill of the variogram of residuals (showing the variance) is lower than the sill of the raw data, because the regression model (modelling the trend/mean) already explains part of the variability. The residuals are the remaining, unexplained variability. If both variograms had the same sill (variance), it would mean that the regression model explains no variability. In this case universal kriging would not be needed.
+
+------------------------------------------------------------------------
+
+When a regression model formula is passed to `variogram`, the variogram of the residuals is calculated. When a model formula is passed to `krige`, universal kriging is used.
+
+Now model the residual variogram with a spherical model, say `zn.res.m`, and apply universal kriging. Compare the maps with predictions from universal kriging and ordinary kriging.
+
+::: panel-tabset
+## sp
+
+```{r, warning=F}
+v = variogram(log(zinc) ~ dist, meuse)
+# fit residual variogram model
+zn.res.m = fit.variogram(v, vgm(1, "Sph", 700, 1))
+zn.res.m
+# universal kriging
+outuk = krige(log(zinc) ~ dist, meuse, meuse.grid, model = zn.res.m)
+spplot(outuk["var1.pred"], main = "Universal Kriging")
+
+# ordinary kriging
+outok = krige(log(zinc) ~ 1, meuse, meuse.grid, model = lzn.mod)
+spplot(outok["var1.pred"], main = "Ordinary Kriging")
+
+# differences ordinary kriging vs. universal kriging
+outuk$diff <- outok$var1.pred-outuk$var1.pred
+spplot(outuk["diff"], main = "Differences OK vs. UK")
+```
+
+## sf/stars
+
+```{r}
+library(tmap)
+v.sf = variogram(log(zinc) ~ dist, meuse.sf)
+# fit residual variogram model
+zn.res.m.sf = fit.variogram(v.sf, vgm(1, "Sph", 700, 1))
+zn.res.m.sf
+# universal kriging
+outuk.stars = krige(log(zinc) ~ dist, meuse.sf, meuse.grid.stars, model = zn.res.m.sf)
+tm_shape(outuk.stars) + 
+  tm_raster("var1.pred", n=20, title = "prediction", palette = bpy.palette) + 
+  tm_layout(main.title = "Universal Kriging", legend.outside = TRUE)
+
+# ordinary kriging
+outok.stars = krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, model = lzn.mod.sf)
+tm_shape(outok.stars) + 
+  tm_raster("var1.pred", n=20, title = "prediction", palette = bpy.palette) + 
+  tm_layout(main.title = "Ordinary Kriging", legend.outside = TRUE)
+
+# differences ordinary kriging vs. universal kriging
+outuk.stars$diff <- outok.stars$var1.pred-outuk.stars$var1.pred
+tm_shape(outuk.stars) + 
+  tm_raster("diff", n=20, title = "diff", palette = bpy.palette) + 
+  tm_layout(main.title = "Differences OK vs. UK", legend.outside = TRUE)
+```
+:::
+
+------------------------------------------------------------------------
+
+### *Exercise 8.3* {.unnumbered}
+
+*Where are the differences most prevalent?*
+
+a)  In areas with values for dist close to 0 and 1
+b)  In areas with few data points
+c)  In areas where both (a) and (b) are valid
+
+
+**Answer:**
+The correct answer is c). The differences are most prevalent where values for 'dist' are close to 0 or 1 and where threre are few data points.
+
+------------------------------------------------------------------------
+
+### *Exercise 8.4* {.unnumbered}
+
+*Why are the differences happening exactly there?*
+
+a)  on locations far from measurements, interpolation relies heavily on the estimated trend value; where dist is close to 0 or 1, the trend value is most different from the value m used in ordinary kriging
+b)  on locations far from measurements we are most uncertain about the true values
+c)  on locations where dist is close to 0 or 1, it was hard to collect data, because these locations were hard to reach.
+
+**Answer:**
+The correct answer is a). At locations where there are only few data points, the estimation relies mainly on the modelled trend value. This value is most different from the mean (which is used in ordinary kriging) at extreme values for 'dist'. These extreme values of dist are near 0 and 1 (actually 0 and 0.88, try 'summary(meuse$dist)' and check 'Min.' and 'Max.').
+
+
+------------------------------------------------------------------------
+
+# Block kriging
+
+We will try block kriging settings under the universal kriging model. Note that the grid cell size of `meuse.grid` is 40:
+
+::: panel-tabset
+## sp
+
+```{r, warning=F}
+gridparameters(meuse.grid)
+```
+
+## sf/stars
+
+```{r}
+st_dimensions(meuse.grid.stars)
+```
+:::
+
+meaning that blocks of size 400 are largely overlapping.
+
+::: panel-tabset
+## sp
+
+```{r,warning=F}
+zn = krige(log(zinc) ~ sqrt(dist), meuse, meuse.grid, zn.res.m)
+zn$pointkr = zn$var1.pred
+zn40 = krige(log(zinc) ~ sqrt(dist), meuse, meuse.grid, zn.res.m, block = c(40, 
+    40))
+zn400 = krige(log(zinc) ~ sqrt(dist), meuse, meuse.grid, zn.res.m, block = c(400, 
+    400))
+zn$block40 = zn40$var1.pred
+zn$block400 = zn400$var1.pred
+spplot(zn[c("pointkr", "block40", "block400")], as.table = TRUE)
+zn$pointkr.se = sqrt(zn$var1.var)
+zn$block40.se = sqrt(zn40$var1.var)
+zn$block400.se = sqrt(zn400$var1.var)
+spplot(zn[c("pointkr.se", "block40.se", "block400.se")], as.table = TRUE)
+
+```
+
+## sf/stars
+
+```{r}
+zn.stars = krige(log(zinc) ~ sqrt(dist), meuse.sf, meuse.grid.stars, zn.res.m.sf)
+zn.stars$pointkr = zn.stars$var1.pred
+zn40.stars = krige(log(zinc) ~ sqrt(dist), meuse.sf, meuse.grid.stars, zn.res.m.sf, block = c(40, 
+    40))
+zn400.stars = krige(log(zinc) ~ sqrt(dist), meuse.sf, meuse.grid.stars, zn.res.m.sf, block = c(400, 
+    400))
+zn.stars$block40 = zn40.stars$var1.pred
+zn.stars$block400 = zn400.stars$var1.pred
+tm_shape(zn.stars) + 
+  tm_raster(c("pointkr","block40","block400"), n=20, palette = bpy.palette, title="") + 
+  tm_facets(free.scales = FALSE) + 
+  tm_layout(legend.outside.size = 0.15, panel.labels = c("pointkr","block40","block400"))
+zn.stars$pointkr.se = sqrt(zn.stars$var1.var)
+zn.stars$block40.se = sqrt(zn40.stars$var1.var)
+zn.stars$block400.se = sqrt(zn400.stars$var1.var)
+tm_shape(zn.stars) + 
+  tm_raster(c("pointkr.se", "block40.se", "block400.se"), n=20, palette = bpy.palette, title="") + 
+  tm_facets(free.scales = FALSE) + 
+  tm_layout(legend.outside.size = 0.15, panel.labels = c("pointkr.se", "block40.se", "block400.se"))
+
+```
+:::
+
+------------------------------------------------------------------------
+
+### *Exercise 8.5* {.unnumbered}
+
+*Describe what happens if we change from point prediction to block prediction of size 40, in terms of predictions and in terms of prediction standard errors?*
+
+**Answer:**
+The estimated values do not differ much. The standard errors however, are smaller. This is because the variability is cancelled out when predicting block means.
+
+------------------------------------------------------------------------
+
+### *Exercise 8.6* {.unnumbered}
+
+*Describe what happens if we change from block prediction for blocks of size 40 m to block prediction for blocks of size 400 m, in terms of predictions and in terms of prediction standard errors?*
+
+**Answer:**
+The map of becomes "smoother", the standard error decreases.
+
+------------------------------------------------------------------------
