@@ -5,7 +5,7 @@ editor: visual
 
 **This exercise will be discussed on YYY-MM-DD.**
 
-## Simple and ordinary kriging
+# Simple and ordinary kriging
 
 ------------------------------------------------------------------------
 
@@ -52,7 +52,7 @@ bpy.palette=bpy.colors()
 ```
 :::
 
-### Weights
+## Weights
 
 One main advantage of kriging compared to e.g. inverse distance weighting is that it cares about clustering of the points where the values for prediction come from.
 
@@ -81,7 +81,7 @@ Download the [E{Z}-Kriging tool](https://www.uni-muenster.de/LearnWeb/learnweb2/
 
 ------------------------------------------------------------------------
 
-### Influence of Variogram on Prediction
+## Influence of Variogram on Prediction
 
 Use E{Z}-Kriging. Place 7 points, some in a cluster and the others on different distances from the centre singularily.You may keep the values at the points.
 
@@ -141,7 +141,7 @@ Next we explore the range. In E{Z}-Kriging put $c1$ back to a medium value (keep
 ------------------------------------------------------------------------
 
 ### *Exercise 7.6* {.unnumbered}
- 
+
 *How is the influence of the range on weighting (compare very small, medium and very big range)?*
 
 ------------------------------------------------------------------------
@@ -218,6 +218,8 @@ tm_shape(lzn.stars) +
 :::
 
 ------------------------------------------------------------------------
+
+## Local Kriging
 
 Local kriging is obtained when, instead of all data points, only a subset of points nearest to the prediction location are selected. If we use only the nearest 5 points:
 

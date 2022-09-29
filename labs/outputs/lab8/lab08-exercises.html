@@ -2645,8 +2645,8 @@ vertical-align: -.125em;
 </header>
 
 <p><strong>This exercise will be discussed on YYY-MM-DD.</strong></p>
-<section id="universal-kriging" class="level2" data-number="1">
-<h2 data-number="1" class="anchored" data-anchor-id="universal-kriging"><span class="header-section-number">1</span> Universal kriging</h2>
+<section id="universal-kriging" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Universal kriging</h1>
 <hr>
 <p>Universal kriging</p>
 <p>Just like stratified kriging, universal kriging provides a less restrictive model than ordinary kriging. Suppose the model for ordinary kriging is written as <span class="math display">\[Z(s)=m+e(s)\]</span> with <span class="math inline">\(Z(s)\)</span> the observed variable <span class="math inline">\(Z\)</span> at spatial location <span class="math inline">\(s\)</span>, <span class="math inline">\(m\)</span> a constant but unknown mean value and <span class="math inline">\(e(s)\)</span> an intrinsically stationary residual, we can write stratified kriging as <span class="math inline">\(j\)</span> models</p>
@@ -2841,45 +2841,25 @@ F-statistic: 270.6 on 1 and 153 DF,  p-value: &lt; 2.2e-16</code></pre>
 <section id="exercise-8.1" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="exercise-8.1"><em>Exercise 8.1</em></h3>
 <p><em>How is the residual standard error from the regression model above (<code>lzn.lm</code>) related to the variogram of the residuals?</em></p>
-<ul>
-<li><ol type="a">
+<ol type="a">
 <li>it is half the mean semivariance of the raw data and that of the residuals</li>
-</ol></li>
-<li><ol start="2" type="a">
 <li>the square of the residual standard error (the residual variance) equals the sill of the residual variogram</li>
-</ol></li>
-<li><ol start="3" type="a">
 <li>it equals the range of the residual variogram</li>
-</ol></li>
-<li><ol start="4" type="a">
 <li>it equals the sill of the residual variogram</li>
-</ol></li>
-<li><ol start="5" type="a">
 <li>it equals the nugget of the residual variogram</li>
-</ol></li>
-<li><ol start="6" type="a">
 <li>the residual variance (approximately) equals the nugget of the variogram</li>
-</ol></li>
-</ul>
+</ol>
 <hr>
 </section>
 <section id="exercise-8.2" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="exercise-8.2"><em>Exercise 8.2</em></h3>
 <p><em>Why is the sill of the residual variogram much lower than the sill of the variogram for the raw data?</em></p>
-<ul>
-<li><ol type="a">
+<ol type="a">
 <li>residuals have less spatial correlation than original data</li>
-</ol></li>
-<li><ol start="2" type="a">
 <li>residuals vary less because here the regression model removed part of the total variability</li>
-</ol></li>
-<li><ol start="3" type="a">
 <li>the residuals have little in common with the (log) zinc data</li>
-</ol></li>
-<li><ol start="4" type="a">
 <li>residuals allways have much smaller variability than raw data</li>
-</ol></li>
-</ul>
+</ol>
 <hr>
 <p>When a regression model formula is passed to <code>variogram</code>, the variogram of the residuals is calculated. When a model formula is passed to <code>krige</code>, universal kriging is used.</p>
 <p>Now model the residual variogram with a spherical model, say <code>zn.res.m</code>, and apply universal kriging. Compare the maps with predictions from universal kriging and ordinary kriging.</p>
@@ -2974,38 +2954,26 @@ F-statistic: 270.6 on 1 and 153 DF,  p-value: &lt; 2.2e-16</code></pre>
 <section id="exercise-8.3" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="exercise-8.3"><em>Exercise 8.3</em></h3>
 <p><em>Where are the differences most prevalent?</em></p>
-<ul>
-<li><ol type="a">
+<ol type="a">
 <li>In areas with values for dist close to 0 and 1</li>
-</ol></li>
-<li><ol start="2" type="a">
 <li>In areas with few data points</li>
-</ol></li>
-<li><ol start="3" type="a">
 <li>In areas where both (a) and (b) are valid</li>
-</ol></li>
-</ul>
+</ol>
 <hr>
 </section>
 <section id="exercise-8.4" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="exercise-8.4"><em>Exercise 8.4</em></h3>
 <p><em>Why are the differences happening exactly there?</em></p>
-<ul>
-<li><ol type="a">
+<ol type="a">
 <li>on locations far from measurements, interpolation relies heavily on the estimated trend value; where dist is close to 0 or 1, the trend value is most different from the value m used in ordinary kriging</li>
-</ol></li>
-<li><ol start="2" type="a">
 <li>on locations far from measurements we are most uncertain about the true values</li>
-</ol></li>
-<li><ol start="3" type="a">
 <li>on locations where dist is close to 0 or 1, it was hard to collect data, because these locations were hard to reach.</li>
-</ol></li>
-</ul>
+</ol>
 <hr>
 </section>
 </section>
-<section id="block-kriging" class="level2" data-number="2">
-<h2 data-number="2" class="anchored" data-anchor-id="block-kriging"><span class="header-section-number">2</span> Block kriging</h2>
+<section id="block-kriging" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Block kriging</h1>
 <p>We will try block kriging settings under the universal kriging model. Note that the grid cell size of <code>meuse.grid</code> is 40:</p>
 <div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true" href>sp</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false" href>sf/stars</a></li></ul>
@@ -3111,7 +3079,7 @@ y    1 104 333760   -40 Amersfoort / RD New FALSE   NULL [y]</code></pre>
 <hr>
 <section id="exercise-8.5" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="exercise-8.5"><em>Exercise 8.5</em></h3>
-<p><em>Describe what happens if we change from point prediction to block predictio of size 40, in terms of predictions and in terms of prediction standard errors?</em></p>
+<p><em>Describe what happens if we change from point prediction to block prediction of size 40, in terms of predictions and in terms of prediction standard errors?</em></p>
 <hr>
 </section>
 <section id="exercise-8.6" class="level3 unnumbered">

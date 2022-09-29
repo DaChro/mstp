@@ -2611,18 +2611,25 @@ vertical-align: -.125em;
   <ul>
   <li><a href="#simple-and-ordinary-kriging" id="toc-simple-and-ordinary-kriging" class="nav-link active" data-scroll-target="#simple-and-ordinary-kriging"><span class="toc-section-number">1</span>  Simple and ordinary kriging</a>
   <ul class="collapse">
-  <li><a href="#weights" id="toc-weights" class="nav-link" data-scroll-target="#weights"><span class="toc-section-number">1.1</span>  Weights</a></li>
+  <li><a href="#weights" id="toc-weights" class="nav-link" data-scroll-target="#weights"><span class="toc-section-number">1.1</span>  Weights</a>
+  <ul class="collapse">
   <li><a href="#exercise-7.1" id="toc-exercise-7.1" class="nav-link" data-scroll-target="#exercise-7.1"><em>Exercise 7.1</em></a></li>
   <li><a href="#exercise-7.2" id="toc-exercise-7.2" class="nav-link" data-scroll-target="#exercise-7.2"><em>Exercise 7.2</em></a></li>
-  <li><a href="#influence-of-variogram-on-prediction" id="toc-influence-of-variogram-on-prediction" class="nav-link" data-scroll-target="#influence-of-variogram-on-prediction"><span class="toc-section-number">1.2</span>  Influence of Variogram on Prediction</a></li>
+  </ul></li>
+  <li><a href="#influence-of-variogram-on-prediction" id="toc-influence-of-variogram-on-prediction" class="nav-link" data-scroll-target="#influence-of-variogram-on-prediction"><span class="toc-section-number">1.2</span>  Influence of Variogram on Prediction</a>
+  <ul class="collapse">
   <li><a href="#exercise-7.3" id="toc-exercise-7.3" class="nav-link" data-scroll-target="#exercise-7.3"><em>Exercise 7.3</em></a></li>
   <li><a href="#exercise-7.4" id="toc-exercise-7.4" class="nav-link" data-scroll-target="#exercise-7.4"><em>Exercise 7.4</em></a></li>
   <li><a href="#exercise-7.5" id="toc-exercise-7.5" class="nav-link" data-scroll-target="#exercise-7.5"><em>Exercise 7.5</em></a></li>
   <li><a href="#exercise-7.6" id="toc-exercise-7.6" class="nav-link" data-scroll-target="#exercise-7.6"><em>Exercise 7.6</em></a></li>
   <li><a href="#exercise-7.7" id="toc-exercise-7.7" class="nav-link" data-scroll-target="#exercise-7.7"><em>Exercise 7.7</em></a></li>
+  </ul></li>
+  <li><a href="#local-kriging" id="toc-local-kriging" class="nav-link" data-scroll-target="#local-kriging"><span class="toc-section-number">1.3</span>  Local Kriging</a>
+  <ul class="collapse">
   <li><a href="#exercise-7.8" id="toc-exercise-7.8" class="nav-link" data-scroll-target="#exercise-7.8"><em>Exercise 7.8</em></a></li>
   <li><a href="#exercise-7.9" id="toc-exercise-7.9" class="nav-link" data-scroll-target="#exercise-7.9"><em>Exercise 7.9</em></a></li>
   <li><a href="#exercise-7.10" id="toc-exercise-7.10" class="nav-link" data-scroll-target="#exercise-7.10"><em>Exercise 7.10</em></a></li>
+  </ul></li>
   </ul></li>
   </ul>
 </nav>
@@ -2647,8 +2654,8 @@ vertical-align: -.125em;
 
 </header>
 
-<section id="simple-and-ordinary-kriging" class="level2" data-number="1">
-<h2 data-number="1" class="anchored" data-anchor-id="simple-and-ordinary-kriging"><span class="header-section-number">1</span> Simple and ordinary kriging</h2>
+<section id="simple-and-ordinary-kriging" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Simple and ordinary kriging</h1>
 <hr>
 <p>Ordinary kriging is an interpolation method that uses weighted averages of all, or a defined set of neighbouring, observations. It calculates a weighted average, where weights are chosen such that (i) prediction error variance is minimal, and (ii) predictions are unbiased. The second requirement results in weights that sum to one. Simple kriging assumes the mean (or mean function) to be known; consequently it drops the second requirement and the weights do not have to sum to unity. Kriging assumes the variogram to be known; based on the variogram (or the covariogram, derived from the variogram) it calculates prediction variances.</p>
 <p>To load everything you need into your workspace do</p>
@@ -2751,11 +2758,10 @@ Projected CRS: Amersfoort / RD New</code></pre>
 </div>
 </div>
 </div>
-<section id="weights" class="level3" data-number="1.1">
-<h3 data-number="1.1" class="anchored" data-anchor-id="weights"><span class="header-section-number">1.1</span> Weights</h3>
+<section id="weights" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="weights"><span class="header-section-number">1.1</span> Weights</h2>
 <p>One main advantage of kriging compared to e.g. inverse distance weighting is that it cares about clustering of the points where the values for prediction come from.</p>
 <hr>
-</section>
 <section id="exercise-7.1" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="exercise-7.1"><em>Exercise 7.1</em></h3>
 <p><em>Imagine you want to predict a value by three others. All three points have the same distance from the point to predict, two of them are very close together and the third one is on the opposite side of the point to predict. Which weighting would you choose and why?</em></p>
@@ -2779,12 +2785,12 @@ Projected CRS: Amersfoort / RD New</code></pre>
 <p>Download the <a href="https://www.uni-muenster.de/LearnWeb/learnweb2/mod/resource/view.php?id=1111161">E{Z}-Kriging tool</a> to see how weighting is done by kriging. Use it to answer the following questions.</p>
 <hr>
 </section>
-<section id="influence-of-variogram-on-prediction" class="level3" data-number="1.2">
-<h3 data-number="1.2" class="anchored" data-anchor-id="influence-of-variogram-on-prediction"><span class="header-section-number">1.2</span> Influence of Variogram on Prediction</h3>
+</section>
+<section id="influence-of-variogram-on-prediction" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="influence-of-variogram-on-prediction"><span class="header-section-number">1.2</span> Influence of Variogram on Prediction</h2>
 <p>Use E{Z}-Kriging. Place 7 points, some in a cluster and the others on different distances from the centre singularily.You may keep the values at the points.</p>
 <p>The first parameter we look at is the nugget effect. Put the partial sill (<span class="math inline">\(c1\)</span>) to 0 and change the nugget effect (<span class="math inline">\(c0\)</span>).</p>
 <hr>
-</section>
 <section id="exercise-7.3" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="exercise-7.3"><em>Exercise 7.3</em></h3>
 <p><em>What happens to the weights, to the prediction and to the prediction error?</em></p>
@@ -2994,6 +3000,10 @@ after 200 iterations: try different initial values?</code></pre>
 </div>
 </div>
 <hr>
+</section>
+</section>
+<section id="local-kriging" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="local-kriging"><span class="header-section-number">1.3</span> Local Kriging</h2>
 <p>Local kriging is obtained when, instead of all data points, only a subset of points nearest to the prediction location are selected. If we use only the nearest 5 points:</p>
 <div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true" href>sp</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false" href>sf/stars</a></li></ul>
@@ -3030,7 +3040,6 @@ after 200 iterations: try different initial values?</code></pre>
 </div>
 </div>
 <hr>
-</section>
 <section id="exercise-7.8" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="exercise-7.8"><em>Exercise 7.8</em></h3>
 <p><em>When we increase the value of nmax, the differences between the local and global kriging will</em></p>
@@ -3145,6 +3154,7 @@ after 200 iterations: try different initial values?</code></pre>
 <p><strong>Answer:</strong> The correct answer is a). In areas where there is no known point to predict the value at the prediction location, simple kriging gives the global mean as estimate.</p>
 <hr>
 <p>Some texts advocate to choose search neighbourhood distances equal to the range of the variogram, however there is no theoretical nor a practical justification for this: weights of points beyond the correlation range are usually not zero. Choosing a local neighbourhood may save time and memory when kriging large data sets. In addition, the assumption of a global constant mean is weakened to that of a constant mean within the search neighbourhood.</p>
+</section>
 </section>
 </section>
 
