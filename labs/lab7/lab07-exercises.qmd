@@ -58,7 +58,7 @@ One main advantage of kriging compared to e.g. inverse distance weighting is tha
 
 ------------------------------------------------------------------------
 
-### Exercise 7.1
+### *Exercise 7.1* {.unnumbered}
 
 *Imagine you want to predict a value by three others. All three points have the same distance from the point to predict, two of them are very close together and the third one is on the opposite side of the point to predict. Which weighting would you choose and why?*
 
@@ -68,7 +68,7 @@ c)  Put less weight on the single point than on the two clustered ones.
 
 ------------------------------------------------------------------------
 
-### Exercise 7.2
+### *Exercise 7.2* {.unnumbered}
 
 *Which of the following properties are true/false for inverse distance interpolation and for kriging, respectively?*
 
@@ -89,7 +89,7 @@ The first parameter we look at is the nugget effect. Put the partial sill ($c1$)
 
 ------------------------------------------------------------------------
 
-### Exercise 7.3
+### *Exercise 7.3* {.unnumbered}
 
 *What happens to the weights, to the prediction and to the prediction error?*
 
@@ -124,13 +124,13 @@ tm_shape(lzn.krige.nugget.stars) +
 
 ------------------------------------------------------------------------
 
-### Exercise 7.4
+### *Exercise 7.4* {.unnumbered}
 
 *How are clustered points weighted? How important is the distance to the point to predict? Does pure nugget effect fit data with strong spatial correlation or data where values in different points are uncorrelated?*
 
 ------------------------------------------------------------------------
 
-### Exercise 7.5
+### *Exercise 7.5* {.unnumbered}
 
 *What are the predicted values? Explain why this makes sense here!*
 
@@ -140,8 +140,8 @@ Next we explore the range. In E{Z}-Kriging put $c1$ back to a medium value (keep
 
 ------------------------------------------------------------------------
 
-### Exercise 7.6
-
+### *Exercise 7.6* {.unnumbered}
+ 
 *How is the influence of the range on weighting (compare very small, medium and very big range)?*
 
 ------------------------------------------------------------------------
@@ -175,7 +175,7 @@ Repeat for $range = 10000$ (true range is about $1000$).
 
 ------------------------------------------------------------------------
 
-### Exercise 7.7
+### *Exercise 7.7* {.unnumbered}
 
 *Describe the main differences of the kriged map for small/big range and compare the errors.*
 
@@ -244,7 +244,7 @@ tm_shape(lzn.stars) +
 
 ------------------------------------------------------------------------
 
-### Exercise 7.8
+### *Exercise 7.8* {.unnumbered}
 
 *When we increase the value of nmax, the differences between the local and global kriging will*
 
@@ -257,7 +257,6 @@ c)  remain the same
 Another, commonly used strategy is to select a kriging neighbourhood based on spatial distance to prediction location. To exagerate the effect of distance-based neighbourhoods, a very small neighbourhood is chosen of 200 m:
 
 ::: panel-tabset
-
 ## sp
 
 ```{r,warning=F}
@@ -286,7 +285,7 @@ tm_shape(lzn.ok.stars) +
 
 ------------------------------------------------------------------------
 
-### Exercise 7.9
+### *Exercise 7.9* {.unnumbered}
 
 *How can the gaps that now occur in the local neighbourhood kriging map be explained? At these prediction locations*
 
@@ -297,7 +296,6 @@ c)  the kriging neighbourhood contains less than 2 observations
 ------------------------------------------------------------------------
 
 ::: panel-tabset
-
 ## sp
 
 ```{r,warning=F}
@@ -326,7 +324,7 @@ Ordinary and simple kriging behave different in this latter aspect.
 
 ------------------------------------------------------------------------
 
-### Exercise 7.10
+### *Exercise 7.10* {.unnumbered}
 
 *In the areas with gaps in the ordinary kriging map, simple kriging yields*
 
