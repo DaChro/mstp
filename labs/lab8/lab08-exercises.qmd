@@ -5,7 +5,7 @@ editor: visual
 
 **This exercise will be discussed on YYY-MM-DD.**
 
-## Universal kriging
+# Universal kriging
 
 ------------------------------------------------------------------------
 
@@ -100,29 +100,12 @@ plot(variogram(g.sf, cross = F), scales = list(relation = "same"), layout = c(2,
 
 *How is the residual standard error from the regression model above (`lzn.lm`) related to the variogram of the residuals?*
 
--   
-
-    a)  it is half the mean semivariance of the raw data and that of the residuals
-
--   
-
-    b)  the square of the residual standard error (the residual variance) equals the sill of the residual variogram
-
--   
-
-    c)  it equals the range of the residual variogram
-
--   
-
-    d)  it equals the sill of the residual variogram
-
--   
-
-    e)  it equals the nugget of the residual variogram
-
--   
-
-    f)  the residual variance (approximately) equals the nugget of the variogram
+a)  it is half the mean semivariance of the raw data and that of the residuals
+b)  the square of the residual standard error (the residual variance) equals the sill of the residual variogram
+c)  it equals the range of the residual variogram
+d)  it equals the sill of the residual variogram
+e)  it equals the nugget of the residual variogram
+f)  the residual variance (approximately) equals the nugget of the variogram
 
 ------------------------------------------------------------------------
 
@@ -130,21 +113,10 @@ plot(variogram(g.sf, cross = F), scales = list(relation = "same"), layout = c(2,
 
 *Why is the sill of the residual variogram much lower than the sill of the variogram for the raw data?*
 
--   
-
-    a)  residuals have less spatial correlation than original data
-
--   
-
-    b)  residuals vary less because here the regression model removed part of the total variability
-
--   
-
-    c)  the residuals have little in common with the (log) zinc data
-
--   
-
-    d)  residuals allways have much smaller variability than raw data
+a)  residuals have less spatial correlation than original data
+b)  residuals vary less because here the regression model removed part of the total variability
+c)  the residuals have little in common with the (log) zinc data
+d)  residuals allways have much smaller variability than raw data
 
 ------------------------------------------------------------------------
 
@@ -207,17 +179,9 @@ tm_shape(outuk.stars) +
 
 *Where are the differences most prevalent?*
 
--   
-
-    a)  In areas with values for dist close to 0 and 1
-
--   
-
-    b)  In areas with few data points
-
--   
-
-    c)  In areas where both (a) and (b) are valid
+a)  In areas with values for dist close to 0 and 1
+b)  In areas with few data points
+c)  In areas where both (a) and (b) are valid
 
 ------------------------------------------------------------------------
 
@@ -225,21 +189,13 @@ tm_shape(outuk.stars) +
 
 *Why are the differences happening exactly there?*
 
--   
-
-    a)  on locations far from measurements, interpolation relies heavily on the estimated trend value; where dist is close to 0 or 1, the trend value is most different from the value m used in ordinary kriging
-
--   
-
-    b)  on locations far from measurements we are most uncertain about the true values
-
--   
-
-    c)  on locations where dist is close to 0 or 1, it was hard to collect data, because these locations were hard to reach.
+a)  on locations far from measurements, interpolation relies heavily on the estimated trend value; where dist is close to 0 or 1, the trend value is most different from the value m used in ordinary kriging
+b)  on locations far from measurements we are most uncertain about the true values
+c)  on locations where dist is close to 0 or 1, it was hard to collect data, because these locations were hard to reach.
 
 ------------------------------------------------------------------------
 
-## Block kriging
+# Block kriging
 
 We will try block kriging settings under the universal kriging model. Note that the grid cell size of `meuse.grid` is 40:
 
@@ -309,7 +265,7 @@ tm_shape(zn.stars) +
 
 ### *Exercise 8.5* {.unnumbered}
 
-*Describe what happens if we change from point prediction to block predictio of size 40, in terms of predictions and in terms of prediction standard errors?*
+*Describe what happens if we change from point prediction to block prediction of size 40, in terms of predictions and in terms of prediction standard errors?*
 
 ------------------------------------------------------------------------
 
