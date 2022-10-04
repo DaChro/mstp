@@ -2706,7 +2706,19 @@ vertical-align: -.125em;
  Max.   :23.10  </code></pre>
 </div>
 </div>
-<p><em>Hint:</em> In case the RData file is not in working directory, you may have to specify the absolute path (e.g. C:/myDirectory/meteo.RData in Windows), but we recommend you to set the working directory properly using the <strong>setwd</strong> function or an R Studio project.</p>
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Hint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In case the RData file is not in working directory, you may have to specify the absolute path (e.g. C:/myDirectory/meteo.RData in Windows), but we recommend you to set the working directory properly using the <strong>setwd</strong> function or an R Studio project.</p>
+</div>
+</div>
 <p>Again, we can generate a plot using the <strong>plot</strong> function:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(T.outside <span class="sc">~</span> date, meteo, <span class="at">type =</span> <span class="st">&quot;l&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -2810,7 +2822,19 @@ $iterations
 </div>
 <section id="exercise-2.1" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="exercise-2.1"><em>Exercise 2.1</em></h3>
+<div class="callout-caution callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Task
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p><em>How many parameters were fitted?</em></p>
+</div>
+</div>
 <p>We will now plot observations and fitted model together:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">#plot the temperature curve first again</span></span>
@@ -2828,7 +2852,19 @@ $iterations
 </section>
 <section id="exercise-2.2" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="exercise-2.2"><em>Exercise 2.2</em></h3>
+<div class="callout-caution callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Task
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p><em>What is the interpretation of the fitted parameters? (if you need to guess, modify them and replot)</em></p>
+</div>
+</div>
 <p>We can now also plot the residual (difference between predicted values and measured temperature values) from this fitted model:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(T.outside<span class="sc">-</span>T.per<span class="sc">~</span>date, meteo, <span class="at">type=</span><span class="st">&#39;l&#39;</span>)</span>
@@ -2870,6 +2906,16 @@ sigma^2 estimated as 0.002556:  log likelihood = 15479.61,  aic = -30945.22</cod
 </div>
 <section id="exercise-2.3" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="exercise-2.3"><em>Exercise 2.3</em></h3>
+<div class="callout-caution callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Task
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(an, <span class="at">type =</span> <span class="st">&quot;partial&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -2877,9 +2923,21 @@ sigma^2 estimated as 0.002556:  log likelihood = 15479.61,  aic = -30945.22</cod
 </div>
 </div>
 <p><em>Does the <strong>an</strong> process exhibit temporal correlation for lags larger than 0?)</em></p>
+</div>
+</div>
 </section>
 <section id="exercise-2.4" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="exercise-2.4"><em>Exercise 2.4</em></h3>
+<div class="callout-caution callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Task
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(<span class="fu">residuals</span>(an.ar5), <span class="at">type =</span> <span class="st">&quot;partial&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -2887,13 +2945,37 @@ sigma^2 estimated as 0.002556:  log likelihood = 15479.61,  aic = -30945.22</cod
 </div>
 </div>
 <p><em>Does the <strong>residuals(an.ar5)</strong> process still exhibit temporal correlation for lags larger than 0?</em></p>
+</div>
+</div>
 </section>
 <section id="exercise-2.5" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="exercise-2.5"><em>Exercise 2.5</em></h3>
+<div class="callout-caution callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Task
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p><em>What is the class of the object returned by <strong>arima</strong>?</em></p>
+</div>
+</div>
 </section>
 <section id="exercise-2.6" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="exercise-2.6"><em>Exercise 2.6</em></h3>
+<div class="callout-caution callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Task
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>Let us see what we can do with such an object.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">methods</span>(<span class="at">class=</span><span class="st">&quot;Arima&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -2908,6 +2990,8 @@ see &#39;?methods&#39; for accessing help and source code</code></pre>
 </div>
 <p>The <strong>methods</strong> function returns the methods of a class, in this case the <strong>Arima</strong> class. The tsdiag function provides time series diagnostic plots.</p>
 <p><em>Explain what you see in the first two plots!</em></p>
+</div>
+</div>
 </section>
 </section>
 <section id="model-selection-with-akaikes-information-criterion-aic" class="level2" data-number="4">
@@ -2928,10 +3012,32 @@ arima(temp, c(9, 0, 0))$aic
 arima(temp, c(10, 0, 0))$aic</code></pre>
 <section id="exercise-2.7" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="exercise-2.7"><em>Exercise 2.7</em></h3>
+<div class="callout-caution callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Task
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p><em>Which model has the smallest AIC?</em></p>
+</div>
+</div>
 </section>
 <section id="exercise-2.8" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="exercise-2.8"><em>Exercise 2.8</em></h3>
+<div class="callout-caution callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Task
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p><em>Do a similar analysis for the humidity variable in the meteo data set:</em></p>
 <ol type="1">
 <li><em>Fit a periodic trend; give the trend equation.</em></li>
@@ -2939,6 +3045,8 @@ arima(temp, c(10, 0, 0))$aic</code></pre>
 <li><em>detrend the humidity data to obtain residuals and report for which value of n in an AR(n) model of the anomalies (residuals) the model has the lowest AIC.</em></li>
 <li><em>Up to which lag does the residual humidity process exhibit temporal correlation?</em></li>
 </ol>
+</div>
+</div>
 </section>
 </section>
 <section id="prediction-with-an-ar-model" class="level2" data-number="5">
@@ -2993,7 +3101,19 @@ arima(temp, c(10, 0, 0))$aic</code></pre>
 </div>
 <section id="exercise-2.9" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="exercise-2.9"><em>Exercise 2.9</em></h3>
+<div class="callout-caution callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Task
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p><em>Where does, for long-term forecasts, the predicted value converge to?</em></p>
+</div>
+</div>
 <p>Now compare this with prediction using an AR(6) model for the residual with respect to the daily cycle:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1 week, including trend:</span></span>
@@ -3017,11 +3137,35 @@ arima(temp, c(10, 0, 0))$aic</code></pre>
 </section>
 <section id="exercise-2.10" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="exercise-2.10"><em>Exercise 2.10</em></h3>
+<div class="callout-caution callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Task
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p><em>Where does now, for long-term forecasts, the predicted value converge to? Explain the difference to the upper model.</em></p>
+</div>
+</div>
 </section>
 <section id="exercise-2.11" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="exercise-2.11"><em>Exercise 2.11</em></h3>
+<div class="callout-caution callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Task
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p><em>Fit a periodic trend and an AR(3) model to the humidity data. Plot predictions for one week.</em></p>
+</div>
+</div>
 </section>
 </section>
 

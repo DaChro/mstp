@@ -16,7 +16,11 @@ class(meteo)
 summary(meteo)
 ```
 
-*Hint:* In case the RData file is not in working directory, you may have to specify the absolute path (e.g. C:/myDirectory/meteo.RData in Windows), but we recommend you to set the working directory properly using the **setwd** function or an R Studio project.
+::: {.callout-note}
+## Hint
+
+In case the RData file is not in working directory, you may have to specify the absolute path (e.g. C:/myDirectory/meteo.RData in Windows), but we recommend you to set the working directory properly using the **setwd** function or an R Studio project.
+::: 
 
 Again, we can generate a plot using the **plot** function:
 
@@ -72,10 +76,14 @@ nlm(f,c(0,0,0))
 ```
 
 ### *Exercise 2.1* {.unnumbered}
+::: {.callout-caution}
+## Task
 
 *How many parameters were fitted?*
+:::
 
-**Answer:**
+::: {.callout-tip}
+## Solution
 
 Three parameters were fitted. The following periodic model is used: $$x_1 + x_2 \sin(\pi(t + x_3)/12)$$
 
@@ -86,6 +94,7 @@ f = function(x) sum((meteo$T.outside - (x[1]+x[2]*sin(pi*(meteo$hours+x[3])/12))
 ```
 
 `nlm` minimizes this function regarding `x[1]`,`x[2]` and `x[3]` starting with the initial values we define by the vector `c(0,0,0)`.
+:::
 
 We will now plot observations and fitted model together:
 
@@ -101,16 +110,23 @@ lines(T.per~date,meteo,col='red')
 ```
 
 ### *Exercise 2.2* {.unnumbered}
+::: {.callout-caution}
+## Task
 
 *What is the interpretation of the fitted parameters? (if you need to guess, modify them and replot)*
+:::
 
-**Answer:**
+::: {.callout-tip}
+## Solution
+
 
 `x[1]`: shift on the y-axis (here 18,2).
 
 `x[2]`: amplitude (here -4,9).
 
 `x[3]`: shift on the x-axis or phase (here 1,6).
+
+:::
 
 We can now also plot the residual (difference between predicted values and measured temperature values) from this fitted model:
 
@@ -147,42 +163,60 @@ an.ar5
 ```
 
 ### *Exercise 2.3* {.unnumbered}
+::: {.callout-caution}
+## Task
 
 ```{r}
 acf(an, type = "partial")
 ```
 
 *Does the **an** process exhibit temporal correlation for lags larger than 0?)*
+:::
 
-**Answer:**
+::: {.callout-tip}
+## Solution
 
 Yes, the process exhibits significant partial autocorrelation up to lag 5.
+:::
 
 ### *Exercise 2.4* {.unnumbered}
+::: {.callout-caution}
+## Task
 
 ```{r}
 acf(residuals(an.ar5), type = "partial")
 ```
 
 *Does the **residuals(an.ar5)** process still exhibit temporal correlation for lags larger than 0?*
+:::
 
-**Answer:**
+::: {.callout-tip}
+## Solution
 
 No, there is no significant partial autocorrelation for lags above 0. Please note that the value range (y-axis) in this acf plot is much smaller than in the previous plot!
+:::
 
 ### *Exercise 2.5* {.unnumbered}
+::: {.callout-caution}
+## Task
 
 *What is the class of the object returned by **arima**?*
+:::
 
-**Answer:**
+::: {.callout-tip}
+## Solution
+
 
 ```{r}
 class(an.ar5)
 ```
 
 The object is of class "Arima".
+:::
 
 ### *Exercise 2.6* {.unnumbered}
+::: {.callout-caution}
+## Task
 
 Let us see what we can do with such an object.
 
@@ -194,12 +228,15 @@ tsdiag(an.ar5)
 The **methods** function returns the methods of a class, in this case the **Arima** class. The tsdiag function provides time series diagnostic plots.
 
 *Explain what you see in the first two plots!*
+:::
 
-**Answer:**
+::: {.callout-tip}
+## Solution
 
 The first plot shows standardized residuals. This means the mean of the residuals is 0 and the standard deviation is 1. This is achieved by subtracting the mean and dividing by the standard deviation. As a result the residuals are better comparable with those of other time series.
 
 The second plot shows the autocorrelation of the residuals of the AR model.
+:::
 
 ## Model selection with Akaike's Information Criterion (AIC)
 
@@ -221,10 +258,14 @@ temp = meteo$T.outside
     arima(temp, c(10, 0, 0))$aic
 
 ### *Exercise 2.7* {.unnumbered}
+::: {.callout-caution}
+## Task
 
 *Which model has the smallest AIC?*
+:::
 
-**Answer:**
+::: {.callout-tip}
+## Solution
 
 ```{r}
 arima(temp, c(1, 0, 0))$aic
@@ -240,8 +281,11 @@ arima(temp, c(10, 0, 0))$aic
 ```
 
 The model of order 8 shows the smalles AIC.
+:::
 
 ### *Exercise 2.8* {.unnumbered}
+::: {.callout-caution}
+## Task
 
 *Do a similar analysis for the humidity variable in the meteo data set:*
 
@@ -249,10 +293,12 @@ The model of order 8 shows the smalles AIC.
 2.  *Plot the humidity data and the fitted model.*
 3.  *detrend the humidity data to obtain residuals and report for which value of n in an AR(n) model of the anomalies (residuals) the model has the lowest AIC.*
 4.  *Up to which lag does the residual humidity process exhibit temporal correlation?*
+:::
 
-**Answer:**
+::: {.callout-tip}
+## Solution
 
-*Exercise 2.8.1:* {.unnumbered}
+#### *Exercise 2.8.1:* {.unnumbered}
 
 ```{r}
 #Exercise 2.8.1 --> fit the periodic component
@@ -264,7 +310,7 @@ nlm(f,c(0,0,0))
 
 Trend equation: $$74.635633 + 19.874064 * sin(pi*(t+1.647808)/12)$$
 
-*Exercise 2.8.2:* {.unnumbered}
+#### *Exercise 2.8.2:* {.unnumbered}
 
 ```{r}
 #Exercise 2.8.2 -> plot the humidity data and the fitted model
@@ -276,7 +322,7 @@ plot(meteo$humidity ~ meteo$date,type="l")
 lines(humidity.per~date, meteo, col="red")
 ```
 
-*Exercise 2.8.3:* {.unnumbered}
+#### *Exercise 2.8.3:* {.unnumbered}
 
 ```{r}
 #Exercise 2.8.3 -> detrend and check residuals
@@ -297,7 +343,7 @@ arima(humidity.an, c(10,0,0))$aic
 
 The model of 9th order has the lowest aic.
 
-*Exercise 2.8.4:* {.unnumbered}
+#### *Exercise 2.8.4:* {.unnumbered}
 
 ```{r}
 #Exercise 2.8.4 -> compute and plot acf for the residuals
@@ -306,6 +352,7 @@ acf(residuals(humidity.an.ar9), type = "partial")
 ```
 
 There is no significant partial autocorrelation for lags above 0.
+:::
 
 ## Prediction with an AR model
 
@@ -348,12 +395,17 @@ title("predicting 1 week")
 ```
 
 ### *Exercise 2.9* {.unnumbered}
+::: {.callout-caution}
+## Task
 
 *Where does, for long-term forecasts, the predicted value converge to?*
+:::
 
-**Answer:**
+::: {.callout-tip}
+## Solution
 
 It converges to the mean of the temperature data (18,13).
+:::
 
 Now compare this with prediction using an AR(6) model for the residual with respect to the daily cycle:
 
@@ -375,18 +427,27 @@ title("predicting 1 week")
 ```
 
 ### *Exercise 2.10* {.unnumbered}
+::: {.callout-caution}
+## Task
 
 *Where does now, for long-term forecasts, the predicted value convergeto? Explain the difference to the upper model.*
+:::
 
-**Answer:**
+::: {.callout-tip}
+## Solution
 
 Here the predicted value does not converge to the mean but to the periodic trend. The daily cycle is taken into account.
+:::
 
 ### *Exercise 2.11* {.unnumbered}
+::: {.callout-caution}
+## Task
 
 *Fit a periodic trend and an AR(3) model to the humidity data. Plot predictions for one week.*
+:::
 
-**Answer:**
+::: {.callout-tip}
+## Solution
 
 ```{r}
 x = arima(meteo$humidity,c(3,0,0))
@@ -404,3 +465,4 @@ lines(9891:19970, humidity.pr+x.pr+2*x.se, col='green')
 lines(9891:19970, humidity.pr+x.pr-2*x.se, col='green')
 title("predicting 1 week")
 ```
+:::

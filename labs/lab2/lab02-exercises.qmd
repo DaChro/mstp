@@ -18,7 +18,11 @@ class(meteo)
 summary(meteo)
 ```
 
-*Hint:* In case the RData file is not in working directory, you may have to specify the absolute path (e.g. C:/myDirectory/meteo.RData in Windows), but we recommend you to set the working directory properly using the **setwd** function or an R Studio project.
+::: {.callout-note}
+## Hint
+
+In case the RData file is not in working directory, you may have to specify the absolute path (e.g. C:/myDirectory/meteo.RData in Windows), but we recommend you to set the working directory properly using the **setwd** function or an R Studio project.
+:::
 
 Again, we can generate a plot using the **plot** function:
 
@@ -74,8 +78,11 @@ nlm(f,c(0,0,0))
 ```
 
 ### *Exercise 2.1* {.unnumbered}
+::: {.callout-caution}
+## Task
 
 *How many parameters were fitted?*
+:::
 
 We will now plot observations and fitted model together:
 
@@ -91,8 +98,11 @@ lines(T.per~date,meteo,col='red')
 ```
 
 ### *Exercise 2.2* {.unnumbered}
+::: {.callout-caution}
+## Task
 
 *What is the interpretation of the fitted parameters? (if you need to guess, modify them and replot)*
+:::
 
 We can now also plot the residual (difference between predicted values and measured temperature values) from this fitted model:
 
@@ -129,26 +139,37 @@ an.ar5
 ```
 
 ### *Exercise 2.3* {.unnumbered}
+::: {.callout-caution}
+## Task
 
 ```{r}
 acf(an, type = "partial")
 ```
 
 *Does the **an** process exhibit temporal correlation for lags larger than 0?)*
+:::
 
 ### *Exercise 2.4* {.unnumbered}
+::: {.callout-caution}
+## Task
 
 ```{r}
 acf(residuals(an.ar5), type = "partial")
 ```
 
 *Does the **residuals(an.ar5)** process still exhibit temporal correlation for lags larger than 0?*
+:::
 
 ### *Exercise 2.5* {.unnumbered}
+::: {.callout-caution}
+## Task
 
 *What is the class of the object returned by **arima**?*
+:::
 
 ### *Exercise 2.6* {.unnumbered}
+::: {.callout-caution}
+## Task
 
 Let us see what we can do with such an object.
 
@@ -160,6 +181,7 @@ tsdiag(an.ar5)
 The **methods** function returns the methods of a class, in this case the **Arima** class. The tsdiag function provides time series diagnostic plots.
 
 *Explain what you see in the first two plots!*
+:::
 
 ## Model selection with Akaike's Information Criterion (AIC)
 
@@ -181,10 +203,15 @@ temp = meteo$T.outside
     arima(temp, c(10, 0, 0))$aic
 
 ### *Exercise 2.7* {.unnumbered}
+::: {.callout-caution}
+## Task
 
 *Which model has the smallest AIC?*
+:::
 
 ### *Exercise 2.8* {.unnumbered}
+::: {.callout-caution}
+## Task
 
 *Do a similar analysis for the humidity variable in the meteo data set:*
 
@@ -192,6 +219,7 @@ temp = meteo$T.outside
 2.  *Plot the humidity data and the fitted model.*
 3.  *detrend the humidity data to obtain residuals and report for which value of n in an AR(n) model of the anomalies (residuals) the model has the lowest AIC.*
 4.  *Up to which lag does the residual humidity process exhibit temporal correlation?*
+:::
 
 ## Prediction with an AR model
 
@@ -234,8 +262,11 @@ title("predicting 1 week")
 ```
 
 ### *Exercise 2.9* {.unnumbered}
+::: {.callout-caution}
+## Task
 
 *Where does, for long-term forecasts, the predicted value converge to?*
+:::
 
 Now compare this with prediction using an AR(6) model for the residual with respect to the daily cycle:
 
@@ -257,9 +288,15 @@ title("predicting 1 week")
 ```
 
 ### *Exercise 2.10* {.unnumbered}
+::: {.callout-caution}
+## Task
 
 *Where does now, for long-term forecasts, the predicted value converge to? Explain the difference to the upper model.*
+:::
 
 ### *Exercise 2.11* {.unnumbered}
+::: {.callout-caution}
+## Task
 
 *Fit a periodic trend and an AR(3) model to the humidity data. Plot predictions for one week.*
+:::
