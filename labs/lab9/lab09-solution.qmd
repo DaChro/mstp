@@ -1,0 +1,654 @@
+---
+title: "Spatio-temporal Modelling, Lab 9, YYYY-MM-DD"
+editor: visual
+---
+
+
+# Cokriging
+
+## Prepare the data
+
+::: panel-tabset
+
+## sp
+
+```{r,warning=F}
+library(gstat)
+library(sp)
+library(rgdal)
+sp.theme(TRUE)
+meuse <- readOGR("./data/meuse.gpkg")
+meuse.grid <- as(readGDAL("./data/meuse_grid.tif"),"SpatialPixelsDataFrame")
+names(meuse.grid) <- c("part.a","part.b","dist","soil","ffreq")
+meuse.grid$soil <- as.factor(meuse.grid$soil)
+meuse.grid$ffreq <- as.factor(meuse.grid$ffreq)
+g <- gstat(NULL, "logCd", log(cadmium) ~ 1, meuse)
+g <- gstat(g, "logCu", log(copper) ~ 1, meuse)
+g <- gstat(g, "logPb", log(lead) ~ 1, meuse)
+g <- gstat(g, "logZn", log(zinc) ~ 1, meuse)
+g
+vm <- variogram(g)
+vm.fit <- fit.lmc(vm, g, vgm(1, "Sph", 800, 1))
+vm.fit
+plot(vm, vm.fit)
+cor(log(as.data.frame(meuse)[c("cadmium", "copper", "lead", "zinc")]))
+
+```
+
+## sf/stars
+
+```{r}
+library(gstat)
+library(sf)
+library(stars)
+library(tmap)
+meuse.sf <- st_read("./data/meuse.gpkg")
+meuse.grid.stars <- read_stars("./data/meuse_grid.tif")
+meuse.grid.stars <- split(meuse.grid.stars, "band")
+names(meuse.grid.stars) <- c("part.a","part.b","dist","soil","ffreq")
+meuse.grid.stars$soil <- as.factor(meuse.grid.stars$soil)
+meuse.grid.stars$ffreq <- as.factor(meuse.grid.stars$ffreq)
+bpy.palette=bpy.colors()
+g.sf <- gstat(NULL, "logCd", log(cadmium) ~ 1, meuse.sf)
+g.sf <- gstat(g.sf, "logCu", log(copper) ~ 1, meuse.sf)
+g.sf <- gstat(g.sf, "logPb", log(lead) ~ 1, meuse.sf)
+g.sf <- gstat(g.sf, "logZn", log(zinc) ~ 1, meuse.sf)
+g.sf
+vm.sf <- variogram(g.sf)
+vm.fit.sf <- fit.lmc(vm.sf, g.sf, vgm(1, "Sph", 800, 1))
+vm.fit.sf
+plot(vm.sf, vm.fit.sf)
+cor(log(as.data.frame(meuse.sf)[c("cadmium", "copper", "lead", "zinc")]))
+```
+
+:::
+
+## Do a cokriging:
+
+::: panel-tabset
+
+## sp
+
+```{r}
+cokr = predict(vm.fit, meuse.grid)
+summary(cokr)
+```
+
+## sf/stars
+
+```{r}
+cokr.stars = predict(vm.fit.sf, meuse.grid.stars)
+summary(cokr.stars)
+```
+
+:::
+
+------------------------------------------------------------------------
+
+### *Exercise 9.1* {.unnumbered}
+::: {.callout-caution}
+## Task
+
+*Explain in language (without equations) what the variables in the resulting object represent, and how they were computed!*
+:::
+
+::: {.callout-tip}
+## Solution
+
+Cokriging in gstat gives predictions and kriging variance for the single variables (e.g. `logCd.pred` and `logCd.var` for Cadmium) as well as the covriances of the prediction errors of the variables at the sampling points (e.g. `cov.logCd.logCu` for covariance of the prediction error between Cadmium and Copper). The predictions and variances are calculated using the spatial autocorrelation and cross correlation (derived from the cross covariograms).
+:::
+
+
+### *Exercise 9.2* {.unnumbered}
+::: {.callout-caution}
+## Task
+
+*Explain why all the prediction error covariances are positive!*
+:::
+
+::: {.callout-tip}
+## Solution
+
+The prediction error increases with the distance between points for all variables. Thus, there is a positive correlation and positive covariance between the prediction errors of all variables.
+:::
+
+
+We want to compute an index of toxicity of the soil, where the different heavy metals are weighted according to their toxicity. The index is computed as
+
+$$I=100\log{Cd}+10logPb+logZn$$
+
+where logCd, logPb and logZn are the log-predictions as obtained above.
+
+
+
+### *Exercise 9.3* {.unnumbered}
+::: {.callout-caution}
+## Task
+
+*Give the R commands to compute this index and to show a map of it. Also give the commands to compute the standard error of the index, taking the error covariances into account.*
+:::
+
+::: {.callout-tip}
+## Solution
+
+To calculate the index you can simply insert the prediction values into the index equation  and create a new index variable.
+
+:::panel-tabset
+
+## sp 
+
+```{r, warning=F}
+cokr$index = 100 * cokr$logCd.pred + 10 * cokr$logPb.pred + cokr$logZn.pred
+spplot(cokr, "index", main = "index")
+```
+
+## sf/stars
+
+```{r}
+cokr.stars$index = 100 * cokr.stars$logCd.pred + 10 * cokr.stars$logPb.pred + cokr.stars$logZn.pred
+tm_shape(cokr.stars) + 
+  tm_raster("index", palette = bpy.palette, n=20, title = "",midpoint = NA) + 
+  tm_layout(main.title = "index", legend.outside = TRUE)
+```
+
+:::
+
+To compute the standard error of the index you can calculate the kriging variances using the formula for the variance of the sum of random variables:
+
+$$Var(\sum_{i=1}^n X_i) = \sum_{i=1}^n Var(X_i)+2*\sum_{i=1}^{n-1} \sum_{j=i+1}^n Cov(X_i,X_j)$$
+
+
+:::panel-tabset
+
+## sp
+
+```{r}
+cokr$index.var = 100^2 * cokr$logCd.var + 10^2 * cokr$logPb.var + cokr$logZn.var + 
+    2 * (100 * 10 * cokr$cov.logCd.logPb + 100 * cokr$cov.logCd.logZn + 10 * 
+        cokr$cov.logPb.logZn)
+cokr$index.se = sqrt(cokr$index.var)
+spplot(cokr, "index.se", main = "index: standard error including covariances")
+```
+
+## sf/stars
+
+```{r}
+cokr.stars$index.var = 100^2 * cokr.stars$logCd.var + 10^2 * cokr.stars$logPb.var + cokr.stars$logZn.var + 
+    2 * (100 * 10 * cokr.stars$cov.logCd.logPb + 100 * cokr.stars$cov.logCd.logZn + 10 * 
+        cokr.stars$cov.logPb.logZn)
+cokr.stars$index.se = sqrt(cokr.stars$index.var)
+tm_shape(cokr.stars) + 
+  tm_raster("index.se", palette = bpy.palette, n=20, title = "",midpoint = NA) + 
+  tm_layout(main.title = "index: standard error including covariances", legend.outside = TRUE)
+
+```
+
+:::
+
+:::
+
+------------------------------------------------------------------------
+
+### *Exercise 9.4* {.unnumbered}
+::: {.callout-caution}
+## Task
+
+*How much does the standard error of this toxicity index change as a result of taking the covariances into account, as opposed to ignoring them?*
+:::
+
+::: {.callout-tip}
+## Solution
+
+To answer this you can calculate and plot the standard error without taking covariances into account:
+
+:::panel-tabset
+
+## sp
+
+```{r,warning=F}
+cokr$index.varu = 100^2 * cokr$logCd.var + 10^2 * cokr$logPb.var + cokr$logZn.var
+cokr$index.seu = sqrt(cokr$index.varu)
+spplot(cokr, "index.seu", main = "index: standard ignoring covariances")
+```
+
+## sf/stars
+
+```{r}
+cokr.stars$index.varu = 100^2 * cokr.stars$logCd.var + 10^2 * cokr.stars$logPb.var + cokr.stars$logZn.var
+cokr.stars$index.seu = sqrt(cokr.stars$index.varu)
+tm_shape(cokr.stars) + 
+  tm_raster("index.seu", palette = bpy.palette, n=20, title = "",midpoint = NA) + 
+  tm_layout(main.title = "index: standard ignoring covariances", legend.outside = TRUE)
+```
+
+:::
+
+As the differences in this map are difficult to determine, you can also look at the numbers:
+
+:::panel-tabset
+
+## sp
+
+```{r, warning=F}
+summary(cokr$index.seu)
+summary(cokr$index.se)
+sum(cokr$index.seu)
+sum(cokr$index.se)
+```
+
+## sf/stars
+
+```{r}
+cokr.stars["index.seu"]
+cokr.stars["index.se"]
+sum(cokr.stars$index.seu,na.rm = T)
+sum(cokr.stars$index.se, na.rm = T)
+```
+
+:::
+
+As you can see, the prediction error without using spatial covariances is slightly lower than with using them.
+:::
+
+
+
+## Cokriging: the undersampled case
+
+Take a subsample of zinc, called meuse1:
+
+::: panel-tabset
+
+## sp
+
+```{r}
+set.seed(1331)
+sam = sample(155)
+sam1 = sam[1:50]
+sam2 = sam[-(1:50)]
+meuse1 = meuse[sam1, ]
+meuse2 = meuse[sam2, ]
+plot(meuse, col = 1, pch = 3)
+plot(meuse1, col = 3, pch = 1, add = TRUE)
+```
+
+## sf/stars
+
+```{r}
+set.seed(1331)
+sam = sample(155)
+sam1 = sam[1:50]
+sam2 = sam[-(1:50)]
+meuse1.sf = meuse.sf[sam1, ]
+meuse2.sf = meuse.sf[sam2, ]
+plot(meuse.sf["zinc"], col = 1, pch = 3,reset=FALSE)
+plot(meuse1.sf["zinc"], col = 3, pch = 1, add = TRUE)
+```
+
+:::
+
+create a multivariate object with subsample of zinc, and full sample of lead:
+
+::: panel-tabset
+
+## sp
+
+```{r,warning=F}
+g = gstat(NULL, "logZinc", log(zinc) ~ 1, meuse1, set = list(nocheck = 1))
+g = gstat(g, "logLead", log(lead) ~ 1, meuse, set = list(nocheck = 1))
+v12 = variogram(g)
+v12 = subset(v12, dist != 0)  # remove 0 distances for fitting
+v12.fit = fit.lmc(v12, g, vgm(1, "Sph", 900, 1))
+v12.fit
+class(v12.fit)
+plot(v12, v12.fit)
+```
+
+## sf/stars
+
+```{r}
+g.sf = gstat(NULL, "logZinc", log(zinc) ~ 1, meuse1.sf, set = list(nocheck = 1))
+g.sf = gstat(g.sf, "logLead", log(lead) ~ 1, meuse.sf, set = list(nocheck = 1))
+v12.sf = variogram(g.sf)
+v12.sf = subset(v12.sf, dist != 0)  # remove 0 distances for fitting
+v12.fit.sf = fit.lmc(v12.sf, g.sf, vgm(1, "Sph", 900, 1))
+v12.fit.sf
+class(v12.fit.sf)
+plot(v12.sf, v12.fit.sf)
+```
+
+:::
+
+cokrige:
+
+::: panel-tabset
+
+## sp
+
+```{r, warning=F,results=F}
+v12.pr = predict(v12.fit, meuse.grid)
+spplot(v12.pr, c("logZinc.pred", "logLead.pred"))
+spplot(v12.pr, c("logZinc.var", "logLead.var", "cov.logZinc.logLead"))
+```
+
+## sf/stars
+
+```{r, warning=F, results=F}
+
+v12.pr.stars = predict(v12.fit.sf, meuse.grid.stars)
+tm_shape(v12.pr.stars) + 
+  tm_raster(c("logZinc.pred", "logLead.pred"), n=20, title = "", palette = bpy.palette) + 
+  tm_facets(free.scales=FALSE) + 
+  tm_layout(legend.outside.size = 0.15, panel.labels=c("logZinc.pred", "logLead.pred"))
+tm_shape(v12.pr.stars) + 
+  tm_raster(c("logZinc.var", "logLead.var", "cov.logZinc.logLead"), n=20, title = "", palette = bpy.palette) + 
+  tm_facets(free.scales=FALSE) + 
+  tm_layout(legend.outside.size = 0.15, panel.labels=c("logZinc.var", "logLead.var", "cov.logZinc.logLead"))
+
+
+```
+
+:::
+
+compare the differences of kriging the 50 observations of zinc with the cokriging from 50 zinc and 155 lead observations:
+
+::: panel-tabset
+
+## sp
+
+```{r,warning=F}
+v12.fit[1]
+v1.pr = predict(v12.fit[1], meuse.grid)
+lt = list(list("sp.points", meuse2, pch = 3), list("sp.points", meuse1, pch = 2))
+v12.pr$diffpr = v12.pr$logZinc.pred - v1.pr$logZinc.pred
+spplot(v12.pr["diffpr"], sp.layout = lt)
+v12.pr$diffse = sqrt(v12.pr$logZinc.var) - sqrt(v1.pr$logZinc.var)
+spplot(v12.pr["diffse"], sp.layout = lt)
+```
+
+## sf/stars
+
+```{r}
+v12.fit.sf[1]
+v1.pr.stars = predict(v12.fit.sf[1], meuse.grid.stars)
+v12.pr.stars$diffpr = v12.pr.stars$logZinc.pred - v1.pr.stars$logZinc.pred
+tm_shape(v12.pr.stars) + 
+  tm_raster("diffpr", title = "",palette = bpy.palette, n=20, midpoint = NA) + 
+  tm_shape(meuse2.sf) + tm_symbols(size = 0.2,  shape = 3, col = "cyan4") + 
+  tm_shape(meuse1.sf) + tm_symbols(size = 0.2, shape = 2, col = "cyan4") + 
+  tm_layout(legend.outside = TRUE)
+v12.pr.stars$diffse = sqrt(v12.pr.stars$logZinc.var) - sqrt(v1.pr.stars$logZinc.var)
+tm_shape(v12.pr.stars) + 
+  tm_raster("diffse", title = "",palette = bpy.palette, n=20, midpoint = NA) + 
+  tm_shape(meuse2.sf) + tm_symbols(size = 0.2,  shape = 3, col = "cyan4") + 
+  tm_shape(meuse1.sf) + tm_symbols(size = 0.2, shape = 2, col = "cyan4") + 
+  tm_layout(legend.outside = TRUE)
+
+```
+
+:::
+
+------------------------------------------------------------------------
+
+### *Exercise 9.5* {.unnumbered}
+::: {.callout-caution}
+## Task
+
+*Why are the standard errors smaller in the cokriging case?*
+:::
+
+::: {.callout-tip}
+## Solution
+
+The standard errors are smaller because zinc and lead are strongly correlated. Therefore, the measurements of lead increase the accuracy of the estimation. 
+:::
+
+
+
+## Kriging errors and confidence intervals
+
+Given that we are not certain about zinc levels at locations where we did not measure it (i.e., interpolated grid cells) we can classify them according to their approximate confidence intervals, formed by using mean and standard error (here: on the log scale).
+
+::: panel-tabset
+
+## sp
+
+```{r,warning=F}
+# Ordinary Kriging log(zinc)
+m <- vgm(0.59, "Sph", 874, 0.04)
+# ordinary kriging:
+lzn.ok <- krige(log(zinc) ~ 1, meuse, meuse.grid, model = m)
+ci = function(cutoff, mean, var, alpha = 0.05) {
+    p = 1 - pnorm(cutoff, mean, sqrt(var))  #$
+    f = ifelse(p < alpha/2, "lower", ifelse(p < (1 - alpha/2), "not dist.", 
+        "higher"))
+    factor(f, levels = c("lower", "not dist.", "higher"))
+}
+lzn.ok$ci250 = ci(log(250), lzn.ok$var1.pred, lzn.ok$var1.var)
+lzn.ok$ci500 = ci(log(500), lzn.ok$var1.pred, lzn.ok$var1.var)
+lzn.ok$ci750 = ci(log(750), lzn.ok$var1.pred, lzn.ok$var1.var)
+lzn.ok$ci1000 = ci(log(1000), lzn.ok$var1.pred, lzn.ok$var1.var)
+spplot(lzn.ok, c("ci250", "ci500", "ci750", "ci1000"), col.regions = c("green", 
+    "grey", "red"))
+```
+
+## sf/stars
+
+```{r}
+# Ordinary Kriging log(zinc)
+m <- vgm(0.59, "Sph", 874, 0.04)
+# ordinary kriging:
+lzn.ok.stars <- krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, model = m)
+ci = function(cutoff, mean, var, alpha = 0.05) {
+    p = 1 - pnorm(cutoff, mean, sqrt(var))  #$
+    f = ifelse(p < alpha/2, "lower", ifelse(p < (1 - alpha/2), "not dist.", 
+        "higher"))
+    factor(f, levels = c("lower", "not dist.", "higher"))
+}
+lzn.ok.stars$ci250 = ci(log(250), lzn.ok.stars$var1.pred, lzn.ok.stars$var1.var)
+lzn.ok.stars$ci500 = ci(log(500), lzn.ok.stars$var1.pred, lzn.ok.stars$var1.var)
+lzn.ok.stars$ci750 = ci(log(750), lzn.ok.stars$var1.pred, lzn.ok.stars$var1.var)
+lzn.ok.stars$ci1000 = ci(log(1000), lzn.ok.stars$var1.pred, lzn.ok.stars$var1.var)
+tm_shape(lzn.ok.stars) + 
+  tm_raster(c("ci250", "ci500", "ci750", "ci1000"), n=3, title = "", palette = c("green", 
+    "grey", "red") ) + 
+  tm_facets(free.scales=FALSE, nrow = 1) + 
+  tm_layout(legend.outside.size = 0.15, panel.labels=c("ci250", "ci500", "ci750", "ci1000"))
+```
+
+:::
+
+
+
+### *Exercise 9.6* {.unnumbered}
+::: {.callout-caution}
+## Task
+
+*For which fraction of the total area is zinc concentration lower than 500 ppm, with 95 percent confidence? Give the number of grid cells for which this is the case, and describe where in the area they are situated.*
+:::
+
+::: {.callout-tip}
+## Solution
+
+You only need the `summary()` command:
+
+:::panel-tabset
+
+## sp
+
+```{r,warning=F}
+summary(lzn.ok$ci500)
+```
+
+## sf/stars
+
+```{r}
+summary(lzn.ok.stars$ci500)
+```
+
+:::
+
+The values with low predictions are in larger distances to the river.
+:::
+
+
+
+For a single threshold, we can vary the confidence level by specifying alpha:
+
+::: panel-tabset
+## sp
+
+```{r,warning=F}
+lzn.ok$ci001 = ci(log(500), lzn.ok$var1.pred, lzn.ok$var1.var, 0.01)
+lzn.ok$ci005 = ci(log(500), lzn.ok$var1.pred, lzn.ok$var1.var, 0.05)
+lzn.ok$ci010 = ci(log(500), lzn.ok$var1.pred, lzn.ok$var1.var, 0.1)
+lzn.ok$ci050 = ci(log(500), lzn.ok$var1.pred, lzn.ok$var1.var, 0.5)
+spplot(lzn.ok, c("ci001", "ci005", "ci010", "ci050"), col.regions = c("green", 
+    "grey", "red"))
+```
+
+## sf/stars
+
+```{r}
+lzn.ok.stars$ci001 = ci(log(500), lzn.ok.stars$var1.pred, lzn.ok.stars$var1.var, 0.01)
+lzn.ok.stars$ci005 = ci(log(500), lzn.ok.stars$var1.pred, lzn.ok.stars$var1.var, 0.05)
+lzn.ok.stars$ci010 = ci(log(500), lzn.ok.stars$var1.pred, lzn.ok.stars$var1.var, 0.1)
+lzn.ok.stars$ci050 = ci(log(500), lzn.ok.stars$var1.pred, lzn.ok.stars$var1.var, 0.5)
+tm_shape(lzn.ok.stars) + 
+  tm_raster(c("ci001", "ci005", "ci010", "ci050"), n=3, title = "", palette = c("green", 
+    "grey", "red") ) + 
+  tm_facets(free.scales=FALSE, nrow = 1) + 
+  tm_layout(legend.outside.size = 0.15, panel.labels=c("ci001", "ci005", "ci010", "ci050"))
+```
+
+:::
+
+------------------------------------------------------------------------
+
+### *Exercise 9.7* {.unnumbered}
+::: {.callout-caution}
+## Task
+
+*Which of these four maps has the highest confidence level, and what is this level? Why are there gray areas on map ci050 at all?*
+:::
+
+::: {.callout-tip}
+## Solution
+
+The highest confidence level is 0.99 at alpha=0.01, i.e. in the map for ci001. There are grey areas in ci050 because a two-sided confidence interval is used.
+:::
+
+
+Now consider the object zn, created under the section of block kriging.
+
+*Hint: If you don't have the znobject in your workspace, you need to reinstantiate it, by executing the complete code chunk, where the object zn has been created!*
+
+::: panel-tabset
+## sp
+
+```{r,warning=F, echo=F,results='hide'}
+v = variogram(log(zinc) ~ dist, meuse)
+zn.res.m = fit.variogram(v, vgm(1, "Sph", 700, 1))
+zn = krige(log(zinc) ~ sqrt(dist), meuse, meuse.grid, zn.res.m)
+# Ordinary Kriging log(zinc)
+m <- vgm(0.59, "Sph", 874, 0.04)
+# ordinary kriging:
+lzn.ok <- krige(log(zinc) ~ 1, meuse, meuse.grid, model = m)
+
+ci = function(cutoff, mean, var, alpha = 0.05) {
+    p = 1 - pnorm(cutoff, mean, sqrt(var))  #$
+    f = ifelse(p < alpha/2, "lower", ifelse(p < (1 - alpha/2), "not dist.", 
+        "higher"))
+    factor(f, levels = c("lower", "not dist.", "higher"))
+}
+
+zn = krige(log(zinc) ~ sqrt(dist), meuse, meuse.grid, zn.res.m)
+zn$pointkr = zn$var1.pred
+zn40 = krige(log(zinc) ~ sqrt(dist), meuse, meuse.grid, zn.res.m, block = c(40, 
+    40))
+zn400 = krige(log(zinc) ~ sqrt(dist), meuse, meuse.grid, zn.res.m, block = c(400, 
+    400))
+zn$block40 = zn40$var1.pred
+zn$block400 = zn400$var1.pred
+zn$pointkr.se = sqrt(zn$var1.var)
+zn$block40.se = sqrt(zn40$var1.var)
+zn$block400.se = sqrt(zn400$var1.var)
+
+zn$ok.point = ci(log(500), lzn.ok$var1.pred, lzn.ok$var1.var, 0.05)
+zn$uk.point = ci(log(500), zn$pointkr, zn$pointkr.se^2, 0.05)
+zn$uk.block40 = ci(log(500), zn$block40, zn$block40.se^2, 0.05)
+zn$uk.block400 = ci(log(500), zn$block400, zn$block400.se^2, 0.05)
+spplot(zn, c("ok.point", "uk.point", "uk.block40", "uk.block400"), col.regions = c("green", 
+    "grey", "red"))
+```
+
+## sf/stars
+
+```{r}
+v.sf = variogram(log(zinc) ~ dist, meuse.sf)
+zn.res.m.sf = fit.variogram(v.sf, vgm(1, "Sph", 700, 1))
+zn.stars= krige(log(zinc) ~ sqrt(dist), meuse.sf, meuse.grid.stars, zn.res.m.sf)
+# Ordinary Kriging log(zinc)
+m <- vgm(0.59, "Sph", 874, 0.04)
+# ordinary kriging:
+lzn.ok.stars <- krige(log(zinc) ~ 1, meuse.sf, meuse.grid.stars, model = m)
+
+ci = function(cutoff, mean, var, alpha = 0.05) {
+    p = 1 - pnorm(cutoff, mean, sqrt(var))  #$
+    f = ifelse(p < alpha/2, "lower", ifelse(p < (1 - alpha/2), "not dist.", 
+        "higher"))
+    factor(f, levels = c("lower", "not dist.", "higher"))
+}
+
+zn.stars = krige(log(zinc) ~ sqrt(dist), meuse.sf, meuse.grid.stars, zn.res.m.sf)
+zn.stars$pointkr = zn.stars$var1.pred
+zn40.stars = krige(log(zinc) ~ sqrt(dist), meuse.sf, meuse.grid.stars, zn.res.m.sf, block = c(40, 
+    40))
+zn400.stars = krige(log(zinc) ~ sqrt(dist), meuse.sf, meuse.grid.stars, zn.res.m.sf, block = c(400, 
+    400))
+zn.stars$block40 = zn40.stars$var1.pred
+zn.stars$block400 = zn400.stars$var1.pred
+zn.stars$pointkr.se = sqrt(zn.stars$var1.var)
+zn.stars$block40.se = sqrt(zn40.stars$var1.var)
+zn.stars$block400.se = sqrt(zn400.stars$var1.var)
+
+zn.stars$ok.point = ci(log(500), lzn.ok.stars$var1.pred, lzn.ok.stars$var1.var, 0.05)
+zn.stars$uk.point = ci(log(500), zn.stars$pointkr, zn.stars$pointkr.se^2, 0.05)
+zn.stars$uk.block40 = ci(log(500), zn.stars$block40, zn.stars$block40.se^2, 0.05)
+zn.stars$uk.block400 = ci(log(500), zn.stars$block400, zn.stars$block400.se^2, 0.05)
+
+tm_shape(zn.stars) + 
+  tm_raster(c("ok.point", "uk.point", "uk.block40", "uk.block400"), n=3, title = "", palette = c("green", 
+    "grey", "red") ) + 
+  tm_facets(free.scales=FALSE, nrow = 1) + 
+  tm_layout(legend.outside.size = 0.15, panel.labels=c("ok.point", "uk.point", "uk.block40", "uk.block400"))
+```
+
+:::
+
+------------------------------------------------------------------------
+
+### *Exercise 9.8* {.unnumbered}
+::: {.callout-caution}
+## Task
+
+*Compare the fraction classified as lower and higher between ok.point and uk.point, and try to explain the difference!*
+:::
+
+::: {.callout-tip}
+## Solution
+
+The proportion of grey area is smaller in UK than in OK. This means that in turn more cells are classified as lower or higher. In UK criging variances are smaller because the trend model explains some variability. This makes the confidence intervals smaller so more values are outside of them. 
+:::
+
+### *Exercise 9.9* {.unnumbered}
+::: {.callout-caution}
+## Task
+
+*Compare the fraction classified as lower and higher between uk.point uk.block40 and uk.block400, and try to explain the difference!*
+:::
+
+::: {.callout-tip}
+## Solution
+
+The bigger the block the smaller the kriging variance. This lets the confidence intervals become narrower and more values are outside of them.
+:::
