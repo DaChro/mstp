@@ -31,7 +31,7 @@ Metropolis = function(theta0, sigma, y, fn, n = 1000) {
         residualSumSquaresProp = sum((y - fn(proposal))^2)
         s2 = lastRSS/length(y)
         # ratio = exp(-residualSumSquaresProp)/exp(-residualSumSquares0) THIS IS
-        # numerically unstable: therefor use
+        # numerically unstable: therefore use
         ratio = exp(-residualSumSquaresProp/(2 * s2) + lastRSS/(2 * s2))
         if (ratio > 1 || runif(1) < ratio) {
             # accept
@@ -109,14 +109,18 @@ Note that now your own plot.Metropolis has been called, because Metropolis is th
 
 ------------------------------------------------------------------------
 
-### *Exercise 4.1* {.unnumbered}
+#### *Exercise 1* {.unnumbered}
+::: {.callout-caution}
+## Exercise 1
 
 *Which percentage of the proposals was rejected, and how could you decrease this percentage?*
+:::
 
-**Answer:**
+::: {.callout-tip}
+## Solution
 
 Around 5 percent or less of the proposals have been accepted, i.e. more than 95% have been rejected. The rejection rate can be decreased by decreasing the standard deviation of the proposal distribution $\sigma$.
-
+:::
 ------------------------------------------------------------------------
 
 Compare the values found with those obtained with `nls` e.g. by:
@@ -153,25 +157,35 @@ out4 = Metropolis(coef(t.nls), rep(0.01, 3), temp, f, n = 5000)
 plot(out4)
 ```
 
-------------------------------------------------------------------------
 
-### *Exercise 4.2* {.unnumbered}
+
+#### *Exercise 2* {.unnumbered}
+::: {.callout-caution}
+## Exercise 2
 
 *Which chain becomes stationary, meaning that it fluctuates sufficiently for a long time over the same area?*
+:::
 
-**Answer:**
+::: {.callout-tip}
+## Solution
 
 Examples 1 and 2 have low acceptance ratio, i.e. the chain does not mix properly. Example 4 is too autocorrelated and its mean value seems to change. Example 3 can be considered as stationary, meaning its variance and mean stays constant (after the burn-in).
+:::
 
-------------------------------------------------------------------------
 
-### *Exercise 4.3* {.unnumbered}
+#### *Exercise 3* {.unnumbered}
+::: {.callout-caution}
+## Exercise 3
 
 *Which of the chains do not mix well?*
+:::
 
-**Answer:** Chain 1 and 2 (see above).
+::: {.callout-tip}
+## Solution
 
-------------------------------------------------------------------------
+Chain 1 and 2 (see above).
+:::
+
 
 ### Computing summary statistics
 
@@ -201,11 +215,17 @@ qqnorm(out4[, 2])
 
 ------------------------------------------------------------------------
 
-### *Exercise 4.4* {.unnumbered}
+#### *Exercise 4* {.unnumbered}
+::: {.callout-caution}
+## Exercise 4
 
 *Does parameter x\[1\] approximately follow a normal distribution?*
+:::
 
-**Answer:** Analyzing the normal q-q plots shows that x\[1\] is close to the theoretical normal distribution particularly in example 3:
+::: {.callout-tip}
+## Solution 
+
+Analyzing the normal q-q plots shows that x\[1\] is close to the theoretical normal distribution particularly in example 3:
 
 ```{r}
 par(mfrow = c(2, 2))
@@ -218,8 +238,8 @@ qqline(out3[, 1])
 qqnorm(out4[, 1])
 qqline(out4[, 1])
 ```
+:::
 
-------------------------------------------------------------------------
 
 ### Initial values and Burn-in
 
@@ -244,30 +264,36 @@ The burn-in period is the period that the chain needs to go from the initial val
 
 ------------------------------------------------------------------------
 
-### *Exercise 4.5* {.unnumbered}
+#### *Exercise 5* {.unnumbered}
+::: {.callout-caution}
+## Exercise 5
 
 *For the different values of sigma, how long does it take before the chain becomes stationary?*
+:::
 
-**Answer:**
+::: {.callout-tip}
+## Solution
 
 -   $(\sigma = 0.3)$: After approx. 300 iterations
 -   $(\sigma = 0.1)$: After approx. 500 iterations
 -   $(\sigma = 0.03)$: After approx. 1800 iterations
-
-------------------------------------------------------------------------
+:::
  
-### *Exercise 4.6* {.unnumbered}
+#### *Exercise 6* {.unnumbered}
+::: {.callout-caution}
+## Exercise 6
 
 *How do you compute (give the R command) the mean and summary statistics for a chain **ignoring** the burn-in values?*
+:::
 
-**Answer**:
+::: {.callout-tip}
+## Solution
 
 ```{r}
 BURNINLENGTH=1800
 apply(out[BURNINLENGTH:nrow(out), ], 2, summary)
 ```
-
-------------------------------------------------------------------------
+:::
 
 ## Simulated Annealing
 
@@ -277,17 +303,21 @@ Simulated annealing is available as a method provided by the generic optimizatio
 
 ------------------------------------------------------------------------
 
-### *Exercise 4.7* {.unnumbered}
+#### *Exercise 7* {.unnumbered}
+::: {.callout-caution}
+## Exercise 7
 
 *Why is simulated annealing not a generic-purpose optimization method?*
+:::
 
-**Answer:**
+::: {.callout-tip}
+## Solution
 
 The R help of `?optim` gives the answer:
 
 > Note that the "SANN" method depends critically on the settings of the control parameters. It is not a general-purpose method but can be very useful in getting to a good value on a very rough surface.
 
-------------------------------------------------------------------------
+:::
 
 Suppose we want to find the mean, scale and phase of the temperature data, and are looking for the model that best fits in terms of least absolute deviations. Define the function
 
@@ -298,15 +328,20 @@ fmin = function(x) {
 optim(c(1, 1, 1), fmin, method = "SANN", control = list(trace = 1))
 ```
 
-------------------------------------------------------------------------
 
-### *Exercise 4.8* {.unnumbered}
+
+#### *Exercise 8* {.unnumbered}
+::: {.callout-caution}
+## Exercise 8
 
 *What do the various output elements mean?*
+:::
 
-**Answer:**
+::: {.callout-tip}
+## Solution
 
 The output contains the sums of **absolute** residuals and corresponding parameter values at specific iterations.
+:::
 
 ------------------------------------------------------------------------
 
@@ -320,21 +355,29 @@ x1$par - x2$par
 
 ------------------------------------------------------------------------
 
-### *Exercise 4.9* {.unnumbered}
+#### *Exercise 9* {.unnumbered}
+::: {.callout-caution}
+## Exercise 9
 
 *Explain why the parameters are equal/not equal.*
+:::
 
-**Answer:**
+::: {.callout-tip}
+## Solution
 
 Simulated annealing is a **stochastic** optimization algorithm. Diferent generated random numbers (for parameter proposals and acceptance decision) explain different parameter estimates.
+:::
 
-------------------------------------------------------------------------
 
-### *Exercise 4.10* {.unnumbered}
+#### *Exercise 10* {.unnumbered}
+::: {.callout-caution}
+## Exercise 10
 
 *Use simulated annealing to find the least squares solution; give the function used, and compare the resulting parameter values with the least absolute error solution.*
+:::
 
-**Answer:**
+::: {.callout-tip}
+## Solution
 
 ```{r}
 fls = function(x) {
@@ -361,5 +404,4 @@ lines(y = model1, x = meteo$hours, col = "red")  # Summe kleinster absoluter Feh
 ```
 
 Differences are rather small but this might be different in other cases.
-
-------------------------------------------------------------------------
+:::
