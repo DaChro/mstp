@@ -73,9 +73,9 @@ plot(cumsum(rnorm(1000)),type='l')
 plot(cumsum(rnorm(10000)),type='l')
 ```
 
-### *Übung 1.1* {.unnumbered}
+#### *Übung 1* {.unnumbered}
 ::: {.callout-caution}
-## Aufgabe
+## Übung 1
 
 *Steigt der Random Walk Prozess generell an, fällt er ab oder hat er keine dominante Richtung?*
 :::
@@ -97,9 +97,9 @@ lines(h, col = "blue")
 ```
 :::
 
-### *Übung 1.2* {.unnumbered}
+#### *Übung 2* {.unnumbered}
 ::: {.callout-caution}
-## Aufgabe
+## Übung 2
 
 ```{r}
 var(cumsum(rnorm(10)))
@@ -117,6 +117,7 @@ var(cumsum(rnorm(1000000)))
 ## Lösung
 
 Random walk Prozesse können als Summen **unabhängiger** Zufallsvariablen $\epsilon_t, t=1,...n$ gesehen werden. Die Varianz ist per Definition immer positiv. Dadurch nimmt die Varianz der Zufallsvariablen $y_t = \sum_{i=1}^{t} \epsilon_i$ immer mit der Länge der Serie zu. Die empirische Varianz der kompletten Zeitreihe steigt daher ebenfalls mit der Länge der Serie.
+:::
 
 ## Generierung von AR-Prozessen
 
@@ -146,11 +147,11 @@ Der folgende Aufruf generiert und plottet einen AR(2)-Prozess mit den Koeffizien
 ```{r fig.width=5, fig.height=4}
 plot(generate.ar(1000, c(0.5,0.2)), type="l")
 ```
-:::
 
-### *Übung 1.3* {.unnumbered}
+
+#### *Übung 3* {.unnumbered}
 ::: {.callout-caution}
-## Aufgabe
+## Übung 3
 
 *Welche Werte für `beta` kann man nutzen, um (i) weißes Rauschen (white noise) und (ii) 'random walk'- Prozesse zu erstellen?*
 :::
@@ -171,9 +172,9 @@ plot(generate.ar(1000, 1), type="l", main="Random walk")
 ```
 :::
 
-### *Übung 1.4* {.unnumbered}
+#### *Übung 4* {.unnumbered}
 ::: {.callout-caution}
-## Aufgabe
+## Übung 4
 
 *Betrachtet den AR(2) Prozess oben: Steigt seine Varianz mit der Länge an?*
 :::
@@ -199,9 +200,9 @@ plot(x=ts.length, y=ts.var, type="l", ylab="Empricial Variance", xlab="Length of
 Nein. Prozesse mit dieser Eigenschaft werden auch manchmal als "(ko)-varianzstationär" bezeichnet, was bedeutet, dass die Variabilität des Prozesses nicht von $t$ abhängt.
 :::
 
-### *Übung 1.5* {.unnumbered}
+#### *Übung 5* {.unnumbered}
 ::: {.callout-caution}
-## Aufgabe
+## Übung 5
 
 Die R-Funktionen `acf()` und `pacf()` erstellen einen Plot der empirischen (partiellen) Autokorrelation einer gegebenen Zeitreihe (siehe `?acf` und `?pacf` für mehr Details).
 
