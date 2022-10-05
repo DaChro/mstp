@@ -17,6 +17,7 @@ format:
     smooth-scroll: true
     toc: true
     toc-location: left
+    toc-depth: 4
 
 
 

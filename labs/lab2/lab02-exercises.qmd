@@ -34,7 +34,7 @@ plot(T.outside ~ date, meteo, type = "l")
 
 ## Fitting a periodic component
 
-For fitting the periodic component for exercise 2.1, a new function with name **f** is defined. In general, we can define functions in R using the following syntax:
+For fitting the periodic component for Exercise 1, a new function with name **f** is defined. In general, we can define functions in R using the following syntax:
 
 ```{r}
 funcMultiply = function(x,y){x*y}
@@ -77,9 +77,9 @@ f = function(x) sum((meteo$T.outside - (x[1]+x[2]*sin(pi*(meteo$hours+x[3])/12))
 nlm(f,c(0,0,0))
 ```
 
-### *Exercise 2.1* {.unnumbered}
+#### *Exercise 1* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 1
 
 *How many parameters were fitted?*
 :::
@@ -97,9 +97,9 @@ meteo$T.per = 18.2 - 4.9 * sin(pi*(meteo$hours+1.6)/12)
 lines(T.per~date,meteo,col='red')
 ```
 
-### *Exercise 2.2* {.unnumbered}
+#### *Exercise 2* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 2
 
 *What is the interpretation of the fitted parameters? (if you need to guess, modify them and replot)*
 :::
@@ -138,9 +138,9 @@ an.ar5 = arima(an, c(5, 0, 0))
 an.ar5
 ```
 
-### *Exercise 2.3* {.unnumbered}
+#### *Exercise 3* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 3
 
 ```{r}
 acf(an, type = "partial")
@@ -149,9 +149,9 @@ acf(an, type = "partial")
 *Does the **an** process exhibit temporal correlation for lags larger than 0?)*
 :::
 
-### *Exercise 2.4* {.unnumbered}
+#### *Exercise 4* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 4
 
 ```{r}
 acf(residuals(an.ar5), type = "partial")
@@ -160,16 +160,16 @@ acf(residuals(an.ar5), type = "partial")
 *Does the **residuals(an.ar5)** process still exhibit temporal correlation for lags larger than 0?*
 :::
 
-### *Exercise 2.5* {.unnumbered}
+#### *Exercise 5* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 5
 
 *What is the class of the object returned by **arima**?*
 :::
 
-### *Exercise 2.6* {.unnumbered}
+#### *Exercise 6* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 6
 
 Let us see what we can do with such an object.
 
@@ -202,16 +202,16 @@ temp = meteo$T.outside
     arima(temp, c(9, 0, 0))$aic
     arima(temp, c(10, 0, 0))$aic
 
-### *Exercise 2.7* {.unnumbered}
+#### *Exercise 7* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 7
 
 *Which model has the smallest AIC?*
 :::
 
-### *Exercise 2.8* {.unnumbered}
+#### *Exercise 8* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 8
 
 *Do a similar analysis for the humidity variable in the meteo data set:*
 
@@ -261,9 +261,9 @@ lines(9891:19970, x.pr-2*x.se, col='green')
 title("predicting 1 week")
 ```
 
-### *Exercise 2.9* {.unnumbered}
+#### *Exercise 9* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 9
 
 *Where does, for long-term forecasts, the predicted value converge to?*
 :::
@@ -287,16 +287,16 @@ lines(9891:19970, T.pr+x.pr-2*x.se, col='green')
 title("predicting 1 week")
 ```
 
-### *Exercise 2.10* {.unnumbered}
+#### *Exercise 10* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 10
 
 *Where does now, for long-term forecasts, the predicted value converge to? Explain the difference to the upper model.*
 :::
 
-### *Exercise 2.11* {.unnumbered}
+#### *Exercise 11* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 11
 
 *Fit a periodic trend and an AR(3) model to the humidity data. Plot predictions for one week.*
 :::

@@ -24,30 +24,39 @@ optimize(f, c(0, pi), x = x, y = y)
 
 The optimization looks quite good, but approximates.
 
-------------------------------------------------------------------------
 
-### *Exercise 3.1* {.unnumbered}
 
-*How many parameters were fitted?*
+#### *Exercise 1* {.unnumbered}
+::: {.callout-caution}
+## Exercise 1
 
-**Answer**: Only `phase` hase been optimized. Though `x` and `y` are given as objective function arguments, they have been defined before and are passed to the `...` arguments of `optimize()`.
+*How many parameters were fitted with the function call above?*
+:::
 
-------------------------------------------------------------------------
+::: {.callout-tip}
+## Solution
 
-The function `optimize` has a parameter `tol`. Let?s check whether more significant digits were fitted correctly, if we set the following value:
+Only `phase` hase been optimized. Though `x` and `y` are given as objective function arguments, they have been defined before and are passed to the `...` arguments of `optimize()`.
+:::
+
+The function `optimize` has a parameter `tol`. Let us check whether more significant digits were fitted correctly, if we set the following value:
 
 ```{r}
 out = optimize(f, c(0, pi), x = x, y = y, tol = 1e-08)
 print(out$minimum, digits = 10)
 ```
 
-------------------------------------------------------------------------
 
-### *Exercise 3.2* {.unnumbered}
+
+#### *Exercise 2* {.unnumbered}
+::: {.callout-caution}
+## Exercise 2
 
 *Is this fit better? Did optimize get the full 9 (or more) digits right?*
+:::
 
-**Answer**:
+::: {.callout-tip}
+## Solution
 
 If we check the help of the function `optimize` we can see, that the default tolerance is
 
@@ -60,28 +69,38 @@ Now we used `1e-08` which is less. Thus, this fit is better, as we can see when 
 ```{r}
 print(out$minimum, digits = 10)
 ```
+:::
 
-------------------------------------------------------------------------
 
-### *Exercise 3.3(i)* {.unnumbered}
+#### *Exercise 3(i of iii)* {.unnumbered}
+::: {.callout-caution}
+## Exercise 3
 
 *What is the other approach used? Search for the explanation of this method (English wikipedia), and briefly describe in your own words how it works.*
+:::
 
-**Answer**: The other approach is **successive parabolic interpolation**. The algorithm works as follows:
+::: {.callout-tip}
+## Solution
+
+The other approach is **successive parabolic interpolation**. The algorithm works as follows:
 
 1.  We start at three points $a_0,b_0,c_0$ with $a_0 < b_0 < c_0$ and $f(b_0) < f(c_0) \land f(b_0) < f(a_0)$ to make sure there is a minimum in $[a_0,c_0]$. Set $i=0$.
 
 2.  Compute a parabola through the points $\{(a_i,f(a_i)), (b_i,f(i)), (c_i,f(c_i))\}$ and compute its vertex / minimum $(x_i,f(x_i))$. (Both steps are computationally straightforward.)
 
 3.  if $x_i - b_i$ is less than a given tolerance, stop and return $\mathrm{argmin}(f(x_i), f(b_i))$. Else, repeat with point triple: $(a_{i+1},b_{i+1},c_{i+1}) = (b_{i},c_{i},x_i)$
+:::
 
-------------------------------------------------------------------------
 
-### *Exercise 3.4 (ii)* {.unnumbered}
+#### *Exercise 4 (ii of iii)* {.unnumbered}
+::: {.callout-caution}
+## Exercise 4
 
 *Compare its properties to golden section search. What are the differences/similarities between both methods?*
+:::
 
-**Answer**:
+::: {.callout-tip}
+## Solution
 
 *Similarities*:
 
@@ -94,20 +113,27 @@ Both methods
 *Differences*:
 
 -   SPI approximates the function by parabolas to compute new interval boundaries, GSS simply selects the best of two candidates that are located according to the golden ratio.
+:::
 
-------------------------------------------------------------------------
 
-### *Exercise 3.5 (iii)* {.unnumbered}
+#### *Exercise 5 (iii of iii)* {.unnumbered}
+::: {.callout-caution}
+## Exercise 5
 
 *Explain why this method is used as well (hint: robustness/efficiency of optimization methods).*
+:::
 
-**Answer**: SPI computes approximations and thus works best (less iterations) for smooth objective functions. GSS might be more robust in general but slower for smooth functions. Combining both methods can often improve the robustness and speed.
+::: {.callout-tip}
+## Solution
 
-------------------------------------------------------------------------
+SPI computes approximations and thus works best (less iterations) for smooth objective functions. GSS might be more robust in general but slower for smooth functions. Combining both methods can often improve the robustness and speed.
+:::
+
 
 ## Linear and non-linear least squares
 
 As a preparation, go through the course slides; if you missed the lecture you may want to go through the Gauss-Newton algorithm, e.g. on [English wikipedia](http://en.wikipedia.org/wiki/Gauss%E2%80%93Newton_algorithm).
+:::
 
 ### Linear least squares: Step-By-Step
 
@@ -126,13 +152,16 @@ $$y = b_0 + b_1 x_1 + b_2 x_2 + e$$
 
 *Hint: Try to define the matrices X and the vector y and use the solve function for computing* $b_0$, $b_1$, and $b_2$.
 
-------------------------------------------------------------------------
- 
-### *Exercise 3.6* {.unnumbered}
+
+#### *Exercise 6* {.unnumbered}
+::: {.callout-caution}
+## Exercise 6
 
 *Report the values of the coeffients found and give the full equation; compute R (the sum of the squared residuals) ; report the steps used to compute R and the value found.*
+:::
 
-**Answer**:
+::: {.callout-tip}
+## Solution
 
 We need to solve the normal equations: $(X^TX)b = X^T y$. Therefore we first need to create $X$ and $y$ from the data:
 
@@ -158,8 +187,8 @@ To compute the sum of squared residuals, we can multiply $X$ with $b$ which yiel
 lsq.ssr = sum((y - X %*% b)^2)
 lsq.ssr
 ```
+:::
 
-------------------------------------------------------------------------
 
 ### Linear least squares: by lm
 
@@ -210,23 +239,35 @@ nls(T.outside ~ a + b * sin(pi * (hours + c)/12), meteo, c(a = 0, b = 1, c = 2))
 
 The two fits provide different outcomes.
 
-------------------------------------------------------------------------
 
-### *Exercise 3.7* {.unnumbered}
+
+#### *Exercise 7* {.unnumbered}
+::: {.callout-caution}
+## Exercise 7
 
 *What does the third argument to nls contain, and why does it change the outcome?*
+:::
 
-**Answer**: The third argument defines the starting values for numerical optimization. Based on the starting values, the Gauss-Newton algorithm might find different (local) minima.
+::: {.callout-tip}
+## Solution
+ 
+The third argument defines the starting values for numerical optimization. Based on the starting values, the Gauss-Newton algorithm might find different (local) minima.
+:::
 
-------------------------------------------------------------------------
 
-### *Exercise 3.8* {.unnumbered}
+#### *Exercise 8* {.unnumbered}
+::: {.callout-caution}
+## Exercise 8
 
 *Does one of the models give a better fit?*
+:::
+
+::: {.callout-tip}
+## Solution
 
 Results differ in estimation of the phase parameter $c$ and in the sign of $b$. However, both fits yield the same sum of squared errors. Having a closer look at the values shows that the difference of both estimations for $c$ is $1.604 - (-10.396) = 12$. Both fits are essentially the same models, recall that $\sin (a) = -\sin(a + \pi)$.
+:::
 
-------------------------------------------------------------------------
 
 The following fit:
 
@@ -236,11 +277,17 @@ nls(T.outside ~ a + b * sin(pi * (hours + c)/12), meteo, c(a = 0, b = 0, c = 0))
 
 gives an error message.
 
-------------------------------------------------------------------------
 
-### *Exercise 3.9* {.unnumbered}
+
+#### *Exercise 9* {.unnumbered}
+::: {.callout-caution}
+## Exercise 9
 
 *Explain why the error occured.*
+:::
+
+::: {.callout-tip}
+## Solution
 
 Our parameter space is $\theta = (a,b,c)$ where the model is again
 
@@ -284,14 +331,20 @@ J=
 $$
 
 However, the iteration step of Gauss Newton needs $(J^T J)^{-1}$ and $J^T J$ also has a zero column (and row).
+:::
 
-------------------------------------------------------------------------
 
-### *Exercise 3.10* {.unnumbered}
+#### *Exercise 10* {.unnumbered}
+::: {.callout-caution}
+## Exercise 10
 
 *Compute the first three rows of the Jacobian matrix by hand.*
+:::
 
-**Answer:** We have seen that the Jacobian is: $$
+::: {.callout-tip}
+## Solution
+ 
+We have seen that the Jacobian is: $$
 J = 
 \begin{pmatrix}
 -1 & - \sin(\pi (x_1+c)/12) & \frac{-b \pi}{12} \cos\left(\frac{\pi (x_1+c)}{12}\right) \\
@@ -327,8 +380,8 @@ J_0 =
 \vdots & \vdots & \vdots \\
 \end{pmatrix}
 $$
+:::
 
-------------------------------------------------------------------------
 
 ### Iteration
 
@@ -338,10 +391,17 @@ The consecutive steps of the optimization are shown when a trace is requested.
 nls(T.outside ~ a + b * sin(pi * (hours + c)/12), meteo, c(a = 0, b = 1, c = 0), trace = TRUE)
 ```
 
-------------------------------------------------------------------------
 
-### *Exercise 3.11* {.unnumbered}
+
+#### *Exercise 11* {.unnumbered}
+::: {.callout-caution}
+## Exercise 11
 
 *What is the meaning of the four columns of additional output?*
+:::
 
-**Answer:** The first column prints values of the objective function whereas colums 2 to 4 show used parameter values. ---
+::: {.callout-tip}
+## Solution
+
+The first column prints values of the objective function whereas colums 2 to 4 show used parameter values.
+:::

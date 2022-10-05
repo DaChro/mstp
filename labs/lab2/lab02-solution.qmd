@@ -32,7 +32,7 @@ plot(T.outside ~ date, meteo, type = "l")
 
 ## Fitting a periodic component
 
-For fitting the periodic component for exercise 2.1, a new function with name **f** is defined. In general, we can define functions in R using the following syntax:
+For fitting the periodic component for Exercise 1, a new function with name **f** is defined. In general, we can define functions in R using the following syntax:
 
 ```{r}
 funcMultiply = function(x,y){x*y}
@@ -75,9 +75,9 @@ f = function(x) sum((meteo$T.outside - (x[1]+x[2]*sin(pi*(meteo$hours+x[3])/12))
 nlm(f,c(0,0,0))
 ```
 
-### *Exercise 2.1* {.unnumbered}
+#### *Exercise 1* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 1
 
 *How many parameters were fitted?*
 :::
@@ -109,9 +109,9 @@ meteo$T.per = 18.2 - 4.9 * sin(pi*(meteo$hours+1.6)/12)
 lines(T.per~date,meteo,col='red')
 ```
 
-### *Exercise 2.2* {.unnumbered}
+#### *Exercise 2* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 2
 
 *What is the interpretation of the fitted parameters? (if you need to guess, modify them and replot)*
 :::
@@ -162,9 +162,9 @@ an.ar5 = arima(an, c(5, 0, 0))
 an.ar5
 ```
 
-### *Exercise 2.3* {.unnumbered}
+#### *Exercise 3* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 3
 
 ```{r}
 acf(an, type = "partial")
@@ -179,9 +179,9 @@ acf(an, type = "partial")
 Yes, the process exhibits significant partial autocorrelation up to lag 5.
 :::
 
-### *Exercise 2.4* {.unnumbered}
+#### *Exercise 4* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 4
 
 ```{r}
 acf(residuals(an.ar5), type = "partial")
@@ -196,9 +196,9 @@ acf(residuals(an.ar5), type = "partial")
 No, there is no significant partial autocorrelation for lags above 0. Please note that the value range (y-axis) in this acf plot is much smaller than in the previous plot!
 :::
 
-### *Exercise 2.5* {.unnumbered}
+#### *Exercise 5* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 5
 
 *What is the class of the object returned by **arima**?*
 :::
@@ -214,9 +214,9 @@ class(an.ar5)
 The object is of class "Arima".
 :::
 
-### *Exercise 2.6* {.unnumbered}
+#### *Exercise 6* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 6
 
 Let us see what we can do with such an object.
 
@@ -257,9 +257,9 @@ temp = meteo$T.outside
     arima(temp, c(9, 0, 0))$aic
     arima(temp, c(10, 0, 0))$aic
 
-### *Exercise 2.7* {.unnumbered}
+#### *Exercise 7* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 7
 
 *Which model has the smallest AIC?*
 :::
@@ -283,9 +283,9 @@ arima(temp, c(10, 0, 0))$aic
 The model of order 8 shows the smalles AIC.
 :::
 
-### *Exercise 2.8* {.unnumbered}
+#### *Exercise 8* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 8
 
 *Do a similar analysis for the humidity variable in the meteo data set:*
 
@@ -298,10 +298,10 @@ The model of order 8 shows the smalles AIC.
 ::: {.callout-tip}
 ## Solution
 
-#### *Exercise 2.8.1:* {.unnumbered}
+### *Exercise 8.1:* {.unnumbered}
 
 ```{r}
-#Exercise 2.8.1 --> fit the periodic component
+#Exercise 8.1 --> fit the periodic component
 ##generate the periodic model function
 f = function(x) sum((meteo$humidity - (x[1]+x[2]*sin(pi*(meteo$hours+x[3])/12)))^2)
 ##optimize by using the function nlm
@@ -310,10 +310,10 @@ nlm(f,c(0,0,0))
 
 Trend equation: $$74.635633 + 19.874064 * sin(pi*(t+1.647808)/12)$$
 
-#### *Exercise 2.8.2:* {.unnumbered}
+### *Exercise 8.2:* {.unnumbered}
 
 ```{r}
-#Exercise 2.8.2 -> plot the humidity data and the fitted model
+#Exercise 8.2 -> plot the humidity data and the fitted model
 ##create new column for the new data calculated with optimized parameter
 meteo$humidity.per = 74.635633+19.874064 * sin(pi * (meteo$hours+1.647808) / 12)
 ##plot humidity
@@ -322,10 +322,10 @@ plot(meteo$humidity ~ meteo$date,type="l")
 lines(humidity.per~date, meteo, col="red")
 ```
 
-#### *Exercise 2.8.3:* {.unnumbered}
+### *Exercise 8.3:* {.unnumbered}
 
 ```{r}
-#Exercise 2.8.3 -> detrend and check residuals
+#Exercise 8.3 -> detrend and check residuals
 ##calculate residuals
 humidity.an = meteo$humidity - meteo$humidity.per
 ##calculate aic for residuals with different order models
@@ -343,10 +343,10 @@ arima(humidity.an, c(10,0,0))$aic
 
 The model of 9th order has the lowest aic.
 
-#### *Exercise 2.8.4:* {.unnumbered}
+### *Exercise 8.4:* {.unnumbered}
 
 ```{r}
-#Exercise 2.8.4 -> compute and plot acf for the residuals
+#Exercise 8.4 -> compute and plot acf for the residuals
 humidity.an.ar9 = arima(humidity.an, c(9,0,0))
 acf(residuals(humidity.an.ar9), type = "partial")
 ```
@@ -394,9 +394,9 @@ lines(9891:19970, x.pr-2*x.se, col='green')
 title("predicting 1 week")
 ```
 
-### *Exercise 2.9* {.unnumbered}
+#### *Exercise 9* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 9
 
 *Where does, for long-term forecasts, the predicted value converge to?*
 :::
@@ -426,9 +426,9 @@ lines(9891:19970, T.pr+x.pr-2*x.se, col='green')
 title("predicting 1 week")
 ```
 
-### *Exercise 2.10* {.unnumbered}
+#### *Eercise 10* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 10
 
 *Where does now, for long-term forecasts, the predicted value convergeto? Explain the difference to the upper model.*
 :::
@@ -439,9 +439,9 @@ title("predicting 1 week")
 Here the predicted value does not converge to the mean but to the periodic trend. The daily cycle is taken into account.
 :::
 
-### *Exercise 2.11* {.unnumbered}
+#### *Exercise 11* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 11
 
 *Fit a periodic trend and an AR(3) model to the humidity data. Plot predictions for one week.*
 :::
