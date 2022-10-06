@@ -74,9 +74,11 @@ plot(zinc.lm, , c("Residuen ~ Modellierte Werte", "QQ-Plot mit Normalverteilung"
     "Cook's Distanz vs Leverage"))
 ```
 
-------------------------------------------------------------------------
 
-### *Exercise 5.1* {.unnumbered}
+
+#### *Exercise 1* {.unnumbered}
+::: {.callout-caution}
+## Exercise 1
 
 *For this regression model, which of the following violated assumptions underlying linear regression are true (if any):*
 
@@ -86,8 +88,9 @@ c)  residuals are not normally distributed (their distribution is for example no
 d)  residuals are heteroscedastic and not normally distributed
 
 *and explain how you can tell that this is the case.*
+:::
 
-------------------------------------------------------------------------
+
 
 ## Spatial data in R (I): the sp package
 
@@ -283,9 +286,11 @@ sel = spplot(meuse, "zinc", identify = TRUE)
 sel
 ```
 
-------------------------------------------------------------------------
 
-### *Exercise 5.2* {.unnumbered}
+
+#### *Exercise 2* {.unnumbered}
+::: {.callout-caution}
+## Exercise 2
 
 *Which points have the largest zinc concentration:*
 
@@ -293,8 +298,9 @@ a)  44 51 54 55 82
 b)  49 53 54 55 82
 c)  54 55 56 60 123
 d)  53 54 55 59 82
+:::
 
-------------------------------------------------------------------------
+
 
 ## Simple interpolation algorithms
 
@@ -337,9 +343,12 @@ Function `surf.ls` from library `spatial` (described in the MASS book) fits tren
 
 As you can see, `?krige` does not provide help on argument `degree`. However, tells that any remaining arguments (...) are passed to function `gstat`, so look for argument `degree` on `?gstat`.
 
-------------------------------------------------------------------------
 
-### *Exercise 5.3* {.unnumbered}
+
+#### *Exercise 3* {.unnumbered}
+::: {.callout-caution}
+## Exercise 3
+
 
 *The danger of extreme extrapolation values is likely to occur*
 
@@ -348,8 +357,9 @@ b)  for high trend orders
 c)  for none of these models
 
 *Briefly explain why this is the case.*
+:::
 
-------------------------------------------------------------------------
+
 
 Local trends, i.e. trends in a local neighbourhood may also be fitted:
 
@@ -432,9 +442,11 @@ tm_shape(meuse.grid.stars) +
 
 The argument `set` is a list because other parameters can be passed to gstat using this list as well.
 
-------------------------------------------------------------------------
 
-### *Exercise 5.4* {.unnumbered}
+
+#### *Exercise 4* {.unnumbered}
+::: {.callout-caution}
+## Exercise 4
 
 *With a larger inverse distance power (`idp`), the weight of the nearest data point*
 
@@ -443,8 +455,9 @@ b)  becomes smaller
 c)  does not change
 
 *explain in words why this is the case.*
+:::
 
-------------------------------------------------------------------------
+
 
 ### Nearest Neighbor / Tiessen (or Voronoi) Polygons
 
@@ -551,9 +564,11 @@ tm_shape(meuse.grid.stars)+tm_raster("se.fit", n=10, palette = bpy.palette)
 ```
 :::
 
-------------------------------------------------------------------------
 
-### *Exercise 5.5* {.unnumbered}
+
+#### *Exercise 5* {.unnumbered}
+::: {.callout-caution}
+## Exercise 5
 
 *Why are prediction standard errors on the log-scale largest for small and large distance to the river?*
 
@@ -561,8 +576,9 @@ a)  Because variability is smallest for intermediate distance to river
 b)  because the uncertainty in the regression slope is most prevalent when the regressor *distance* takes extreme values
 c)  because we have too few degrees of freedom for regression (i.e., too few observations) overall
 d)  because we have too little data close to the river and far away from the river
+:::
 
-------------------------------------------------------------------------
+
 
 We can use the prediction errors provided by `lm` to calculate regression prediction intervals:
 
@@ -634,17 +650,20 @@ tm_shape(meuse.grid.stars) +
 
 Note that all these prediction intervals refer to prediction of single observations; confidence intervals for mean values (i.e., the regression line alone) are obtained by specifying interval = `"confidence"`.
 
-------------------------------------------------------------------------
 
-### *Exercise 5.6* {.unnumbered}
+
+#### *Exercise 6* {.unnumbered}
+::: {.callout-caution}
+## Exercise 6
 
 *Compared to prediction intervals, the intervals obtained by interval = `"confidence"` are*
 
 a)  wider
 b)  narrower
 c)  of approximately equal width
+:::
 
-------------------------------------------------------------------------
+
 
 Another regression model is obtained by relating zinc to flood frequency, try
 
@@ -667,37 +686,46 @@ plot(log(zinc) ~ ffreq, meuse.sf)
 ```
 :::
 
-------------------------------------------------------------------------
 
-### *Exercise 5.7* {.unnumbered}
+
+#### *Exercise 7* {.unnumbered}
+::: {.callout-caution}
+## Exercise 7
 
 *Why is a box-and whisker plot drawn for the second plot, and not a scatter plot?*
 
 a)  `ffreq` has been turned into a categorical variable with numeric levels
 b)  `ffreq` has been turned into a variable with only three values, 1, 2 and 3
 c)  flood frequency is always expressed by boxes
+:::
 
-------------------------------------------------------------------------
 
-### *Exercise 5.8* {.unnumbered}
+
+#### *Exercise 8* {.unnumbered}
+::: {.callout-caution}
+## Exercise 8
 
 *What do the boxes in a box-and whisker plot refer to?*
 
 a)  the mean plus and minus one standard deviation of the group
 b)  the 95 percent confidence interval for the mean
 c)  the inter-quartile range (from 25-th to 75-th percentiles)
+:::
 
-------------------------------------------------------------------------
 
-### *Exercise 5.9* {.unnumbered}
+
+#### *Exercise 9* {.unnumbered}
+::: {.callout-caution}
+## Exercise 9
 
 *What is needed for flood frequency to use it for mapping zinc?*
 
 a)  it needs to be the number of times a grid cell floods
 b)  it needs to be known at each prediction location (i.e., grid cells in `meuse.grid`)
 c)  it needs to be independent of distance to the river
+:::
 
-------------------------------------------------------------------------
+
 
 Try the model in prediction mode:
 
@@ -735,10 +763,13 @@ tm_shape(meuse.grid.stars) +
 ```
 :::
 
-------------------------------------------------------------------------
 
-### *Exercise 5.10* {.unnumbered}
+
+#### *Exercise 10* {.unnumbered}
+::: {.callout-caution}
+## Exercise 10
 
 *Why is the pattern obtained not smooth?*
+:::
 
-------------------------------------------------------------------------
+
