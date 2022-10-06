@@ -107,7 +107,7 @@ plot(out)
 
 Note that now your own plot.Metropolis has been called, because Metropolis is the class of out (we actively assigned the class "Metropolis" (and "matrix") to the output of objects created by our self-written function above when we did `class(out) = c("Metropolis", "matrix")`).
 
-------------------------------------------------------------------------
+
 
 #### *Exercise 1* {.unnumbered}
 ::: {.callout-caution}
@@ -121,7 +121,7 @@ Note that now your own plot.Metropolis has been called, because Metropolis is th
 
 Around 5 percent or less of the proposals have been accepted, i.e. more than 95% have been rejected. The rejection rate can be decreased by decreasing the standard deviation of the proposal distribution $\sigma$.
 :::
-------------------------------------------------------------------------
+
 
 Compare the values found with those obtained with `nls` e.g. by:
 
@@ -213,7 +213,7 @@ Univarite distribution plots can be obtained by `hist()` and `qnorm()`, e.g..
 qqnorm(out4[, 2])
 ```
 
-------------------------------------------------------------------------
+
 
 #### *Exercise 4* {.unnumbered}
 ::: {.callout-caution}
@@ -262,7 +262,7 @@ plot(out)
 
 The burn-in period is the period that the chain needs to go from the initial values to the region where it becomes stationary.
 
-------------------------------------------------------------------------
+
 
 #### *Exercise 5* {.unnumbered}
 ::: {.callout-caution}
@@ -301,7 +301,7 @@ Not surprisingly, numeric optimization is an area with many applications in stat
 
 Simulated annealing is available as a method provided by the generic optimization function `optim()`. Read the help page of this function and answer the following question.
 
-------------------------------------------------------------------------
+
 
 #### *Exercise 7* {.unnumbered}
 ::: {.callout-caution}
@@ -343,7 +343,7 @@ optim(c(1, 1, 1), fmin, method = "SANN", control = list(trace = 1))
 The output contains the sums of **absolute** residuals and corresponding parameter values at specific iterations.
 :::
 
-------------------------------------------------------------------------
+
 
 Compare two runs of simulated annealing:
 
@@ -353,7 +353,7 @@ x2 = optim(c(1, 1, 1), fmin, method = "SANN")
 x1$par - x2$par
 ```
 
-------------------------------------------------------------------------
+
 
 #### *Exercise 9* {.unnumbered}
 ::: {.callout-caution}
