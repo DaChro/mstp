@@ -22,7 +22,7 @@ objects()
 
 ## Models: the formula interface; linear regression
 
-Most statisticians (and many earth scientists as well) like to analyse data through models: models reflect the hypotheses we entertain, and from fitting models, analysing model output, and analysising graphs of fitted values and residuals we can learn from the data whether a given hypothesis was reasonable or not.
+Most statisticians (and many earth scientists as well) like to analyse data through models: models reflect the hypotheses we entertain, and from fitting models, analysing model output, and analysing graphs of fitted values and residuals we can learn from the data whether a given hypothesis was reasonable or not.
 
 Many models are variations of regression models. Here, we will illustrate an example of a simple linear regression model involving the heavy metal pollution data in `meuse`. We will entertain the hypothesis that zinc concentration, present in variable `zinc`, depends linearly on distance to the river, present in `dist`. We can express dependency of y on x by a formula, coded as y\~x. Formulas can have multiple right-hand sides for multiple linear regression, as y\~x1+x2; they also can contain expressions (transformations) of variables, as in log(y)\~sqrt(x). See `?formula` for a full description of the full functionality.
 
