@@ -5,7 +5,7 @@ editor: visual
 
 # Simple and ordinary kriging
 
-------------------------------------------------------------------------
+
 
 Ordinary kriging is an interpolation method that uses weighted averages of all, or a defined set of neighbouring, observations. It calculates a weighted average, where weights are chosen such that (i) prediction error variance is minimal, and (ii) predictions are unbiased. The second requirement results in weights that sum to one. Simple kriging assumes the mean (or mean function) to be known; consequently it drops the second requirement and the weights do not have to sum to unity. Kriging assumes the variogram to be known; based on the variogram (or the covariogram, derived from the variogram) it calculates prediction variances.
 
@@ -54,34 +54,48 @@ bpy.palette=bpy.colors()
 
 One main advantage of kriging compared to e.g. inverse distance weighting is that it cares about clustering of the points where the values for prediction come from.
 
-------------------------------------------------------------------------
 
-### *Exercise 7.1* {.unnumbered}
+
+#### *Exercise 1* {.unnumbered}
+::: {.callout-caution}
+## Exercise 1
 
 *Imagine you want to predict a value by three others. All three points have the same distance from the point to predict, two of them are very close together and the third one is on the opposite side of the point to predict. Which weighting would you choose and why?*
 
 a)  Equal weights on all points
 b)  Put more weight on the single point than on the two clustered ones.
 c)  Put less weight on the single point than on the two clustered ones.
+:::
 
-**Answer:** The single point carries more additional information than the two clustered points. It is therefore better to put a higher weight on the single point. The correct answer is b).
+::: {.callout-tip}
+## Solution
 
-------------------------------------------------------------------------
+The single point carries more additional information than the two clustered points. It is therefore better to put a higher weight on the single point. The correct answer is b).
+:::
 
-### *Exercise 7.2* {.unnumbered}
+
+
+#### *Exercise 2* {.unnumbered}
+::: {.callout-caution}
+## Exercise 2
 
 *Which of the following properties are true/false for inverse distance interpolation and for kriging, respectively?*
 
 a)  Points closer to the point to predict have more weight.
 b)  Clustered points have more weight.
+:::
 
-**Answer:** The correct answer is a). In both, IDW and Kriging, closer points get higher weights than points far away. Clustering of points is not accounted for in IDW. In Kriging, clustered points get lower weights.
+::: {.callout-tip}
+## Solution
 
-------------------------------------------------------------------------
+The correct answer is a). In both, IDW and Kriging, closer points get higher weights than points far away. Clustering of points is not accounted for in IDW. In Kriging, clustered points get lower weights.
+:::
+
+
 
 Download the [E{Z}-Kriging tool](https://www.uni-muenster.de/LearnWeb/learnweb2/mod/resource/view.php?id=1111161) to see how weighting is done by kriging. Use it to answer the following questions.
 
-------------------------------------------------------------------------
+
 
 ## Influence of Variogram on Prediction
 
@@ -89,15 +103,22 @@ Use E{Z}-Kriging. Place 7 points, some in a cluster and the others on different 
 
 The first parameter we look at is the nugget effect. Put the partial sill ($c1$) to 0 and change the nugget effect ($c0$).
 
-------------------------------------------------------------------------
 
-### *Exercise 7.3* {.unnumbered}
+
+#### *Exercise 3* {.unnumbered}
+::: {.callout-caution}
+## Exercise 3
 
 *What happens to the weights, to the prediction and to the prediction error?*
+:::
 
-**Answer:** The weights are the same for all points. The prediction value is the same for all values. The prediction error increases with increasing nugget.
+::: {.callout-tip}
+## Solution
 
-------------------------------------------------------------------------
+The weights are the same for all points. The prediction value is the same for all values. The prediction error increases with increasing nugget.
+:::
+
+
 
 Can you imagine how the interpolated map looks like? Try pure nugget effect kriging on the `log(zinc)` data from meuse:
 
@@ -126,35 +147,55 @@ tm_shape(lzn.krige.nugget.stars) +
 ```
 :::
 
-------------------------------------------------------------------------
 
-### *Exercise 7.4* {.unnumbered}
+
+#### *Exercise 4* {.unnumbered}
+::: {.callout-caution}
+## Exercise 4
 
 *How are clustered points weighted? How important is the distance to the point to predict? Does pure nugget effect fit data with strong spatial correlation or data where values in different points are uncorrelated?*
+:::
 
-**Answer:**The weights are the same for all points, so clustering and distance have no effect. The pure nugget effect fits data where the different points are uncorrelated.
+::: {.callout-tip}
+## Solution
 
-------------------------------------------------------------------------
+The weights are the same for all points, so clustering and distance have no effect. The pure nugget effect fits data where the different points are uncorrelated.
+:::
 
-### *Exercise 7.5* {.unnumbered}
+
+
+#### *Exercise 5* {.unnumbered}
+::: {.callout-caution}
+## Exercise 5
 
 *What are the predicted values? Explain why this makes sense here!*
+:::
 
-**Answer:** Since the weights are the same for all known points, the predicted value is the mean.
+::: {.callout-tip}
+## Solution
+Since the weights are the same for all known points, the predicted value is the mean.
+:::
 
-------------------------------------------------------------------------
+
 
 Next we explore the range. In E{Z}-Kriging put $c1$ back to a medium value (keep the exponential model). Try out different ranges.
 
-------------------------------------------------------------------------
 
-### *Exercise 7.6* {.unnumbered}
+
+#### *Exercise 6* {.unnumbered}
+::: {.callout-caution}
+## Exercise 6
 
 *How is the influence of the range on weighting (compare very small, medium and very big range)?*
+:::
 
-**Answer:** For a very small range, the weigths are very similar for all points (maximum variance is reached after a short distance from the prediction point already). For medium ranges the influence of points close to the prediction location gets higher. For very large ranges the weights of the different points get more similar again (the correlation high for all points)
+::: {.callout-tip}
+## Solution
 
-------------------------------------------------------------------------
+For a very small range, the weigths are very similar for all points (maximum variance is reached after a short distance from the prediction point already). For medium ranges the influence of points close to the prediction location gets higher. For very large ranges the weights of the different points get more similar again (the correlation high for all points)
+:::
+
+
 
 Try kriging for different ranges on the $log(zinc)$ values.
 
@@ -183,11 +224,17 @@ tm_shape(lzn.krige.smallrange.stars) +
 
 Repeat for $range = 10000$ (true range is about $1000$).
 
-------------------------------------------------------------------------
 
-### *Exercise 7.7* {.unnumbered}
+
+#### *Exercise 7* {.unnumbered}
+::: {.callout-caution}
+## Exercise 7
 
 *Describe the main differences of the kriged map for small/big range and compare the errors.*
+:::
+
+::: {.callout-tip}
+## Solution
 
 Let's first plot the map using a variogram with $range = 10000$:
 
@@ -212,9 +259,11 @@ tm_shape(lzn.krige.smallrange.stars) +
 ```
 :::
 
-**Answer:** As you can see, for a large range the map of prediction values and that of kriging vanriance is "smoother". Also, the kriging variance is in total smaller, because the values are more correlated at larger distances.
 
-------------------------------------------------------------------------
+As you can see, for a large range the map of prediction values and that of kriging vanriance is "smoother". Also, the kriging variance is in total smaller, because the values are more correlated at larger distances.
+:::
+
+
 
 Given that lzn.mod contains a suitable variogram model (see above), we can apply ordinary kriging by
 
@@ -252,7 +301,7 @@ tm_shape(lzn.stars) +
 ```
 :::
 
-------------------------------------------------------------------------
+
 
 ## Local Kriging
 
@@ -279,19 +328,26 @@ tm_shape(lzn.stars) +
 ```
 :::
 
-------------------------------------------------------------------------
 
-### *Exercise 7.8* {.unnumbered}
+
+#### *Exercise 8* {.unnumbered}
+::: {.callout-caution}
+## Exercise 8
 
 *When we increase the value of nmax, the differences between the local and global kriging will*
 
 a)  become smaller
 b)  become larger
 c)  remain the same
+:::
 
-**Answer:** The correct answer is a). If we increase nmax, more neighbours (i.e. also more distant neighbours) will be taken into account.
+::: {.callout-tip}
+## Solution
 
-------------------------------------------------------------------------
+The correct answer is a). If we increase nmax, more neighbours (i.e. also more distant neighbours) will be taken into account.
+:::
+
+
 
 Another, commonly used strategy is to select a kriging neighbourhood based on spatial distance to prediction location. To exagerate the effect of distance-based neighbourhoods, a very small neighbourhood is chosen of 200 m:
 
@@ -321,19 +377,26 @@ tm_shape(lzn.ok.stars) +
 ```
 :::
 
-------------------------------------------------------------------------
 
-### *Exercise 7.9* {.unnumbered}
+
+#### *Exercise 9* {.unnumbered}
+::: {.callout-caution}
+## Exercise 9
 
 *How can the gaps that now occur in the local neighbourhood kriging map be explained? At these prediction locations*
 
 a)  the kriging neighbourhood is empty
 b)  the kriging neighbourhood only contains a single observation
 c)  the kriging neighbourhood contains less than 2 observations
+:::
 
-**Answer:** Thee correct answer is a). If we select the kriging neighbourhood (the areas of points to be included in the kriging process) based on the distance and regardless of the number of neighbours, there can be neighbourhoods without any points to use.
+::: {.callout-tip}
+## Solution
 
-------------------------------------------------------------------------
+Thee correct answer is a). If we select the kriging neighbourhood (the areas of points to be included in the kriging process) based on the distance and regardless of the number of neighbours, there can be neighbourhoods without any points to use.
+:::
+
+
 
 ::: panel-tabset
 ## sp
@@ -361,9 +424,11 @@ tm_shape(lzn.ok.stars) +
 
 Ordinary and simple kriging behave different in this latter aspect.
 
-------------------------------------------------------------------------
 
-### *Exercise 7.10* {.unnumbered}
+
+#### *Exercise 10* {.unnumbered}
+::: {.callout-caution}
+## Exercise 10
 
 *In the areas with gaps in the ordinary kriging map, simple kriging yields*
 
@@ -372,9 +437,14 @@ b)  a compromise between the mean value (5.9) and the nearest observation
 c)  a compromise between the mean value (5.9) and the nearest two or more observations
 
 *Explain why this is the case.*
+:::
 
-**Answer:** The correct answer is a). In areas where there is no known point to predict the value at the prediction location, simple kriging gives the global mean as estimate.
+::: {.callout-tip}
+## Solution
 
-------------------------------------------------------------------------
+The correct answer is a). In areas where there is no known point to predict the value at the prediction location, simple kriging gives the global mean as estimate.
+:::
+
+
 
 Some texts advocate to choose search neighbourhood distances equal to the range of the variogram, however there is no theoretical nor a practical justification for this: weights of points beyond the correlation range are usually not zero. Choosing a local neighbourhood may save time and memory when kriging large data sets. In addition, the assumption of a global constant mean is weakened to that of a constant mean within the search neighbourhood.
