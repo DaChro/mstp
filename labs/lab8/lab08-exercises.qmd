@@ -7,7 +7,7 @@ editor: visual
 
 # Universal kriging
 
-------------------------------------------------------------------------
+
 
 Universal kriging
 
@@ -94,9 +94,11 @@ plot(variogram(g.sf, cross = F), scales = list(relation = "same"), layout = c(2,
 ```
 :::
 
-------------------------------------------------------------------------
 
-### *Exercise 8.1* {.unnumbered}
+
+#### *Exercise 1* {.unnumbered}
+::: {.callout-caution}
+## Exercise 1
 
 *How is the residual standard error from the regression model above (`lzn.lm`) related to the variogram of the residuals?*
 
@@ -106,10 +108,13 @@ c)  it equals the range of the residual variogram
 d)  it equals the sill of the residual variogram
 e)  it equals the nugget of the residual variogram
 f)  the residual variance (approximately) equals the nugget of the variogram
+:::
 
-------------------------------------------------------------------------
 
-### *Exercise 8.2* {.unnumbered}
+
+#### *Exercise 2* {.unnumbered}
+::: {.callout-caution}
+## Exercise 2
 
 *Why is the sill of the residual variogram much lower than the sill of the variogram for the raw data?*
 
@@ -117,8 +122,9 @@ a)  residuals have less spatial correlation than original data
 b)  residuals vary less because here the regression model removed part of the total variability
 c)  the residuals have little in common with the (log) zinc data
 d)  residuals allways have much smaller variability than raw data
+:::
 
-------------------------------------------------------------------------
+
 
 When a regression model formula is passed to `variogram`, the variogram of the residuals is calculated. When a model formula is passed to `krige`, universal kriging is used.
 
@@ -173,27 +179,34 @@ tm_shape(outuk.stars) +
 ```
 :::
 
-------------------------------------------------------------------------
 
-### *Exercise 8.3* {.unnumbered}
+
+#### *Exercise 3* {.unnumbered}
+::: {.callout-caution}
+## Exercise 3
 
 *Where are the differences most prevalent?*
 
 a)  In areas with values for dist close to 0 and 1
 b)  In areas with few data points
 c)  In areas where both (a) and (b) are valid
+:::
 
-------------------------------------------------------------------------
 
-### *Exercise 8.4* {.unnumbered}
+
+#### *Exercise 4* {.unnumbered}
+::: {.callout-caution}
+## Exercise 4
+ 
 
 *Why are the differences happening exactly there?*
 
 a)  on locations far from measurements, interpolation relies heavily on the estimated trend value; where dist is close to 0 or 1, the trend value is most different from the value m used in ordinary kriging
 b)  on locations far from measurements we are most uncertain about the true values
 c)  on locations where dist is close to 0 or 1, it was hard to collect data, because these locations were hard to reach.
+:::
 
-------------------------------------------------------------------------
+
 
 # Block kriging
 
@@ -261,16 +274,21 @@ tm_shape(zn.stars) +
 ```
 :::
 
-------------------------------------------------------------------------
 
-### *Exercise 8.5* {.unnumbered}
+
+#### *Exercise 5* {.unnumbered}
+::: {.callout-caution}
+## Exercise 5
 
 *Describe what happens if we change from point prediction to block prediction of size 40, in terms of predictions and in terms of prediction standard errors?*
+:::
 
-------------------------------------------------------------------------
 
-### *Exercise 8.6* {.unnumbered}
+
+#### *Exercise 6* {.unnumbered}
+::: {.callout-caution}
+## Exercise 6 
 
 *Describe what happens if we change from block prediction for blocks of size 40 m to block prediction for blocks of size 400 m, in terms of predictions and in terms of prediction standard errors?*
+:::
 
-------------------------------------------------------------------------
