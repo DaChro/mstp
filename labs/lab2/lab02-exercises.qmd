@@ -1,10 +1,10 @@
 ---
-title: "Spatio-temporal Modelling, Lab 2, YYYY-MM-DD"
+title: "Spatio-temporal Modelling, Lab 2, 2022-10-19"
 format: html
 editor: visual
 ---
 
-**This excercise will be discussed on YYYY-MM-DD.**
+**This excercise will be discussed on 2022-10-26.**
 
 This exercise is about exploratory time series analysis, fitting periodic components, and AR models. You will need to download the R data file `meteo.Rdata` from the Learnweb and put it into your workspace directory.
 

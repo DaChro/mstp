@@ -1,5 +1,5 @@
 ---
-title: "Spatio-temporal Modelling, Lab 1, YYYY-MM-DD"
+title: "Spatio-temporal Modelling, Lab 1, 2022-10-19"
 format: html
 editor: visual
 ---
