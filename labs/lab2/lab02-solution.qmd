@@ -432,7 +432,7 @@ lines(9891:19970, T.pr+x.pr-2*x.se, col='green')
 title("predicting 1 week")
 ```
 
-#### *Eercise 10* {.unnumbered}
+#### *Exercise 10* {.unnumbered}
 
 ::: callout-caution
 ## Exercise 10
