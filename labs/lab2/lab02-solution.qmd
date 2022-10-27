@@ -1,5 +1,5 @@
 ---
-title: "Spatio-temporal Modelling, Lab 2, YYYY-MM-DD"
+title: "Spatio-temporal Modelling, Lab 2, 2022-10-26"
 format: html
 editor: visual
 ---
@@ -16,11 +16,11 @@ class(meteo)
 summary(meteo)
 ```
 
-::: {.callout-note}
+::: callout-note
 ## Hint
 
 In case the RData file is not in working directory, you may have to specify the absolute path (e.g. C:/myDirectory/meteo.RData in Windows), but we recommend you to set the working directory properly using the **setwd** function or an R Studio project.
-::: 
+:::
 
 Again, we can generate a plot using the **plot** function:
 
@@ -76,13 +76,14 @@ nlm(f,c(0,0,0))
 ```
 
 #### *Exercise 1* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 1
 
 *How many parameters were fitted?*
 :::
 
-::: {.callout-tip}
+::: callout-tip
 ## Solution
 
 Three parameters were fitted. The following periodic model is used: $$x_1 + x_2 \sin(\pi(t + x_3)/12)$$
@@ -110,22 +111,21 @@ lines(T.per~date,meteo,col='red')
 ```
 
 #### *Exercise 2* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 2
 
 *What is the interpretation of the fitted parameters? (if you need to guess, modify them and replot)*
 :::
 
-::: {.callout-tip}
+::: callout-tip
 ## Solution
-
 
 `x[1]`: shift on the y-axis (here 18,2).
 
 `x[2]`: amplitude (here -4,9).
 
 `x[3]`: shift on the x-axis or phase (here 1,6).
-
 :::
 
 We can now also plot the residual (difference between predicted values and measured temperature values) from this fitted model:
@@ -163,7 +163,8 @@ an.ar5
 ```
 
 #### *Exercise 3* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 3
 
 ```{r}
@@ -173,14 +174,15 @@ acf(an, type = "partial")
 *Does the **an** process exhibit temporal correlation for lags larger than 0?)*
 :::
 
-::: {.callout-tip}
+::: callout-tip
 ## Solution
 
 Yes, the process exhibits significant partial autocorrelation up to lag 5.
 :::
 
 #### *Exercise 4* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 4
 
 ```{r}
@@ -190,22 +192,22 @@ acf(residuals(an.ar5), type = "partial")
 *Does the **residuals(an.ar5)** process still exhibit temporal correlation for lags larger than 0?*
 :::
 
-::: {.callout-tip}
+::: callout-tip
 ## Solution
 
 No, there is no significant partial autocorrelation for lags above 0. Please note that the value range (y-axis) in this acf plot is much smaller than in the previous plot!
 :::
 
 #### *Exercise 5* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 5
 
 *What is the class of the object returned by **arima**?*
 :::
 
-::: {.callout-tip}
+::: callout-tip
 ## Solution
-
 
 ```{r}
 class(an.ar5)
@@ -215,7 +217,8 @@ The object is of class "Arima".
 :::
 
 #### *Exercise 6* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 6
 
 Let us see what we can do with such an object.
@@ -230,7 +233,7 @@ The **methods** function returns the methods of a class, in this case the **Arim
 *Explain what you see in the first two plots!*
 :::
 
-::: {.callout-tip}
+::: callout-tip
 ## Solution
 
 The first plot shows standardized residuals. This means the mean of the residuals is 0 and the standard deviation is 1. This is achieved by subtracting the mean and dividing by the standard deviation. As a result the residuals are better comparable with those of other time series.
@@ -258,13 +261,14 @@ temp = meteo$T.outside
     arima(temp, c(10, 0, 0))$aic
 
 #### *Exercise 7* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 7
 
 *Which model has the smallest AIC?*
 :::
 
-::: {.callout-tip}
+::: callout-tip
 ## Solution
 
 ```{r}
@@ -284,7 +288,8 @@ The model of order 8 shows the smalles AIC.
 :::
 
 #### *Exercise 8* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 8
 
 *Do a similar analysis for the humidity variable in the meteo data set:*
@@ -295,7 +300,7 @@ The model of order 8 shows the smalles AIC.
 4.  *Up to which lag does the residual humidity process exhibit temporal correlation?*
 :::
 
-::: {.callout-tip}
+::: callout-tip
 ## Solution
 
 ### *Exercise 8.1:* {.unnumbered}
@@ -395,13 +400,14 @@ title("predicting 1 week")
 ```
 
 #### *Exercise 9* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 9
 
 *Where does, for long-term forecasts, the predicted value converge to?*
 :::
 
-::: {.callout-tip}
+::: callout-tip
 ## Solution
 
 It converges to the mean of the temperature data (18,13).
@@ -427,26 +433,28 @@ title("predicting 1 week")
 ```
 
 #### *Eercise 10* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 10
 
 *Where does now, for long-term forecasts, the predicted value convergeto? Explain the difference to the upper model.*
 :::
 
-::: {.callout-tip}
+::: callout-tip
 ## Solution
 
 Here the predicted value does not converge to the mean but to the periodic trend. The daily cycle is taken into account.
 :::
 
 #### *Exercise 11* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 11
 
 *Fit a periodic trend and an AR(3) model to the humidity data. Plot predictions for one week.*
 :::
 
-::: {.callout-tip}
+::: callout-tip
 ## Solution
 
 ```{r}

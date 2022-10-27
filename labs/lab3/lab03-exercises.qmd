@@ -1,10 +1,10 @@
 ---
-title: "Spatio-temporal Modelling, Lab 3, YYYY-MM-DD"
+title: "Spatio-temporal Modelling, Lab 3, 2022-10-26"
 format: html
 editor: visual
 ---
 
-**This excercise will be discussed on YYYY-MM-DD**
+**This excercise will be discussed on 2022-11-09**
 
 ------------------------------------------------------------------------
 
@@ -28,10 +28,9 @@ optimize(f, c(0, pi), x = x, y = y)
 
 The optimization looks quite good, but approximates.
 
-
-
 #### *Exercise 1* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 1
 
 *How many parameters were fitted with the function call above?*
@@ -44,32 +43,33 @@ out = optimize(f, c(0, pi), x = x, y = y, tol = 1e-08)
 print(out$minimum, digits = 10)
 ```
 
-
-
 #### *Exercise 2* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 2
 
 *Is this fit better? Did optimize get the full 9 (or more) digits right?*
 :::
 
-#### *Exercise 3(i of iii)* {.unnumbered}
-::: {.callout-caution}
+#### *Exercise 3 (i of iii)* {.unnumbered}
+
+::: callout-caution
 ## Exercise 3
 
 *What is the other approach used? Search for the explanation of this method (English wikipedia), and briefly describe in your own words how it works.*
 :::
 
 #### *Exercise 4 (ii of iii)* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 4
 
 *Compare its properties to golden section search. What are the differences/similarities between both methods?*
 :::
 
-
 #### *Exercise 5 (iii of iii)* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 5
 
 *Explain why this method is used as well (hint: robustness/efficiency of optimization methods).*
@@ -96,15 +96,13 @@ $$y = b_0 + b_1 x_1 + b_2 x_2 + e$$
 
 (a trend surface in three dimensions), using the step-by-step example in the course slides. *Hint: Try to define the matrices X and the vector y and use the solve function for computing* $b_0$, $b_1$, and $b_2$.
 
-
-
 #### *Exercise 6* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 6
 
 *Report the values of the coeffients found and give the full equation; compute R (the sum of the squared residuals) ; report the steps used to compute R and the value found.*
 :::
-
 
 ### Linear least squares: by lm
 
@@ -155,23 +153,21 @@ nls(T.outside ~ a + b * sin(pi * (hours + c)/12), meteo, c(a = 0, b = 1, c = 2))
 
 The two fits provide different outcomes.
 
-
-
 #### *Exercise 7* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 7
 
 *What does the third argument to nls contain, and why does it change the outcome?*
 :::
 
-
 #### *Exercise 8* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 8
 
 *Does one of the models give a better fit?*
 :::
-
 
 The following fit:
 
@@ -181,23 +177,21 @@ nls(T.outside ~ a + b * sin(pi * (hours + c)/12), meteo, c(a = 0, b = 0, c = 0))
 
 gives an error message.
 
-
-
 #### *Exercise 9* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 9
 
 *Explain why the error occured.*
 :::
 
-
 #### *Exercise 10* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 10
 
 *Compute the first three rows of the Jacobian matrix by hand.*
 :::
-
 
 ### Iteration
 
@@ -207,11 +201,10 @@ The consecutive steps of the optimization are shown when a trace is requested.
 nls(T.outside ~ a + b * sin(pi * (hours + c)/12), meteo, c(a = 0, b = 1, c = 0), trace = TRUE)
 ```
 
-
 #### *Exercise 11* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 11
 
 *What is the meaning of the four columns of additional output?*
 :::
-
