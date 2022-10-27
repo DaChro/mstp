@@ -437,7 +437,7 @@ title("predicting 1 week")
 ::: callout-caution
 ## Exercise 10
 
-*Where does now, for long-term forecasts, the predicted value convergeto? Explain the difference to the upper model.*
+*Where does now, for long-term forecasts, the predicted value converge to? Explain the difference to the upper model.*
 :::
 
 ::: callout-tip
