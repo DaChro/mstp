@@ -238,22 +238,40 @@ meuse.grid.stars
 plot(meuse.grid.stars[3], col=heat.colors(10))
 ```
 
-## Visualizing spatial data with the tmap package
+### Visualizing spatial data with the tmap package
+
+In the previous section, we have used the function `spplot()` to create plots from data handled by the package `sp`, such as `SpatialPointsDataFrame` or `SpatialPixelsDataFrame`. While the packages `sf` and `stars` offer plot functions for objects of these classes as well, we will use the package `tmap` for plotting those throughout this exercise. `tmap` allows easy handling of `sf` and `stars` objects combined in one plot and offers a lot of utility for creating and styling maps and other visualizations of spatial data. The syntax for plotting is very simple and straightforward: the basic building blog of a plot is a `tm_shape` element, which defines the spatial data object (raster or vector, can be, e.g., an `sf` or `stars` object, but also objects from the packages `sp` or `raster`) to be added to the map, plus one or more layer elements, e.g., `tm_raster` or `tm_polygons`, which define how the object is to plotted (and which aspects of it). All these elements are combined via the + operator. The example creates a plot with one layer showing the "dist" attribute of "meuse.grid.stars" together with the polygon of the meuse river. 
 
 ```{r}
 library(tmap)
-tm_shape(meuse.grid)+tm_raster("dist",n=10)+tm_shape(meuse.riv.sf)+tm_polygons()
+tm_shape(meuse.grid.stars)+tm_raster("dist",n=10)+tm_shape(meuse.riv.sf)+tm_polygons()
 ```
+
+The functions adding the layers like `tm_raster()` or `tm_polygons()` allow for several arguments further specifying how the layers should be visualized. In the code above we only specified that the raster layer should show the "dist" attribute with a preferred number of 10 classes. Many other arguments can be set as well (see below for an example that adds the point data of the "meuse.sf" data set with symbols of a specific shape, size and color).
 
 ```{r}
 bpy.palette <- bpy.colors()
 tm_shape(meuse.grid.stars) + 
   tm_raster("dist",n=10, palette = bpy.palette) + 
-  tm_shape(meuse.riv) + 
+  tm_shape(meuse.riv.sf) + 
   tm_polygons() + 
   tm_shape(meuse.sf) + 
   tm_symbols(shape = 3,size = 0.2,col="black")
 ```
+
+There are also other tmap elements, e.g., tm_layout, which further specifies the overall map layout, or tm_facets, which can be used to create small mutliples in a map.
+
+```{r}
+tm_shape(meuse.grid.stars) + 
+  tm_raster(c("dist","soil")) + 
+  tm_shape(meuse.riv.sf)+ tm_polygons() + 
+  tm_shape(meuse) + tm_symbols(shape = 3,size = 0.2,col="black") + 
+  tm_facets() + 
+  tm_layout(legend.outside.size = 0.15, main.title = "distance to river and soil type in one plot", panel.labels = c("distance to river","soil type"))
+```
+
+
+`tmap` can be used not only for plotting static maps, but also for visualizing spatial data in an interactive viewer. Changing the mode to "view" will cause all visualizations to be shown in an interactive leaflet map including selectable background layers as well as zoom and pan functionality. The following code shows an example (note that after creating the interactive map, we switch back to the mode "plot" for creating static maps in the following sections).
 
 ```{r}
 tmap_mode("view")
@@ -262,6 +280,8 @@ tm_shape(meuse.grid.stars) +
   tm_shape(meuse.riv)+tm_polygons()
 tmap_mode("plot")
 ```
+
+For more information on the use of `tmap` please refer to [the get started!](https://cran.r-project.org/web/packages/tmap/vignettes/tmap-getstarted.html#interactive-maps) vignette.
 
 # Geostatistics
 
