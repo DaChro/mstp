@@ -2,8 +2,9 @@ project:
   title: "labs"
   output-dir: "./outputs"
   execute-dir: project
-  
+
 number-sections: true
+bibliography: sources.bib
 highlight-style: tango
 theme: [yeti, theme.scss]
 css: style.css
@@ -18,6 +19,7 @@ format:
     toc: true
     toc-location: left
     toc-depth: 4
+    
 
 
 

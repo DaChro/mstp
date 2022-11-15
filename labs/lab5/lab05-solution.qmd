@@ -98,10 +98,9 @@ The correct answer is d).In the third plot (standardised residuals \~ fitted val
 :::
 
 
-
 ## Spatial data in R (I): the sp package
 
-The R package `sp` provides classes and methods for spatial data; currently it can deal with points, grids, lines and polygons. It further provides interfaces to various GIS functions such as overlay, projection and reading and writing of external GIS formats.
+The R package **sp** [@R-sp] provides classes and methods for spatial data; currently it can deal with points, grids, lines and polygons. It further provides interfaces to various GIS functions such as overlay, projection and reading and writing of external GIS formats.
 
 ### Points
 
@@ -151,6 +150,8 @@ meuse.grid <- as(readGDAL("./data/meuse_grid.tif"),"SpatialPixelsDataFrame")
 class(meuse.grid)
 ```
 
+This has loaded the GeoTiff as a `SpatialPixelsDataFrame`. The GeoTiff contains 5 bands: bands 1 and 2 simply indicate, whether a pixel belongs to "part.a" or "part.b" of the study area (this an arbitrary division of the area in two parts), "dist" shows the distance to the river Meuse, "soil" has the soil type, and "ffreq" indicates the number of times a pixel has been flooded before. To represent this in our `SpatialPixelsDataFrame`, we can assign corresponding names to the data attributes. We will also change the type of the attributes containing categorical data to `factor`.
+
 ```{r}
 names(meuse.grid) <- c("part.a","part.b","dist","soil","ffreq")
 meuse.grid$soil <- as.factor(meuse.grid$soil)
@@ -160,7 +161,7 @@ meuse.grid$ffreq <- as.factor(meuse.grid$ffreq)
 ```{r,warning=F}
 summary(meuse.grid)
 ```
-
+Let´s try to plot the data:
 ```{r,warning=F}
 meuse.lt = list(riv = list("sp.polygons", meuse.riv, fill = "grey"), pts = list("sp.points", 
     meuse, pch = 3, cex = 0.5, col = "black"))
@@ -175,7 +176,6 @@ Note that `spplot` plots points on top of the grid, and the grid cells on top of
 
 R package `rgdal` provides several drivers for import/export of spatial data. We have used it above to read the vector and raster data `meuse`, `meuse.riv` and `meuse.grid`. An overview of available drivers for vector data (points, lines, polygons) can be obtained by
 
-
 ```{r,warning=F}
 ogrDrivers()
 ```
@@ -187,7 +187,6 @@ gdalDrivers()
 ```
 
 The full set of theoretically available drivers with documentation are given [here](http://www.gdal.org/formats_list.html) and [here](http://www.gdal.org/ogr_formats.html).
-
 
 Export the data set to KML
 
@@ -205,17 +204,37 @@ and import it in google earth.
 
 ## Spatial data in R (II): the packages sf and stars
 
+The package **sf** [@R-sf], which first appeared on CRAN in 2016, is intended to replace the vector parts of **sp** (among others). It was developed "to move spatial data analysis in R closer to standards-based approaches seen in the industry and open source projects, to build upon more modern versions of the open source geospatial software stack [...], and to allow for integration of R spatial software with the tidyverse [...]" [@sdsr, chap. 7.1].  
+The package **stars** [@R-stars], which first came to CRAN in 2018, was developed for analyzing raster (and vector) data cubes. It is meant to extend current packages for raster data with functionality to represent dynamic raster stacks (e.g. time series) and to be scalable computations to data beyond local disc sizes [@sdsr, chap. 7.4].
+
+Both packages are developed to work closely together and can be used for all spatial analyses throughout our exercises. In the following, we show how to repeat the examples from above for handling points and grids with **sf** and **stars**.
+
+For an introduction to **sf** and **stars**, see
+
 ### Points
 
 ```{r}
 library(sf)
 meuse.sf <- st_read("./data/meuse.gpkg")
+
+```
+```{r}
+class(meuse.sf)
+```
+
+```{r}
+summary(meuse.sf)
+```
+
+```{r}
 plot(meuse.sf)
 ```
 
 ```{r}
 plot(meuse.sf["zinc"],axes=T)
 ```
+
+Again, we can add the meuse river as refeference.
 
 ```{r}
 meuse.riv.sf <- st_read("./data/meuse_river.gpkg")
@@ -225,16 +244,22 @@ plot(meuse.riv.sf,col='grey',add=T)
 
 ### Grids
 
+Try: 
+
 ```{r}
 library(stars)
 meuse.grid.stars <- read_stars("./data/meuse_grid.tif")
 meuse.grid.stars
 ```
+The bands of our data set are automatically interpreted as another dimension of the date (Here you can see the characteristic of **stars** to naturally support multidimensional raster data). However, in this case our bands do not represent another dimension (like for example having the same measurements at different times in the different bands), so instead we want them to be interpreted as 5 different attributes of a 2-dimensional array. This can be done using the function `split`
 
 ```{r}
 meuse.grid.stars <- split(meuse.grid.stars, "band")
 meuse.grid.stars
+
 ```
+
+Similar to above, we can now assign the names to the attributes and change the type of the attributes representing categorical variables to `factor`.
 
 ```{r}
 names(meuse.grid.stars) <- c("part.a","part.b","dist","soil","ffreq")
@@ -243,13 +268,15 @@ meuse.grid.stars$ffreq <- as.factor(meuse.grid.stars$ffreq)
 meuse.grid.stars
 ```
 
+Let´s try a simple plot before looking more into visualization of `sf` and `stars`objects.
+
 ```{r}
 plot(meuse.grid.stars[3], col=heat.colors(10))
 ```
 
-### Visualizing spatial data with the tmap package
+## Visualizing spatial data with the tmap package
 
-In the previous section, we have used the function `spplot()` to create plots from data handled by the package `sp`, such as `SpatialPointsDataFrame` or `SpatialPixelsDataFrame`. While there are base plot methods for `sf` and `stars` as well (see lecture), we will introduce the package `tmap` by Martijn Tennekes for plotting objects of those classes throughout this exercise. `tmap` allows easy handling of `sf` and `stars` objects combined in one plot and offers a lot of utility for creating and styling maps and other visualizations of spatial data. The syntax for plotting is very simple and straightforward: the basic building blog of a plot is a `tm_shape` element, which defines the spatial data object (raster or vector, can be, e.g., an `sf` or `stars` object, but also objects from the packages `sp` or `raster`) to be added to the map, plus one or more layer elements, e.g., `tm_raster` or `tm_polygons`, which define how the object is to plotted (and which aspects of it). All these elements are combined via the + operator. The example creates a plot with one layer showing the "dist" attribute of "meuse.grid.stars" together with the polygon of the meuse river. 
+In the previous section, we have used the function `spplot()` to create plots from data handled by the package **sp**, such as `SpatialPointsDataFrame` or `SpatialPixelsDataFrame`. While there are base `plot` methods for `sf` and `stars` objects as well (we have used some of them in the examples above, more examples can be found in the lecture material), we will use the package **tmap** by Martijn Tennekes for plotting objects of those classes throughout this exercise. **tmap** allows easy handling of `sf` and `stars` objects combined in one plot and offers a lot of utility for creating and styling maps and other visualizations of spatial data. The syntax for plotting is very simple and straightforward: the basic building blog of a plot is a `tm_shape` element, which defines the spatial data object (raster or vector, can be, e.g., an `sf` or `stars` object, but also objects from the packages **sp** or **raster**) to be added to the map, plus one or more layer elements, e.g., `tm_raster` or `tm_polygons`, which define how the object is to plotted (and which aspects of it). All these elements are combined via the + operator. The example below creates a plot with one layer showing the "dist" attribute of `meuse.grid.stars` together with the polygon of the meuse river. 
 
 ```{r}
 library(tmap)
@@ -280,62 +307,28 @@ tm_shape(meuse.grid.stars) +
 ```
 
 
-`tmap` can be used not only for plotting static maps, but also for visualizing spatial data in an interactive viewer. Changing the mode to "view" will cause all visualizations to be shown in an interactive leaflet map including selectable background layers as well as zoom and pan functionality. The following code shows an example (note that after creating the interactive map, we switch back to the mode "plot" for creating static maps in the following sections).
+**tmap** can be used not only for plotting static maps, but also for visualizing spatial data in an interactive viewer. Changing the mode to "view" will cause all visualizations to be shown in an interactive leaflet map including selectable background layers as well as zoom and pan functionality. The following code shows an example (note that after creating the interactive map, we switch back to the mode "plot" for creating static maps in the following sections).
 
 ```{r}
 tmap_mode("view")
 tm_shape(meuse.grid.stars) + 
   tm_raster("dist",n=10) + 
-  tm_shape(meuse.riv)+tm_polygons()
+  tm_shape(meuse.riv)+tm_polygons() + 
 tmap_mode("plot")
 ```
 
-For more information on the use of `tmap` please refer to [the get started!](https://cran.r-project.org/web/packages/tmap/vignettes/tmap-getstarted.html#interactive-maps) vignette.
+For more information on the use of **tmap** please refer to the [get started!](https://cran.r-project.org/web/packages/tmap/vignettes/tmap-getstarted.html#interactive-maps) vignette.
 
+
+## sp vs. sf & stars
+
+Whether you prefer to use **sp** or **sf** and **stars**, is up to you. As mentioned above **sf** and **stars** are intended to replace **sp** in the long term. For now, we will always present the code for both alternatives when analyzing spatial data. You can switch between them by selecting the corresponding tabs in the code sections. You will notice that for the most part there are only minor (if any) differences between both alternatives. Most of the functions we will be using can handle objects from **sp**, **sf** and **stars** identically. Main differences occur when plotting the data (`spplot` for **sp**, functions from **tmap** for **sf** & **stars**).  
 
 # Geostatistics
 
 The following practical exercises cover the use of geostatistical applications in environmental research. They give an introduction to exploratory data analysis, sample variogram calculation and variogram modelling and several spatial interpolation techniques. Interpolation methods described and applied are inverse distance interpolation, trend surface fitting, thiessen polygons, ordinary (block) kriging, stratified (block) kriging and indicator (block) kriging.
 
-The gstat R package is used for all geostatistical calculations. See:
-
-E.J. Pebesma, 2004. Multivariable geostatistics in S: the gstat package. Computers & Geosciences [30: 683-691.](http://www.stats.uwo.ca/faculty/kulperger/S9934a/Papers/Pebesma2004.pdf)
-
-## Exploratory data analysis
-
-If you set the parameter `identify=TRUE`, you can identify points in the plot and retrieve the zinc concentration. Copy the code below and execute it in your local R environment to identify the five largest zinc concentrations by clicking them on the plot:
-
-```{r,warning=F}
-library(sp)
-sp.theme(TRUE)
-
-```
-
-```{r,warning=F}
-sel = spplot(meuse, "zinc", identify = TRUE)
-sel
-```
-
-
-
-#### *Exercise 2* {.unnumbered}
-::: {.callout-caution}
-## Exercise 2
-
-*Which points have the largest zinc concentration:*
-
-a)  44 51 54 55 82
-b)  49 53 54 55 82
-c)  54 55 56 60 123
-d)  53 54 55 59 82
-:::
-
-::: {.callout-tip}
-## Solution
-
-The Points which have the highest zinc concentration are: 53,54,55,59,82. The correct answer is d).
-:::
-
+The **gstat** R package [@R-gstat] is used for all geostatistical calculations. See @gstatcg for more info.
 
 
 ## Simple interpolation algorithms
@@ -386,9 +379,9 @@ As you can see, `?krige` does not provide help on argument `degree`. However, te
 
 
 
-#### *Exercise 3* {.unnumbered}
+#### *Exercise 2* {.unnumbered}
 ::: {.callout-caution}
-## Exercise 3
+## Exercise 2
 
 *The danger of extreme extrapolation values is likely to occur*
 
@@ -448,7 +441,7 @@ Inverse distance interpolation calculates a weighted average of points in the (b
 ## sp
 
 ```{r,warning=F}
-library(gstat)
+
 lzn.tp = idw(log(zinc) ~ 1, meuse, meuse.grid)
 
 spplot(lzn.tp, "var1.pred", sp.layout = meuse.lt, main = "log(zinc), inverse distance interpolation")
@@ -502,9 +495,9 @@ The argument `set` is a list because other parameters can be passed to gstat usi
 
 
 
-#### *Exercise 4* {.unnumbered}
+#### *Exercise 3* {.unnumbered}
 ::: {.callout-caution}
-## Exercise 4
+## Exercise 3
 
 *With a larger inverse distance power (`idp`), the weight of the nearest data point*
 
@@ -637,9 +630,9 @@ tm_shape(meuse.grid.stars)+tm_raster("se.fit", n=10, palette = bpy.palette)
 
 
 
-#### *Exercise 5* {.unnumbered}
+#### *Exercise 4* {.unnumbered}
 ::: {.callout-caution}
-## Exercise 5
+## Exercise 4
 
 *Why are prediction standard errors on the log-scale largest for small and large distance to the river?*
 
@@ -732,9 +725,9 @@ Note that all these prediction intervals refer to prediction of single observati
 
 
 
-#### *Exercise 6* {.unnumbered}
+#### *Exercise 5* {.unnumbered}
 ::: {.callout-caution}
-## Exercise 6
+## Exercise 5
 
 *Compared to prediction intervals, the intervals obtained by interval = `"confidence"` are*
 
@@ -777,9 +770,9 @@ plot(log(zinc) ~ ffreq, meuse.sf)
 
 
 
-#### *Exercise 7* {.unnumbered}
+#### *Exercise 6* {.unnumbered}
 ::: {.callout-caution}
-## Exercise 7
+## Exercise 6
 
 *Why is a box-and whisker plot drawn for the second plot, and not a scatter plot?*
 
@@ -796,9 +789,9 @@ The correct answer is a). Flood frequency in our data set has numbers as labels,
 
 
 
-#### *Exercise 8* {.unnumbered}
+#### *Exercise 7* {.unnumbered}
 ::: {.callout-caution}
-## Exercise 8
+## Exercise 7
 
 *What do the boxes in a box-and whisker plot refer to?*
 
@@ -815,9 +808,9 @@ The correct answer is c).
 
 
 
-#### *Exercise 9* {.unnumbered}
+#### *Exercise 8* {.unnumbered}
 ::: {.callout-caution}
-## Exercise 9
+## Exercise 8
 
 *What is needed for flood frequency to use it for mapping zinc?*
 
@@ -873,9 +866,9 @@ tm_shape(meuse.grid.stars) +
 
 
 
-#### *Exercise 10* {.unnumbered}
+#### *Exercise 9* {.unnumbered}
 ::: {.callout-caution}
-## Exercise 10
+## Exercise 9
 
 *Why is the pattern obtained not smooth?*
 :::
