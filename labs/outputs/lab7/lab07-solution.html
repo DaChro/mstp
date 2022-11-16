@@ -3053,7 +3053,7 @@ Solution
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Let’s first plot the map using a variogram with <span class="math inline">\(range = 10000\)</span>:</p>
+<p>Let’s first plot the map using a variogram with <code>range</code>=10000:</p>
 <div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true" href>sp</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false" href>sf/stars</a></li></ul>
 <div class="tab-content">
@@ -3095,7 +3095,7 @@ after 200 iterations: try different initial values?</code></pre>
 <p>As you can see, for a large range the map of prediction values and that of kriging vanriance is “smoother”. Also, the kriging variance is in total smaller, because the values are more correlated at larger distances.</p>
 </div>
 </div>
-<p>Given that lzn.mod contains a suitable variogram model (see above), we can apply ordinary kriging by</p>
+<p>Given that <code>lzn.mod</code> contains a suitable variogram model (see above), we can apply ordinary kriging by</p>
 <div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true" href>sp</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false" href>sf/stars</a></li></ul>
 <div class="tab-content">
@@ -3204,7 +3204,7 @@ Exercise 8
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><em>When we increase the value of nmax, the differences between the local and global kriging will</em></p>
+<p><em>When we increase the value of <code>nmax</code>, the differences between the local and global kriging will</em></p>
 <ol type="a">
 <li>become smaller</li>
 <li>become larger</li>
@@ -3222,7 +3222,7 @@ Solution
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The correct answer is a). If we increase nmax, more neighbours (i.e. also more distant neighbours) will be taken into account.</p>
+<p>The correct answer is a). If we increase <code>nmax</code>, more neighbours (i.e. also more distant neighbours) will be taken into account.</p>
 </div>
 </div>
 <p>Another, commonly used strategy is to select a kriging neighbourhood based on spatial distance to prediction location. To exagerate the effect of distance-based neighbourhoods, a very small neighbourhood is chosen of 200 m:</p>

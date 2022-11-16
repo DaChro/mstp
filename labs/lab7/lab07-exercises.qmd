@@ -201,7 +201,7 @@ Repeat for $range = 10000$ (true range is about $1000$).
 
 
 
-Given that lzn.mod contains a suitable variogram model (see above), we can apply ordinary kriging by
+Given that `lzn.mod` contains a suitable variogram model (see above), we can apply ordinary kriging by
 
 ::: panel-tabset
 ## sp
@@ -270,7 +270,7 @@ tm_shape(lzn.stars) +
 ::: {.callout-caution}
 ## Exercise 8
 
-*When we increase the value of nmax, the differences between the local and global kriging will*
+*When we increase the value of `nmax`, the differences between the local and global kriging will*
 
 a)  become smaller
 b)  become larger

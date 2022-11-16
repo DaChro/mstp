@@ -236,7 +236,7 @@ Repeat for $range = 10000$ (true range is about $1000$).
 ::: {.callout-tip}
 ## Solution
 
-Let's first plot the map using a variogram with $range = 10000$:
+Let's first plot the map using a variogram with `range`=10000:
 
 ::: panel-tabset
 ## sp
@@ -265,7 +265,7 @@ As you can see, for a large range the map of prediction values and that of krigi
 
 
 
-Given that lzn.mod contains a suitable variogram model (see above), we can apply ordinary kriging by
+Given that `lzn.mod` contains a suitable variogram model (see above), we can apply ordinary kriging by
 
 ::: panel-tabset
 ## sp
@@ -334,7 +334,7 @@ tm_shape(lzn.stars) +
 ::: {.callout-caution}
 ## Exercise 8
 
-*When we increase the value of nmax, the differences between the local and global kriging will*
+*When we increase the value of `nmax`, the differences between the local and global kriging will*
 
 a)  become smaller
 b)  become larger
@@ -344,7 +344,7 @@ c)  remain the same
 ::: {.callout-tip}
 ## Solution
 
-The correct answer is a). If we increase nmax, more neighbours (i.e. also more distant neighbours) will be taken into account.
+The correct answer is a). If we increase `nmax`, more neighbours (i.e. also more distant neighbours) will be taken into account.
 :::
 
 
