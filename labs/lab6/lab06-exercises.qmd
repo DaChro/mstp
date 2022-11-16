@@ -24,7 +24,7 @@ Before we jump into h-scatterplots of spatial data, let us first (re-)consider l
 
 
 
-Read the help for function hscat in package gstat.
+Read the help for function `hscat` in package **gstat**.
 
 We will use this function to compute $h$-scatterplots. An $h$-scatterplot plots data pairs $z(x_i), z(x_j)$ for selected pairs that have $|x_i - x_j|$ fall within a given interval. The intervals are given by the third argument, (breaks).
 
@@ -227,7 +227,7 @@ plot(lzn.vgm)
 ```
 :::
 
-For the maximum distance (cutoff) and bin width, sensible defaults are chosen as one-third the largest area diagonal and 15 bins, but we can modify this when needed by setting cutoff and width:
+For the maximum distance (`cutoff`) and bin `width`, sensible defaults are chosen as one-third the largest area diagonal and 15 bins, but we can modify this when needed by setting `cutoff` and `width`:
 
 ::: panel-tabset
 ## sp
