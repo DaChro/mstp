@@ -117,7 +117,7 @@ We want to compute an index of toxicity of the soil, where the different heavy m
 
 $$I=100\log{Cd}+10logPb+logZn$$
 
-where logCd, logPb and logZn are the log-predictions as obtained above.
+where $logCd$, $logPb$ and $logZn$ are the log-predictions as obtained above.
 
 
 
