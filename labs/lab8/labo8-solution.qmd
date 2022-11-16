@@ -197,7 +197,7 @@ tm_shape(outuk.stars) +
 
 *Where are the differences most prevalent?*
 
-a)  In areas with values for dist close to 0 and 1
+a)  In areas with values for `dist` close to 0 and 1
 b)  In areas with few data points
 c)  In areas where both (a) and (b) are valid
 :::
@@ -205,7 +205,7 @@ c)  In areas where both (a) and (b) are valid
 ::: {.callout-tip}
 ## Solution
 
-The correct answer is c). The differences are most prevalent where values for 'dist' are close to 0 or 1 and where threre are few data points.
+The correct answer is c). The differences are most prevalent where values for `dist` are close to 0 or 1 and where threre are few data points.
 :::
 
 
@@ -216,15 +216,15 @@ The correct answer is c). The differences are most prevalent where values for 'd
 
 *Why are the differences happening exactly there?*
 
-a)  on locations far from measurements, interpolation relies heavily on the estimated trend value; where dist is close to 0 or 1, the trend value is most different from the value m used in ordinary kriging
+a)  on locations far from measurements, interpolation relies heavily on the estimated trend value; where `dist` is close to 0 or 1, the trend value is most different from the value m used in ordinary kriging
 b)  on locations far from measurements we are most uncertain about the true values
-c)  on locations where dist is close to 0 or 1, it was hard to collect data, because these locations were hard to reach.
+c)  on locations where `dist` is close to 0 or 1, it was hard to collect data, because these locations were hard to reach.
 :::
 
 ::: {.callout-tip}
 ## Solution
 
-The correct answer is a). At locations where there are only few data points, the estimation relies mainly on the modelled trend value. This value is most different from the mean (which is used in ordinary kriging) at extreme values for 'dist'. These extreme values of dist are near 0 and 1 (actually 0 and 0.88, try 'summary(meuse\$dist)' and check 'Min.' and 'Max.').
+The correct answer is a). At locations where there are only few data points, the estimation relies mainly on the modelled trend value. This value is most different from the mean (which is used in ordinary kriging) at extreme values for `dist`. These extreme values of `dist` are near 0 and 1 (actually 0 and 0.88, try `summary(meuse\$dist)` and check `Min.` and `Max.`).
 :::
 
 

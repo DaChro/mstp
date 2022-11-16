@@ -187,7 +187,7 @@ tm_shape(outuk.stars) +
 
 *Where are the differences most prevalent?*
 
-a)  In areas with values for dist close to 0 and 1
+a)  In areas with values for `dist` close to 0 and 1
 b)  In areas with few data points
 c)  In areas where both (a) and (b) are valid
 :::
@@ -201,9 +201,9 @@ c)  In areas where both (a) and (b) are valid
 
 *Why are the differences happening exactly there?*
 
-a)  on locations far from measurements, interpolation relies heavily on the estimated trend value; where dist is close to 0 or 1, the trend value is most different from the value m used in ordinary kriging
+a)  on locations far from measurements, interpolation relies heavily on the estimated trend value; where `dist` is close to 0 or 1, the trend value is most different from the value m used in ordinary kriging
 b)  on locations far from measurements we are most uncertain about the true values
-c)  on locations where dist is close to 0 or 1, it was hard to collect data, because these locations were hard to reach.
+c)  on locations where `dist` is close to 0 or 1, it was hard to collect data, because these locations were hard to reach.
 :::
 
 

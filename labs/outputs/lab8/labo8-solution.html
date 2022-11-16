@@ -3009,7 +3009,7 @@ Exercise 3
 <div class="callout-body-container callout-body">
 <p><em>Where are the differences most prevalent?</em></p>
 <ol type="a">
-<li>In areas with values for dist close to 0 and 1</li>
+<li>In areas with values for <code>dist</code> close to 0 and 1</li>
 <li>In areas with few data points</li>
 <li>In areas where both (a) and (b) are valid</li>
 </ol>
@@ -3025,7 +3025,7 @@ Solution
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The correct answer is c). The differences are most prevalent where values for ‘dist’ are close to 0 or 1 and where threre are few data points.</p>
+<p>The correct answer is c). The differences are most prevalent where values for <code>dist</code> are close to 0 or 1 and where threre are few data points.</p>
 </div>
 </div>
 </section>
@@ -3043,9 +3043,9 @@ Exercise 4
 <div class="callout-body-container callout-body">
 <p><em>Why are the differences happening exactly there?</em></p>
 <ol type="a">
-<li>on locations far from measurements, interpolation relies heavily on the estimated trend value; where dist is close to 0 or 1, the trend value is most different from the value m used in ordinary kriging</li>
+<li>on locations far from measurements, interpolation relies heavily on the estimated trend value; where <code>dist</code> is close to 0 or 1, the trend value is most different from the value m used in ordinary kriging</li>
 <li>on locations far from measurements we are most uncertain about the true values</li>
-<li>on locations where dist is close to 0 or 1, it was hard to collect data, because these locations were hard to reach.</li>
+<li>on locations where <code>dist</code> is close to 0 or 1, it was hard to collect data, because these locations were hard to reach.</li>
 </ol>
 </div>
 </div>
@@ -3059,7 +3059,7 @@ Solution
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The correct answer is a). At locations where there are only few data points, the estimation relies mainly on the modelled trend value. This value is most different from the mean (which is used in ordinary kriging) at extreme values for ‘dist’. These extreme values of dist are near 0 and 1 (actually 0 and 0.88, try ‘summary(meuse$dist)’ and check ‘Min.’ and ‘Max.’).</p>
+<p>The correct answer is a). At locations where there are only few data points, the estimation relies mainly on the modelled trend value. This value is most different from the mean (which is used in ordinary kriging) at extreme values for <code>dist</code>. These extreme values of <code>dist</code> are near 0 and 1 (actually 0 and 0.88, try <code>summary(meuse\$dist)</code> and check <code>Min.</code> and <code>Max.</code>).</p>
 </div>
 </div>
 </section>
