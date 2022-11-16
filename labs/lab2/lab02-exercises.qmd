@@ -10,7 +10,7 @@ This exercise is about exploratory time series analysis, fitting periodic compon
 
 ## Exploratory Time Series Analysis
 
-w You can load the **RData** file in R using the **load** function. The **class** function allows you to retrieve the class of an R object. In this case, the data is loaded as a [data.frame](http://cran.r-project.org/doc/manuals/r-release/R-intro.html#Data-frames).
+You can load the `RData` file in R using the `load` function. The `class` function allows you to retrieve the class of an R object. In this case, the data is loaded as a [data.frame](http://cran.r-project.org/doc/manuals/r-release/R-intro.html#Data-frames).
 
 ```{r}
 load("./data/meteo.RData")
@@ -21,20 +21,20 @@ summary(meteo)
 ::: {.callout-note}
 ## Hint
 
-In case the RData file is not in working directory, you may have to specify the absolute path (e.g. C:/myDirectory/meteo.RData in Windows), but we recommend you to set the working directory properly using the **setwd** function or an R Studio project.
+In case the RData file is not in working directory, you may have to specify the absolute path (e.g. C:/myDirectory/meteo.RData in Windows), but we recommend you to set the working directory properly using the `setwd` function or an R Studio project.
 :::
 
-Again, we can generate a plot using the **plot** function:
+Again, we can generate a plot using the `plot` function:
 
 ```{r fig.width=5, fig.height=4}
 plot(T.outside ~ date, meteo, type = "l")
 ```
 
-**T.outside** and **date** are both contained in the meteo data as columns (see the output of **summary** above). In order to state that the temperature outside should be plotted against the dates, we pass the **T.outside \~ date** expression to the plot function as first parameter, then indicate that both are part of the meteo dataset (second parameter), and the third paramter **type="l"** is the same as described above.
+`T.outside` and `date` are both contained in the meteo data as columns (see the output of `summary` above). In order to state that the temperature outside should be plotted against the dates, we pass the `T.outside \~ date` expression to the plot function as first parameter, then indicate that both are part of the meteo dataset (second parameter), and the third paramter `type="l"` is the same as described above.
 
 ## Fitting a periodic component
 
-For fitting the periodic component for Exercise 1, a new function with name **f** is defined. In general, we can define functions in R using the following syntax:
+For fitting the periodic component for Exercise 1, a new function with name `f` is defined. In general, we can define functions in R using the following syntax:
 
 ```{r}
 funcMultiply = function(x,y){x*y}
@@ -42,7 +42,7 @@ z = funcMultiply(3,4)
 z
 ```
 
-In the example above, we define a new function called **funcMultiply** that multiplies two numbers. The two numbers are passed to the function, indicated by **function(x,y)**. If we then invoke funcMulitply with the numbers 3 and 4, we get the result 12.
+In the example above, we define a new function called `funcMultiply` that multiplies two numbers. The two numbers are passed to the function, indicated by `function(x,y)`. If we then invoke funcMulitply with the numbers 3 and 4, we get the result 12.
 
 We may also pass vectors to a function. Taking the example of a multiply function, we may also pass a vector with two numbers.
 
@@ -55,19 +55,19 @@ z
 
 *Hint:* In the example for exercises 2.1 and 2.2, the second approach, where a vector is passed to the function is implemented.
 
-The meteo dataset is loaded as a [data.frame](http://cran.r-project.org/doc/manuals/r-release/R-intro.html#Data-frames) in R. The **summary** function lists all columns with summary statistics. We can easily add a new column computed from other using the following syntax:
+The meteo dataset is loaded as a [data.frame](http://cran.r-project.org/doc/manuals/r-release/R-intro.html#Data-frames) in R. The `summary` function lists all columns with summary statistics. We can easily add a new column computed from other using the following syntax:
 
 ```{r}
 meteo$T.dummy = meteo$T.outside-10
 ```
 
-The code above creates a new temperature dummy variable called **T.dummy** that consists of the **T.outside** values minus 10. If we now invoke the **summary** function again, the column is listed.
+The code above creates a new temperature dummy variable called `T.dummy` that consists of the `T.outside` values minus 10. If we now invoke the `summary` function again, the column is listed.
 
 ```{r}
 summary(meteo)
 ```
 
-We can now fit a periodic component to the temperature data, using a non-linear optimization **nlm**.
+We can now fit a periodic component to the temperature data, using a non-linear optimization `nlm`.
 
 ```{r}
 #generate the periodic model function and, based on this, 
@@ -111,17 +111,17 @@ plot(T.outside-T.per~date, meteo, type='l')
 title("difference from fitted sinus")
 ```
 
-Note that a new column **T.per** is generated that contains the predicted values from the model. and that the **lines** function plots the predicted values (shown as red line) in the time series plot generated before.
+Note that a new column `T.per` is generated that contains the predicted values from the model. and that the `lines` function plots the predicted values (shown as red line) in the time series plot generated before.
 
 ## Fitting AR models to residuals
 
-Note that the AR models in these exercises are not fitted to the actual outside temperature data (**T.outside**), but to the residuals between the predictions made by the periodic model in exercises 2.1 and 2.2 (**T.per**) and the actual outside temperature values (**T.outside**). Therefore, the residuals are computed by
+Note that the AR models in these exercises are not fitted to the actual outside temperature data (`T.outside`), but to the residuals between the predictions made by the periodic model in exercises 2.1 and 2.2 (`T.per`) and the actual outside temperature values (`T.outside`). Therefore, the residuals are computed by
 
 ```{r}
 an = meteo$T.outside - meteo$T.per
 ```
 
-Please use the help functionality of R (and of R Studio) to get more information about the functions **arima**, **acf**, and **tsdiag**. The theoretical background of the two functions is provided in the [slides of our lecture](https://edzer.github.io/mstp/).
+Please use the help functionality of R (and of R Studio) to get more information about the functions `arima`, `acf`, and `tsdiag`. The theoretical background of the two functions is provided in the [slides of our lecture](https://edzer.github.io/mstp/).
 
 The $AR(p)$ model is defined as
 
@@ -146,7 +146,7 @@ an.ar5
 acf(an, type = "partial")
 ```
 
-*Does the **an** process exhibit temporal correlation for lags larger than 0?)*
+*Does the `an` process exhibit temporal correlation for lags larger than 0?)*
 :::
 
 #### *Exercise 4* {.unnumbered}
@@ -157,14 +157,14 @@ acf(an, type = "partial")
 acf(residuals(an.ar5), type = "partial")
 ```
 
-*Does the **residuals(an.ar5)** process still exhibit temporal correlation for lags larger than 0?*
+*Does the `residuals(an.ar5)` process still exhibit temporal correlation for lags larger than 0?*
 :::
 
 #### *Exercise 5* {.unnumbered}
 ::: {.callout-caution}
 ## Exercise 5
 
-*What is the class of the object returned by **arima**?*
+*What is the class of the object returned by `arima`?*
 :::
 
 #### *Exercise 6* {.unnumbered}
@@ -178,14 +178,14 @@ methods(class="Arima")
 tsdiag(an.ar5)
 ```
 
-The **methods** function returns the methods of a class, in this case the **Arima** class. The tsdiag function provides time series diagnostic plots.
+The `methods` function returns the methods of a class, in this case the `Arima` class. The tsdiag function provides time series diagnostic plots.
 
 *Explain what you see in the first two plots!*
 :::
 
 ## Model selection with Akaike's Information Criterion (AIC)
 
-We can use the **\$aic** suffix to directly retrieve the AIC from an AR model.
+We can use the `$aic` suffix to directly retrieve the AIC from an AR model.
 
 ```{r}
 temp = meteo$T.outside
