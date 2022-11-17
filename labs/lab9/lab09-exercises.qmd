@@ -86,17 +86,17 @@ summary(cokr.stars)
 
 
 
-### *Exercise 9.1* {.unnumbered}
+#### *Exercise 1* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 1
 
 *Explain in language (without equations) what the variables in the resulting object represent, and how they were computed!*
 :::
 
 
-### *Exercise 9.2* {.unnumbered}
+#### *Exercise 2* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 2
 
 *Explain why all the prediction error covariances are positive!*
 :::
@@ -110,17 +110,17 @@ where $logCd$, $logPb$ and $logZn$ are the log-predictions as obtained above.
 
 
 
-### *Exercise 9.3* {.unnumbered}
+#### *Exercise 3* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 3
 
 *Give the R commands to compute this index and to show a map of it. Also give the commands to compute the standard error of the index, taking the error covariances into account.*
 :::
 
 
-### *Exercise 9.4* {.unnumbered}
+#### *Exercise 4* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 4
 
 *How much does the standard error of this toxicity index change as a result of taking the covariances into account, as opposed to ignoring them?*
 :::
@@ -128,7 +128,7 @@ where $logCd$, $logPb$ and $logZn$ are the log-predictions as obtained above.
 
 ## Cokriging: the undersampled case
 
-Take a subsample of zinc, called meuse1:
+Take a subsample of `zinc`, called `meuse1`:
 
 ::: panel-tabset
 
@@ -160,7 +160,7 @@ plot(meuse1.sf["zinc"], col = 3, pch = 1, add = TRUE)
 
 :::
 
-create a multivariate object with subsample of zinc, and full sample of lead:
+create a multivariate object with subsample of `zinc`, and full sample of `lead`:
 
 ::: panel-tabset
 
@@ -223,7 +223,7 @@ tm_shape(v12.pr.stars) +
 
 :::
 
-compare the differences of kriging the 50 observations of zinc with the cokriging from 50 zinc and 155 lead observations:
+compare the differences of kriging the 50 observations of `zinc` with the cokriging from 50 zinc and 155 lead observations:
 
 ::: panel-tabset
 
@@ -263,9 +263,9 @@ tm_shape(v12.pr.stars) +
 
 
 
-### *Exercise 9.5* {.unnumbered}
+#### *Exercise 5* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 5
 
 *Why are the standard errors smaller in the cokriging case?*
 :::
@@ -326,11 +326,11 @@ tm_shape(lzn.ok.stars) +
 
 
 
-### *Exercise 9.6* {.unnumbered}
+#### *Exercise 6* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 6
 
-*For which fraction of the total area is zinc concentration lower than 500 ppm, with 95 percent confidence? Give the number of grid cells for which this is the case, and describe where in the area they are situated.*
+*For which fraction of the total area is the zinc concentration lower than 500 ppm, with 95 percent confidence? Give the number of grid cells for which this is the case, and describe where in the area they are situated.*
 :::
 
 
@@ -366,17 +366,17 @@ tm_shape(lzn.ok.stars) +
 
 
 
-### *Exercise 9.7* {.unnumbered}
+#### *Exercise 7* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 7
 
 *Which of these four maps has the highest confidence level, and what is this level? Why are there gray areas on map ci050 at all?*
 :::
 
 
-Now consider the object zn, created under the section of block kriging.
+Now consider the object `zn`, created under the section of block kriging.
 
-*Hint: If you don't have the znobject in your workspace, you need to reinstantiate it, by executing the complete code chunk, where the object zn has been created!*
+*Hint: If you don't have the `zn` object in your workspace, you need to reinstantiate it, by executing the complete code chunk, where the object `zn` has been created!*
 
 ::: panel-tabset
 ## sp
@@ -463,17 +463,17 @@ tm_shape(zn.stars) +
 
 
 
-### *Exercise 9.8* {.unnumbered}
+#### *Exercise 8* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 8
 
 *Compare the fraction classified as lower and higher between ok.point and uk.point, and try to explain the difference!*
 :::
 
 
-### *Exercise 9.9* {.unnumbered}
+#### *Exercise 9* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 9
 
 *Compare the fraction classified as lower and higher between uk.point uk.block40 and uk.block400, and try to explain the difference!*
 :::

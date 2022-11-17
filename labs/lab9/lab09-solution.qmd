@@ -85,9 +85,9 @@ summary(cokr.stars)
 
 ------------------------------------------------------------------------
 
-### *Exercise 9.1* {.unnumbered}
+#### *Exercise 1* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 1
 
 *Explain in language (without equations) what the variables in the resulting object represent, and how they were computed!*
 :::
@@ -99,9 +99,9 @@ Cokriging in gstat gives predictions and kriging variance for the single variabl
 :::
 
 
-### *Exercise 9.2* {.unnumbered}
+#### *Exercise 2* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 2
 
 *Explain why all the prediction error covariances are positive!*
 :::
@@ -121,9 +121,9 @@ where $logCd$, $logPb$ and $logZn$ are the log-predictions as obtained above.
 
 
 
-### *Exercise 9.3* {.unnumbered}
+#### *Exercise 3* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 3
 
 *Give the R commands to compute this index and to show a map of it. Also give the commands to compute the standard error of the index, taking the error covariances into account.*
 :::
@@ -189,9 +189,9 @@ tm_shape(cokr.stars) +
 
 ------------------------------------------------------------------------
 
-### *Exercise 9.4* {.unnumbered}
+#### *Exercise 4* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 4
 
 *How much does the standard error of this toxicity index change as a result of taking the covariances into account, as opposed to ignoring them?*
 :::
@@ -254,7 +254,7 @@ As you can see, the prediction error without using spatial covariances is slight
 
 ## Cokriging: the undersampled case
 
-Take a subsample of zinc, called meuse1:
+Take a subsample of `zinc`, called `meuse1`:
 
 ::: panel-tabset
 
@@ -286,7 +286,7 @@ plot(meuse1.sf["zinc"], col = 3, pch = 1, add = TRUE)
 
 :::
 
-create a multivariate object with subsample of zinc, and full sample of lead:
+create a multivariate object with subsample of `zinc`, and full sample of `lead`:
 
 ::: panel-tabset
 
@@ -349,7 +349,7 @@ tm_shape(v12.pr.stars) +
 
 :::
 
-compare the differences of kriging the 50 observations of zinc with the cokriging from 50 zinc and 155 lead observations:
+compare the differences of kriging the 50 observations of `zinc` with the cokriging from 50 zinc and 155 lead observations:
 
 ::: panel-tabset
 
@@ -389,9 +389,9 @@ tm_shape(v12.pr.stars) +
 
 ------------------------------------------------------------------------
 
-### *Exercise 9.5* {.unnumbered}
+#### *Exercise 5* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 5
 
 *Why are the standard errors smaller in the cokriging case?*
 :::
@@ -459,11 +459,11 @@ tm_shape(lzn.ok.stars) +
 
 
 
-### *Exercise 9.6* {.unnumbered}
+#### *Exercise 6* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 6
 
-*For which fraction of the total area is zinc concentration lower than 500 ppm, with 95 percent confidence? Give the number of grid cells for which this is the case, and describe where in the area they are situated.*
+*For which fraction of the total area is the zinc concentration lower than 500 ppm, with 95 percent confidence? Give the number of grid cells for which this is the case, and describe where in the area they are situated.*
 :::
 
 ::: {.callout-tip}
@@ -492,7 +492,7 @@ The values with low predictions are in larger distances to the river.
 
 
 
-For a single threshold, we can vary the confidence level by specifying alpha:
+For a single threshold, we can vary the confidence level by specifying `alpha`:
 
 ::: panel-tabset
 ## sp
@@ -524,10 +524,10 @@ tm_shape(lzn.ok.stars) +
 
 ------------------------------------------------------------------------
 
-### *Exercise 9.7* {.unnumbered}
+#### *Exercise 7* {.unnumbered}
 ::: {.callout-caution}
-## Task
-
+## Exercise 7
+ 
 *Which of these four maps has the highest confidence level, and what is this level? Why are there gray areas on map ci050 at all?*
 :::
 
@@ -538,9 +538,9 @@ The highest confidence level is 0.99 at alpha=0.01, i.e. in the map for ci001. T
 :::
 
 
-Now consider the object zn, created under the section of block kriging.
+Now consider the object `zn`, created under the section of block kriging.
 
-*Hint: If you don't have the znobject in your workspace, you need to reinstantiate it, by executing the complete code chunk, where the object zn has been created!*
+*Hint: If you don't have the `zn` object in your workspace, you need to reinstantiate it, by executing the complete code chunk, where the object `zn` has been created!*
 
 ::: panel-tabset
 ## sp
@@ -627,9 +627,9 @@ tm_shape(zn.stars) +
 
 ------------------------------------------------------------------------
 
-### *Exercise 9.8* {.unnumbered}
+#### *Exercise 8* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 8
 
 *Compare the fraction classified as lower and higher between ok.point and uk.point, and try to explain the difference!*
 :::
@@ -640,9 +640,9 @@ tm_shape(zn.stars) +
 The proportion of grey area is smaller in UK than in OK. This means that in turn more cells are classified as lower or higher. In UK criging variances are smaller because the trend model explains some variability. This makes the confidence intervals smaller so more values are outside of them. 
 :::
 
-### *Exercise 9.9* {.unnumbered}
+#### *Exercise 9* {.unnumbered}
 ::: {.callout-caution}
-## Task
+## Exercise 9
 
 *Compare the fraction classified as lower and higher between uk.point uk.block40 and uk.block400, and try to explain the difference!*
 :::
