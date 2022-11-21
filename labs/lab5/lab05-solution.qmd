@@ -9,7 +9,7 @@ editor: visual
 ## meuse
 
 The meuse data set is a data set collected from the Meuse floodplain. The heavy metals analyzed are copper, cadmium, lead and zinc concentrations, extracted from the topsoil of a part of the Meuse floodplain, the area around Meers and Maasband (Limburg, The Netherlands). The data were collected during fieldwork in 1990 [@meuse1; @meuse2].
-
+Let´s have a look at the data. If not done yet, download the data set from learnweb. The code below assumes the data to sit in subdirectory `data` of your working directory. Adapt the path to wherever you have stored the data on your disk.
 
 ```{r}
 library(gstat)
@@ -25,7 +25,7 @@ objects()
 
 Most statisticians (and many earth scientists as well) like to analyse data through models: models reflect the hypotheses we entertain, and from fitting models, analysing model output, and analysing graphs of fitted values and residuals we can learn from the data whether a given hypothesis was reasonable or not.
 
-Many models are variations of regression models. Here, we will illustrate an example of a simple linear regression model involving the heavy metal pollution data in `meuse`. We will entertain the hypothesis that zinc concentration, present in variable `zinc`, depends linearly on distance to the river, present in `dist`. We can express dependency of y on x by a formula, coded as y\~x. Formulas can have multiple right-hand sides for multiple linear regression, as y\~x1+x2; they also can contain expressions (transformations) of variables, as in log(y)\~sqrt(x). See `?formula` for a full description of the full functionality.
+Many models are variations of regression models. Here, we will illustrate an example of a simple linear regression model involving the heavy metal pollution data in `meuse`. We will entertain the hypothesis that zinc concentration, present in variable `zinc`, depends linearly on distance to the river, present in `dist`. We can express dependency of y on x by a formula, coded as `y~x`. Formulas can have multiple right-hand sides for multiple linear regression, as `y~x1+x2`; they also can contain expressions (transformations) of variables, as in `log(y)~sqrt(x)`. See `?formula` for a full description of the full functionality.
 
 To calculate a linear regression model for the meuse data:
 
@@ -59,7 +59,7 @@ par(mfrow=c(1,2))
  plot(zinc.lm, , , , , , , FALSE)
 ```
 
-will not work as it comes after the ... argument, which may contain an arbitrary number of arguments that are passed to underlying plot routines. But the following two commands (search for the difference!) both work:
+will not work as it comes after the `...` argument, which may contain an arbitrary number of arguments that are passed to underlying plot routines. But the following two commands (search for the difference!) both work:
 
 ```{r,warning=F}
  par(mfrow=c(1,2)) 
@@ -97,6 +97,7 @@ d)  residuals are heteroscedastic and not normally distributed
 The correct answer is d).In the third plot (standardised residuals \~ fitted values) you can see that the residuals are heteroscedastic, i.e. their variance is not constant. In the second plot (QQ-Plot), you can see that the residuals are not normally distributed.
 :::
 
+The example above is a spatial model only to the extent that the explanatory variable `dist` in this case contains some spatial information (distance to the river). We are not using the spatial information contained in the `SpatialPointsDataFrame` with respect to the location (coordinates) of the heavy metal measurements. In the following, we will look at actual spatial data analysis starting with how to handle spatial data in R.
 
 ## Spatial data in R (I): the sp package
 
@@ -150,7 +151,7 @@ meuse.grid <- as(readGDAL("./data/meuse_grid.tif"),"SpatialPixelsDataFrame")
 class(meuse.grid)
 ```
 
-This has loaded the GeoTiff as a `SpatialPixelsDataFrame`. The GeoTiff contains 5 bands: bands 1 and 2 simply indicate, whether a pixel belongs to "part.a" or "part.b" of the study area (this an arbitrary division of the area in two parts), "dist" shows the distance to the river Meuse, "soil" has the soil type, and "ffreq" indicates the number of times a pixel has been flooded before. To represent this in our `SpatialPixelsDataFrame`, we can assign corresponding names to the data attributes. We will also change the type of the attributes containing categorical data to `factor`.
+As you can see, the GeoTiff has been loaded as a `SpatialPixelsDataFrame`. The GeoTiff contains 5 bands: bands 1 and 2 simply indicate, whether a pixel belongs to "part.a" or "part.b" of the study area ("yes" or "no", i.e., 1 or 0 in the corresponding band). This is an arbitrary division of the area in two parts. Band 3 shows the distance to the river Meuse, band 4 has the soil type, and band 5 indicates the number of times a pixel has been flooded before. To represent this in our `SpatialPixelsDataFrame`, we can assign corresponding names to the data attributes. We will also change the type of the attributes containing categorical data to `factor`.
 
 ```{r}
 names(meuse.grid) <- c("part.a","part.b","dist","soil","ffreq")
@@ -205,7 +206,7 @@ and import it in google earth.
 ## Spatial data in R (II): the packages sf and stars
 
 The package **sf** [@R-sf], which first appeared on CRAN in 2016, is intended to replace the vector parts of **sp** (among others). It was developed "to move spatial data analysis in R closer to standards-based approaches seen in the industry and open source projects, to build upon more modern versions of the open source geospatial software stack [...], and to allow for integration of R spatial software with the tidyverse [...]" [@sdsr, chap. 7.1].  
-The package **stars** [@R-stars], which first came to CRAN in 2018, was developed for analyzing raster (and vector) data cubes. It is meant to extend current packages for raster data with functionality to represent dynamic raster stacks (e.g. time series) and to be scalable computations to data beyond local disc sizes [@sdsr, chap. 7.4].
+The package **stars** [@R-stars], which first came to CRAN in 2018, was developed for analyzing raster (and vector) data cubes. It is meant to extend current packages for raster data with functionality to represent dynamic raster stacks (e.g. time series) and to scale computations to data beyond local disc sizes [@sdsr, chap. 7.4].
 
 Both packages are developed to work closely together and can be used for all spatial analyses throughout our exercises. In the following, we show how to repeat the examples from above for handling points and grids with **sf** and **stars**.
 
@@ -251,7 +252,7 @@ library(stars)
 meuse.grid.stars <- read_stars("./data/meuse_grid.tif")
 meuse.grid.stars
 ```
-The bands of our data set are automatically interpreted as another dimension of the date (Here you can see the characteristic of **stars** to naturally support multidimensional raster data). However, in this case our bands do not represent another dimension (like for example having the same measurements at different times in the different bands), so instead we want them to be interpreted as 5 different attributes of a 2-dimensional array. This can be done using the function `split`
+The bands of our data set are automatically interpreted as another dimension of the data (here you can recognize the characteristic of **stars** to naturally support multidimensional raster data). However, in this case our bands do not represent another dimension (like for example having the same measurements at different times in the different bands), so instead we want them to be interpreted as 5 different attributes of a 2-dimensional array. This can be done using the function `split`:
 
 ```{r}
 meuse.grid.stars <- split(meuse.grid.stars, "band")
@@ -276,14 +277,14 @@ plot(meuse.grid.stars[3], col=heat.colors(10))
 
 ## Visualizing spatial data with the tmap package
 
-In the previous section, we have used the function `spplot()` to create plots from data handled by the package **sp**, such as `SpatialPointsDataFrame` or `SpatialPixelsDataFrame`. While there are base `plot` methods for `sf` and `stars` objects as well (we have used some of them in the examples above, more examples can be found in the lecture material), we will use the package **tmap** by Martijn Tennekes for plotting objects of those classes throughout this exercise. **tmap** allows easy handling of `sf` and `stars` objects combined in one plot and offers a lot of utility for creating and styling maps and other visualizations of spatial data. The syntax for plotting is very simple and straightforward: the basic building blog of a plot is a `tm_shape` element, which defines the spatial data object (raster or vector, can be, e.g., an `sf` or `stars` object, but also objects from the packages **sp** or **raster**) to be added to the map, plus one or more layer elements, e.g., `tm_raster` or `tm_polygons`, which define how the object is to plotted (and which aspects of it). All these elements are combined via the + operator. The example below creates a plot with one layer showing the "dist" attribute of `meuse.grid.stars` together with the polygon of the meuse river. 
+In the previous section, we have used the function `spplot()` to create plots from data handled by the package **sp**, such as `SpatialPointsDataFrame` or `SpatialPixelsDataFrame`. While there are base `plot` methods for `sf` and `stars` objects as well (we have used some of them in the examples above, more examples can be found in the lecture material), we will use the package **tmap** [@R-tmap]  for plotting objects of those classes throughout this exercise. **tmap** allows easy handling of `sf` and `stars` objects combined in one plot and offers a lot of utility for creating and styling maps and other visualizations of spatial data. The syntax for plotting is very simple and straightforward: the basic building blog of a plot is a `tm_shape` element, which defines the spatial data object (raster or vector) to be added to the map plus one or more layer elements, e.g., `tm_raster` or `tm_polygons`, which define how the object is to be plotted (and which aspects of it). Spatial data objects can be, e.g., an `sf` or `stars` object, but also objects from the packages **sp** or **raster**. All these elements are combined via the + operator. The example below creates a plot with one layer showing the "dist" attribute of `meuse.grid.stars` together with the polygon of the Meuse river. 
 
 ```{r}
 library(tmap)
-tm_shape(meuse.grid.stars)+tm_raster("dist",n=10)+tm_shape(meuse.riv.sf)+tm_polygons()
+tm_shape(meuse.grid.stars)+tm_raster("dist",n=10)+tm_shape(meuse.riv.sf)+tm_polygons() #plots the `dist` attribute of the spatial data object `meuse.grid.stars` and the polygon of the Meuse river contained in spatial data object `meuse.riv.sf` 
 ```
 
-The functions adding the layers like `tm_raster()` or `tm_polygons()` allow for several arguments further specifying how the layers should be visualized. In the code above we only specified that the raster layer should show the "dist" attribute with a preferred number of 10 classes. Many other arguments can be set as well (see below for an example that adds the point data of the "meuse.sf" data set with symbols of a specific shape, size and color).
+The functions for adding the layers like `tm_raster()` or `tm_polygons()` allow for several arguments further specifying how the layers should be visualized. In the code above we only specified that the raster layer should show the "dist" attribute with a preferred number of 10 classes. Many other arguments can be set as well (see below for an example that adds the point data of the "meuse.sf" data set with symbols of a specific shape, size and color).
 
 ```{r}
 bpy.palette <- bpy.colors()
@@ -292,10 +293,10 @@ tm_shape(meuse.grid.stars) +
   tm_shape(meuse.riv.sf) + 
   tm_polygons() + 
   tm_shape(meuse.sf) + 
-  tm_symbols(shape = 3,size = 0.2,col="black")
+  tm_symbols(shape = 3,size = 0.2,col="green")
 ```
 
-There are also other tmap elements, e.g., tm_layout, which further specifies the overall map layout, or tm_facets, which can be used to create small multiples in a map.
+There are also other tmap elements, e.g., `tm_layout()`, which further specifies the overall map layout, or `tm_facets()`, which can be used to create small multiples in a map.
 
 ```{r}
 tm_shape(meuse.grid.stars) + 
@@ -313,7 +314,7 @@ tm_shape(meuse.grid.stars) +
 tmap_mode("view")
 tm_shape(meuse.grid.stars) + 
   tm_raster("dist",n=10) + 
-  tm_shape(meuse.riv)+tm_polygons() + 
+  tm_shape(meuse.riv)+tm_polygons()
 tmap_mode("plot")
 ```
 
