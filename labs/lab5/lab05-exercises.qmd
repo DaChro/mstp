@@ -1,9 +1,9 @@
 ---
-title: "Spatio-temporal Modelling, Lab 5, YYYY-MM-DD"
+title: "Spatio-temporal Modelling, Lab 5, 2022-11-23"
 editor: visual
 ---
 
-**This exercise will be discussed on YYY-MM-DD.**
+**This exercise will be discussed on 2022-11-30.**
 
 # Spatial modelling: introductory matter
 
