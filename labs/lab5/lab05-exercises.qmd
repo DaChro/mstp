@@ -330,7 +330,7 @@ The **gstat** R package [@R-gstat] is used for all geostatistical calculations. 
 
 ### Trend surface analysis
 
-Trend surface interpolation is multiple linear regression with polynomials of coordinates as independent, predictor variables. Although we could use `lm` to fit these models and predict them, it would require scaling of coordinates prior to prediction in most cases because higher powers of large coordinate values result in large numerical errors. The `krige` function in library `gstat` scales coordinates and computes trend surface up to degree 3, using scaled coordinates.
+Trend surface interpolation is multiple linear regression with polynomials of coordinates as independent, predictor variables. Although we could use `lm` to fit these models and predict them, it would require scaling of coordinates prior to prediction in most cases because higher powers of large coordinate values result in large numerical errors. The `krige` function in library `gstat` scales coordinates and computes trend surface up to order 3 (argument `degree`), using scaled coordinates.
 
 
 
@@ -363,11 +363,14 @@ tm_shape(meuse.grid.stars) +
 ```
 :::
 
-Function `surf.ls` from library `spatial` (described in the MASS book) fits trends up to order 6 with scaled coordinates.
+::: {.callout-note}
+Function `surf.ls` from library `spatial` fits trends up to order 6 with scaled coordinates.
+:::
 
-As you can see, `?krige` does not provide help on argument `degree`. However, tells that any remaining arguments (...) are passed to function `gstat`, so look for argument `degree` on `?gstat`.
 
+Here is another example of the use of the `...` argument in function definitions. As you can see, `?krige` does not provide help on argument `degree`. However, it tells that any remaining arguments (`...`) are passed to function `gstat`, so look for argument `degree` on `?gstat` to see information on this argument.
 
+In the example above, we have fitted trends up to order 3. The higher the order, the more exactly the surface can be fitted to the data. However...
 
 #### *Exercise 2* {.unnumbered}
 ::: {.callout-caution}
@@ -410,7 +413,7 @@ tm_shape(m) +
 
 ### Inverse distance interpolation
 
-Inverse distance interpolation calculates a weighted average of points in the (by default global) neighbourhood, using weights inverse proportional to the distance of data locations to the prediction location raised to the power ( p ). This power is by default 2:
+Inverse distance interpolation calculates a weighted average of points in the (by default global) neighbourhood, using weights inverse proportional to the distance of data locations to the prediction location raised to the power $p$. This power is by default 2, but can of course be adapted:
 
 ::: panel-tabset
 ## sp
@@ -464,9 +467,6 @@ tm_shape(meuse.grid.stars) +
 ```
 :::
 
-The argument `set` is a list because other parameters can be passed to gstat using this list as well.
-
-
 
 #### *Exercise 3* {.unnumbered}
 ::: {.callout-caution}
@@ -485,7 +485,7 @@ c)  does not change
 
 ### Nearest Neighbor / Tiessen (or Voronoi) Polygons
 
-Nearest neighbor interpolation on a regular grid (creating Thiessen Polygons) is simply obtained by using e.g. inverse distance interpolation and a neighbourhood size of one ( nmax = 1}). :
+Nearest neighbor interpolation on a regular grid (creating Thiessen Polygons) is simply obtained by using e.g. inverse distance interpolation and a neighbourhood size of one (`nmax = 1`). :
 
 ::: panel-tabset
 ## sp
