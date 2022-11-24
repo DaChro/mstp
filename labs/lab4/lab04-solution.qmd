@@ -1,5 +1,5 @@
 ---
-title: "Spatio-temporal Modelling, Lab 4, YYYY-MM-DD"
+title: "Spatio-temporal Modelling, Lab 4, 2022-11-23"
 format: html
 editor: visual
 ---
@@ -365,7 +365,7 @@ x1$par - x2$par
 ::: {.callout-tip}
 ## Solution
 
-Simulated annealing is a **stochastic** optimization algorithm. Diferent generated random numbers (for parameter proposals and acceptance decision) explain different parameter estimates.
+Simulated annealing is a **stochastic** optimization algorithm. Different generated random numbers (for parameter proposals and acceptance decision) explain different parameter estimates.
 :::
 
 
