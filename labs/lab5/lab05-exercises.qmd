@@ -281,8 +281,8 @@ tm_shape(meuse.grid.stars)+tm_raster("dist",n=10)+tm_shape(meuse.riv.sf)+tm_poly
 The functions for adding the layers like `tm_raster()` or `tm_polygons()` allow for several arguments further specifying how the layers should be visualized. In the code above we only specified that the raster layer should show the "dist" attribute with a preferred number of 10 classes. Many other arguments can be set as well (see below for an example that adds the point data of the "meuse.sf" data set with symbols of a specific shape, size and color).
 
 ```{r}
-bpy.palette <- bpy.colors()
-tm_shape(meuse.grid.stars) + 
+bpy.palette <- bpy.colors() #define color palette for the following plots equal to the one used above by spplot()
+tm_shape(meuse.grid.stars) +
   tm_raster("dist",n=10, palette = bpy.palette) + 
   tm_shape(meuse.riv.sf) + 
   tm_polygons() + 
