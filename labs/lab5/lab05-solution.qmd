@@ -467,7 +467,7 @@ spplot(meuse.grid, c("idp0.5", "idp02", "idp05", "idp10"), sp.layout = meuse.lt,
 ```{r}
 lzn.tp = idw(log(zinc) ~ 1, meuse.sf, meuse.grid.stars)
 
-tm_shape(m)+tm_raster("var1.pred", palette = bpy.palette, n=10) + 
+tm_shape(lzn.tp)+tm_raster("var1.pred", palette = bpy.palette, n=10) + 
   tm_shape(meuse.riv.sf) + 
   tm_polygons() + 
   tm_shape(meuse) +
@@ -549,7 +549,7 @@ tm_shape(lzn.tp) +
 
 In the data set `meuse` we have a large number of variables present that can be used to form predictive regression models for either of the heavy metal variables. If we want to use such a regression model for spatial prediction, we need the variables as a full spatial coverage, e.g. in the form of a regular grid covering the study area, as well.
 
-Only few variables are available for this in `meuse.grid`:
+Only few variables are available for this in `meuse.grid`. Let´s reload the original data set:
 
 :::panel-tabset
 
@@ -574,8 +574,8 @@ names(meuse.grid.stars)
 
 :::
 
-
-Now try:
+We already demonstrated using `dist` at the beginning of this exercise and we saw that some assumptions underlying linear regression were violated. Often, simple transformations of the input data can help, e.g., to overcome non-linearity or heteroscedastic residuals.
+Try:
 
 :::panel-tabset
 
