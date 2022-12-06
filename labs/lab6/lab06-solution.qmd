@@ -1,5 +1,5 @@
 ---
-title: "Spatio-temporal Modelling, Lab 6, YYYY-MM-DD"
+title: "Spatio-temporal Modelling, Lab 6, 2022-12-07"
 editor: visual
 ---
 
