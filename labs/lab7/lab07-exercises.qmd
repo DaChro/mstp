@@ -1,9 +1,9 @@
 ---
-title: "Spatio-temporal Modelling, Lab 7, YYYY-MM-DD"
+title: "Spatio-temporal Modelling, Lab 7, 2022-12-07"
 editor: visual
 ---
 
-**This exercise will be discussed on YYY-MM-DD.**
+**This exercise will be discussed on 2022-12-14.**
 
 # Simple and ordinary kriging
 
