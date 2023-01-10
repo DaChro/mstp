@@ -224,7 +224,7 @@ c)  on locations where `dist` is close to 0 or 1, it was hard to collect data, b
 ::: {.callout-tip}
 ## Solution
 
-The correct answer is a). At locations where there are only few data points, the estimation relies mainly on the modelled trend value. This value is most different from the mean (which is used in ordinary kriging) at extreme values for `dist`. These extreme values of `dist` are near 0 and 1 (actually 0 and 0.88, try `summary(meuse\$dist)` and check `Min.` and `Max.`).
+The correct answer is a). At locations where there are only few data points, the estimation relies mainly on the modelled trend value. This value is most different from the mean (which is used in ordinary kriging) at extreme values for `dist`. These extreme values of `dist` are near 0 and 1 (try `summary(meuse.grid$dist)` and check `Min.` and `Max.`).
 :::
 
 
