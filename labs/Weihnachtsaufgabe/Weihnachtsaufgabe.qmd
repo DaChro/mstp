@@ -1,0 +1,142 @@
+---
+title: "Einführung in die Modellierung dynamischer räumlicher Prozesse, Weihnachtsaufgabe, 2022-12-21"
+editor: visual
+---
+
+
+
+## Hinweis {.unnumbered}
+
+**Die Lösung zu diesem Aufgabenzettel muss bis zum 06.01.2023, 12:00 im Learnweb abgegeben werden. Gruppen mit bis zu zwei Studierenden dürfen die Aufgaben zusammen bearbeiten. Bitte reicht eure Lösungen mit textueller Beschreibung des Vorgehens und erstellten Plots als PDF Datei und zusätzlich euren R Source Code als .R Datei ein. Bitte kennzeichnet eure Abgaben mit Namen und Matrikelnummern.**
+
+Für alle Aufgaben des Zettels: Beschreibt eurer Vorgehen, eure Analys, und die Visualisierungen die ihr nutzt, um Ergebnisse zu finden, Schlüsse zu ziehen und Fragen zu beantworten.
+
+
+
+## Modellierung von Zeitreihen: Analyse bodennaher Ozon- und Temperaturmessungen 
+
+
+
+### Daten
+Die Datei `ex01_AABU.Rdata` beinhaltet einen data.frame `AABU.obs` mit stündlichen (!) Messungen  bodennaher Ozonkonzentration in der Luft  (`O3`, in $\mu g/m^3$) und Lufttemperatur (`TEMP`, in celsius) von Januar 2007 bis Dezember 2014 an einer Messstation in Aachen. Der folgende Abschnitt zeigt eine kurze Zusammenfassung der Daten:
+
+```{r, fig.align='center', warning=F}
+load("./data/ex01_AABU.Rdata")
+summary(AABU.obs)
+plot(AABU.obs$time,AABU.obs$O3, type="l")
+plot(AABU.obs$time,AABU.obs$TEMP, type="l")
+```
+
+Die Spalten `AABU.obs$HOURS` und  `AABU.obs$time` enthalten vergangene Stunden seit 2007-01-01-00:00:00 bzw. exakte Datums- und Zeitangaben. 
+Das Problem ist, dass es in der Ozon-Zeitreihe relativ viele Lücken gibt, also Zeitpunkte, an denen keine Messdaten vorhanden sind. Dies könnt ihr herausfinden, indem ihr den Befehl `any(is.na(AABU.obs$O3))` ausführt. Außerdem lässt sich die Saisonalität der Ozonwerte schwieriger in einem Modell beschreiben, als die der Temperatur (siehe Übungen 1 und 2).
+
+Wir haben jedoch eine vollständige Zeitreihe der Temperaturdaten (teste: `any(is.na(AABU.obs$O3))`). Wenn es also eine ausreichende Korrelation zwischen Temperatur und Ozonbelastung gäbe, könnte man die Temperaturdaten verwenden, um 
+
+* die fehlenden Werte in der Ozon-Zeitreihe zu füllen
+und
+* Vorhersagen über Ozonwerte in der Zukunft (abgeleitet aus Vorhersagen der Temperatur) zu treffen
+
+
+### _Aufgabe 1.1_ {.unnumbered}
+Zunächst wollen wir uns daher die Daten genauer anschauen. Für eine erste explorative Analyse betrachte die Zeitreihendarstellung der O$_3$ und der Temperatur-Messungen und thematisiere die folgenden Punkte:
+
+
+1. Gibt es saisonale / periodische Komponenten in den Daten?
+2. Sind die Ozonmessungen zeitlich autokorreliert?
+3. Wie stark ist die Korrelation zwischen den Ozon- und den Temperaturmessungen?
+
+
+
+### _Aufgabe 1.2_ {.unnumbered}
+Im Folgenden wollen wir zwei Modelle anpassen, um den Temperaturprozess zu verstehen und Vorhersagen machen zu können. 
+
+
+1. Passe an die Temperaturzeitreihe einen Trend für jährliche und tägliche Schwankungen an. Betrachte also das Modell $\textrm{TEMP} = \beta_0 + \beta_1 \sin(\frac{2 \pi (\textrm{HOURS}+ \beta_2)}{8766} ) + \beta_3 \sin(\frac{2 \pi (\textrm{HOURS} + \beta_4)}{24} )$ und passe die Parameter mit einem geeigneten Optimierungsverfahren an die Daten an. Analysiere die Residuen erneut auf Autokorrelation und saisonale Komponenten. 
+
+2. Wende nun ein AR Modell auf die Residuen von 1. an und analysiere dabei das AIC, um eine passende AR Ordung zu wählen (es genügt dabei, die Ordnungen 1 bis 10 zu untersuchen, um sich ein Bild zu machen).
+
+3. Wähle nun ein finales Modell (Kombination aus Trend und AR-Modell der Residuen) und benutze es, um die Temperaturwerte für zwei Monate über den Betrachtungszeitraum hinaus (also für Januar und Februar 2015) vorherzusagen.
+
+4. Welche Komponente des Modells ist die wichtigste (reduziert Vorhersagefehler am meisten)?
+
+
+
+### _Aufgabe 1.3_ {.unnumbered}
+Als nächstes wollen wir den Zusammenhang zwischen Ozon-Werten und der Temperatur modellieren und diesen nutzen, um die fehlenden Werte in der Ozon-Zeitreihe zu fülllen und ebenfalls Vorhersagen für Januar und Februar 2015 zu treffen. 
+
+1. Passe ein einfaches lineares Regressionsmodell  $\textrm{O}_3 = \beta_0 + \beta_1 \textrm{TEMP}$ an die Daten an und erläutere das Ergebnis. 
+
+2. Nutze das Regressionsmodell, um die fehlenden Werte in der Ozon-Zeitreihe zu füllen.
+
+3. Nutze das Regressionsmodell und die Vorhersage der Temperatur, um die Ozonwerte für Januar und Februar 2015 vorherzusagen.
+
+4. Diskutiere: Zur Vorhersage zukünftiger Ozonwerte ist das Vorgehen unvorteilhaft. Warum?
+
+
+
+---
+
+
+
+## Räumliche interpolation: Rurale PM$_{10}$ Belastung in Mitteleuropa
+
+Feinstaub mit Partikelgröße unter $10 \mu \textrm{m}$ (PM$_{10}$) ist dafür bekannt, verschiedene Herz-Kreislauf-Erkrankungen beim Menschen auszulösen. Gesetze der europäischen Union definieren Grenzwerte und Standards zum Überwachen der Luftqualität, die von Mitgliedsländern einzuhalten sind. In dieser Aufgabe wird die rurale Komponente von Feinstaub an einem bestimmten Tag analysiert, um auch Werte an Orten ohne Messstation zu schätzen. 
+
+
+
+
+### Daten
+Die Datei `ex02_pm10eu.Rdata` enthält zwei R Objekte der Klasse `sp`. Das Objekt `EU.stations` enthält die mittlere PM$_{10}$ Konzentration sowie Höheninformation an 270 rural gelegenen Messstationen in Mitteleuropa am 30.4.2009. `EU.grid` ist ein reguläres Gitter, welches die gleiche Fläche mit einer Pixelgröße von  10 km, also insgesamt $374 \times 220$ Pixeln abdeckt. Für jeden Pixel sind Höheninformation basierend auf der [SRTM Erdbeobachtungsmission](http://www2.jpl.nasa.gov/srtm/index.html) verfügbar.    
+
+Der folgende R code lädt die Daten sowie benötigte Pakete und gibt einen Überblick über die Daten:
+
+```{r, fig.align='center', warning=F}
+library(sp)
+library(gstat)
+
+load("./data/ex02_pm10eu.Rdata")
+
+summary(EU.stations)
+summary(EU.grid)
+
+spplot(EU.stations[,"elevation"], main="Elevation (m)", scales=list(T))
+spplot(EU.stations[,"PM10"], 
+       main="PM10 concentration (micrograms per cubic meter)", scales=list(T))
+spplot(EU.stations[,"logPM10"], 
+       main="PM10 concentration (micrograms per cubic meter, log scale)", scales=list(T))
+
+spplot(EU.grid, main="Elevation (m)", scales=list(T))
+```
+
+
+### _Aufgabe 2.1_ {.unnumbered}
+
+Um eine kontinuierliche PM$_{10}$ Karte zu erstellen, führe das in der Vorlesung vorgestellte  **ordinary Kriging** aus um an jedem Pixel des Gitters `EU.grid` einen PM$_{10}$ Wert zu schätzen:
+
+
+1. Berechne das experimentelle Variogramm und beschreibe die Ergebnisse (ob und bis zu welchem Grad die Daten räumlich korelliert sind).
+
+2. Wähle ein geeignetes theoretisches Variogrammmodell und passe dieses an das berechnete experimentelle Variogramm an
+
+3. Benutze das angepasste theoretische Variogramm um logarithmische PM$_{10}$ Konzentrationen auf dem Gitter `EU.grid` vorherzusagen.
+
+
+4. Erstelle je eine Karte mit vorhergesagten Werten und geschätzten Vorhersagefehlern (Krigingvarianz).
+
+
+
+### _Aufgabe 2.2_ {.unnumbered}
+
+Da wir existierende Kovariate nicht ignorieren wollen, soll die Höheninformation nun mittles **universal Kriging** zur Vorhersage mitbenutzt werden. Führe dabei Schritte 1 - 4 analog zu _Aufgabe 2.1_ durch.
+
+
+
+### _Aufgabe 2.3_ {.unnumbered}
+
+Vergleiche und diskutiere die Ergebnisse der Interpolation durch ordinary und universal Kriging und berücksichtige dabei die folgenden Fragen:
+
+1. Welches Interpolationsmodell scheint passender?
+2. Ist der Einfluss der Höheninformation auf der Vorhersagekarte sichtbar?
+3. Wie würdest Du die Vorhersagequalität / Güte analysieren? 
+4. Warum ist es nützlich, logarithmische PM$_{10}$ Werte vorherzusagen?
+5. Wie verlässliche sind die generierten Karten um Überschreitungen von Grenzwerten an Orten ohne Messstationen zu überwachen (nach EU Recht darf ein Tagesmittelwert von $50 \mu \textrm{g} / \textrm{m}^3$ nur an 35 Tagen im Jahr überschritten werden)?
