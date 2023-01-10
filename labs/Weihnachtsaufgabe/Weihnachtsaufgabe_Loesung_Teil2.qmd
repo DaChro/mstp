@@ -1,0 +1,230 @@
+---
+title: "Einführung in die Modellierung dynamischer räumlicher Prozesse, Weihnachtsaufgabe - Lösung Teil 2"
+editor: source
+---
+
+Feinstaub mit Partikelgröße unter $10 \mu \textrm{m}$ (PM$_{10}$) ist dafür bekannt, verschiedene Herz-Kreislauf-Erkrankungen beim Menschen auszulösen. Gesetze der europäischen Union definieren Grenzwerte und Standards zum Überwachen der Luftqualität, die von Mitgliedsländern einzuhalten sind. In dieser Aufgabe wird die rurale Komponente von Feinstaub an einem bestimmten Tag analysiert, um auch Werte an Orten ohne Messstation zu schätzen. 
+
+
+
+
+### Daten {.unnumbered}
+
+Die Datei `ex02_pm10eu.Rdata` enthält zwei R Objekte der Klasse `sp`. `EU.stations` speichert die mittlere PM$_{10}$ Konzentration sowie Höheninformation an 270 rural gelegenen Messstationen in Mitteleuropa am 30.4. 2009. `EU.grid` ist ein reguläres Gitter, welches die gleiche Fläche mit einer Pixelgröße von  10 km, also insgesamt $374 \times 220$ Pixeln abdeckt. für jeden Pixel sind Höheninformation basierend auf der [SRTM Erdbeobachtungsmission](http://www2.jpl.nasa.gov/srtm/index.html) verfügbar.    
+
+Der folgende R code lädt die Daten, benötigte Pakete und gibt einen Überblick über die Daten:
+
+```{r, fig.align='center', warning=F}
+library(sp)
+library(gstat)
+
+load("./data/ex02_pm10eu.Rdata")
+
+summary(EU.stations)
+summary(EU.grid)
+
+spplot(EU.stations[,"elevation"], main="Elevation (m)", scales=list(T))
+spplot(EU.stations[,"PM10"], main="PM10 concentration (micrograms per cubic meter)", scales=list(T))
+spplot(EU.stations[,"logPM10"], main="PM10 concentration (micrograms per cubic meter, log scale)", scales=list(T))
+
+spplot(EU.grid, main="Elevation (m)", scales=list(T))
+```
+
+
+### _Aufgabe 2.1_ {.unnumbered}
+
+Um eine kontinuierliche PM$_{10}$ Karte zu erstellen, führe das in der Vorlesung vorgestellte  **ordinary Kriging** aus um an jedem Pixel des Gitters `EU.grid` einen PM$_{10}$ Wert zu schätzen:
+
+
+1. Berechne das experimentelle Variogramm und beschreibe die Ergebnisse (ob und bis zu welchem Grad die Daten räumlich korelliert sind).
+
+
+**Lösung:**
+
+Man kann sich die Variogrammwolke über folgenden Befehl anzeigen lassen:
+
+```{r,warning=F}
+plot(variogram(logPM10 ~ 1, EU.stations, cloud = TRUE))
+```
+
+Um hieraus ein experimentelles Variogramm (Semivarianz gruppiert in Abstandsklassen mit Angabe der jeweiligen Gruppenmittelwerte) zu erstellen, muss man lediglich `cloud=FALSE` sezten oder diesen Parameter weglassen (FALSe ist default).
+
+```{r,warning=F}
+plot(variogram(logPM10 ~ 1, EU.stations, cloud = FALSE))
+```
+
+Man kann dem experimentellen Variogramm entnehmen, dass eine Korrelation bis zu einer Entfernung von etwa 800.000 bis 900.000 Metern vorliegt.
+
+---
+
+2. Wähle ein geeignetes theoretisches Variogrammmodell und passe dieses an das berechnete experimentelle Variogramm an
+
+**Lösung:**
+
+Man kann sich verschiedene Variogrammmodelle anzeigen lassen über:
+```{r,warning=F}
+show.vgms()
+```
+
+Diejenigen, die am passensten erscheinen, kann man an das experimentelle Variogramm anpassen und vergleichen, wie gut sie tatsächlich geeignet sind. Im experimentellen Variogramm kann man dabei ablesen, welche Startwerte sich jeweils für `partial sill`, `range` und `nugget` eignen.   
+
+```{r, warning=F,results='hide',message=FALSE}
+#Erstelle empirisches Variogramm und weise es der Variable vgm1 zu
+vgm1 <- variogram(logPM10 ~ 1, EU.stations, cloud=F)
+#Passe ein theroretisches Variogramm an und weise es der Variable v.mod zu
+v.mod = fit.variogram(vgm1, vgm(0.5,"Sph",900000,0.08))
+#Plotte das theroretische und das experimentelle Variogramm 
+plot(vgm1,v.mod, main="spherical")
+
+#Wiederhole das ganze mit einem anderen Variogrammodell  
+v.mod = fit.variogram(vgm1, vgm(0.5,"Exp",900000,0.08))
+plot(vgm1,v.mod, main ="exponential")
+  
+```
+
+_Welches passt besser?_
+
+Wenn man genauer und objektiv untersuchen möchte, wie gut ein angepasstes theoretisches Variogramm tatsächlich zu dem experimentellen passt, kann man sich zum Beispiel die Abweichungen genauer ausrechnen. So könnte man etwa den root mean square error (RMSE) verschiedener Variogrammmodelle vergleichen (war nicht gefordert!):
+
+```{r,warning=F}
+##Funktion zum Testen der Variogrammmodelle für ordinary Kriging
+varmodtest <- function (vtype){
+  vgm1 <- variogram(logPM10 ~ 1, EU.stations, cloud=F)
+  v.mod = fit.variogram(vgm1, vgm(0.5,vtype,900000,0.08))
+  th = variogramLine(v.mod,dist_vector=vgm1$dist)
+  RMSE = sqrt(mean((th$gamma - vgm1$gamma)^2))
+  RMSE
+}  
+
+varmodtest("Sph")
+varmodtest("Cir")
+varmodtest("Ste")
+
+```
+
+Das sphärische Modell scheint von den getesteten das am besten passende und auch visuell ziemlich gut geeignet zu sein.
+
+---
+
+3. Benutze das angepasste theoretische Variogramm um logarithmische PM$_{10}$ Konzentrationen auf dem Gitter `EU.grid` vorherzusagen.
+
+**Lösung:**
+
+Wenn man ein theoretisches Variogramm angepasst hat, kann man über den Befehl `krige()` eine Kriging-Interpolation durchführen, bei der das angepasste Modell verwendet wird.
+
+```{r,warning=F}
+# Experimentelles Variogramm ertellen (s.o.)
+vgm1 <- variogram(logPM10 ~ 1, EU.stations)
+#Threoretisches Variogramm anpassen (s.o.)
+v.mod = fit.variogram(vgm1, vgm(0.5,"Sph",900000,0.08))
+#Kriging mit Hilfe des theoretischen Variogramms durchführen
+PM10.OK = krige(logPM10 ~ 1, EU.stations, EU.grid, v.mod)
+```
+
+---
+
+4. Erstelle je eine Karte mit vorhergesagten Werten und geschätzten Vorhersagefehlern (Krigingvarianz).
+
+**Lösung:**
+
+Das Ergebnis der Interpolation kann man mit Hilfe von `spplot()` plotten. Standardmäßig werden der Plot für die Schätzwerte und der Plot für die Kriging Varianz gemeinsam ausgegeben.
+```{r,warning=F}
+spplot(PM10.OK)
+```
+
+Diese Darstellung ist suboptimal: Dadurch, dass die Kriging-Varianz viel geringere Werte annimmt als die Vorhersage, kann man hier die kleineren Unterschiede auf der gemeinsamen Farbskala nicht sehen. 
+Wenn man daher die Plotes jeweils einzeln erstellt, wird die Farbskala auch jeweils passend skaliert. Hiefür muss man dem Befehl `spplot()` lediglich einen zusätzlichen Parameter übergeben (`"var1.pred"` für die Vorhersage oder `"var1.var"` für die Kriging-Varianz).
+
+```{r,warning=F}
+spplot(PM10.OK, "var1.pred")
+spplot(PM10.OK, "var1.var")
+```
+
+---
+
+### _Aufgabe 2.2_ {.unnumbered}
+
+Da wir existierende Kovariate nicht ignorieren wollen, soll die Höheninformation nun mittles **universal Kriging** zur Vorhersage mitbenutzt werden. führe dabei Schritte 1 - 4 analog zu _Aufgabe 2.1_ durch.
+
+**Lösung:**
+
+Das Vorgehen ist hier das gleiche wie beim Ordinary Kriging, nur dass die Variable `elevation` bei der Erstellung des Variogramms und dann auch beim Kriging mit einbezogen wird.
+
+```{r,warning=F}
+#Experimentelles Variogramm erstellen
+vgm2 = variogram(logPM10 ~ elevation, EU.stations)
+
+#Variogramm Plotten
+plot(vgm2)
+
+#ggf. verschiedene theoretische Variogramme -jetzt für Universal Kriging- testen. Geeignete Startwerte kann man wieder dem experimentellen Variogramm entnehmen
+varmodtest <- function (vartype){
+  vgm2 <- variogram(logPM10 ~ elevation, EU.stations, cloud=F)
+  v.mod2 = fit.variogram(vgm2, vgm(0.4,vartype,700000,0.08))
+  th = variogramLine(v.mod2,dist_vector=vgm2$dist)
+  RMSE = sqrt(mean((th$gamma - vgm2$gamma)^2))
+  RMSE
+}  
+
+#Führe die oben definierte Funktion mit verschiedenen Variogrammmodellen durch
+varmodtest("Sph")
+varmodtest("Exp")
+varmodtest("Cir")
+varmodtest("Pen")
+
+```
+
+Das exponentielle Modell scheint besonders gut zu passen. Dies bestätigt auch der visuelle Eindruck:
+
+```{r,warning=F}
+#Theoretisches Variogramm (exponentiell) and das empirische/experimentelle anpassen
+v.mod2 = fit.variogram(vgm2, vgm(0.4,"Exp",700000,0.08))
+#Beide Variogramme plotten
+plot(vgm2,v.mod2)
+
+```
+
+Da nun ein geeignetes Variogramm gefunden ist, kann mit dem Befehl `krige()` nun wiederum Kriging durchgeführt werden. Da wir universal Kriging anwenden wollen, wird wie bei der Erstellung des Variogramms `elevation` als zusätzlicher Parameter übergeben.
+
+```{r,warning=F}
+#Führe Universal Kriging mit Hilfe des eben erstellten Variogramms durch
+PM10.UK = krige(logPM10 ~ elevation, EU.stations, EU.grid, v.mod2)
+```
+
+Die Karte kann auf die gleiche Weise wie beim ordinary Kriging erstellt werden.
+
+```{r,warning=F}
+spplot(PM10.UK, "var1.pred")
+spplot(PM10.UK, "var1.var")
+```
+
+---
+
+### _Aufgabe 2.3_ {.unnumbered}
+
+Vergleiche und diskutiere die Ergebnisse der Interpolation durch ordinary und universal Kriging und berücksichtige dabei die folgenden fragen:
+
+1. Welches Interpolationsmodell scheint passender?
+2. Ist der Einfluss der Höheninformation auf der Vorhersagekarte sichtbar?
+3. Wie würdest Du die Vorhersagequalität / Güte analysieren? 
+4. Warum ist es nützlich, logarithmische PM$_{10}$ Werte vorherzusagen?
+5. Wie verlässliche sind die generierten Karten um Überschreitungen von Grenzwerten an Orten ohne Messstationen zu überwachen (nach EU Recht darf ein Tagesmittelwert von $50 \mu \textrm{g} / \textrm{m}^3$ nur an 35 Tagen im Jahr überschritten werden)?
+
+**Antwort:**
+Universal Kriging scheint passender, da es den Einfluss der Höhe mit einbezieht. Dies scheint sinnvoll, da Feinstaubkonzentration mit steigender Höhe in der Regel abnimmt. Teste `cor(EU.stations$PM10,EU.stations$elevation)` (Ist jedoch stark vereinfacht. Beachtet bitte, dass es viel andere, wichtigere Einflussfaktoren gibt, s.u.)
+Den Einfluss der Höheninformation beim Universal Kriging kann man deutlich in der Karte sehen, insbesondere wenn man sich größere Gebirgszüge wie die Alpen ansieht und hier die Karten vom ordinary und universal Kriging vergleicht. 
+Eine Möglichkeit, die Güte der Vorhersage zu analysieren, wäre zum Beispiel, dass man bekannte Werte aus den Daten entfernt, die Vorhersage durchführt und diese an den betreffenden Orten mit den gemessenen Werten vergleicht (siehe Kreuzvalidierung).
+
+Hinsichtlich möglicher Grenzwertüberschreitungen sind die geschätzten Werte insgesamt mit Vorsicht zu betrachten, da viele wichtige Einflussfaktoren (z.B. Niederschlag) nicht beachtet werden. Vor allem aber handelt es sich bei den Messorten um "rurale" Messstationen, also solche außerhalb großer Städte. Gerade in den Städten ist die Feinstaubkonzentration jedoch besonders hoch. Gleichzeitig spielt hier der Feinstaub eine große Rolle für die Gesundheit vieler Menschen, so dass die Einhaltung von Grenzwerten hier entscheidend ist.
+
+Die PM$_{10}$-Werte logtransformiert zu betrachten ist sinnvoll, da diese Werte oft eine sehr schiefe Verteilung aufweisen.
+
+```{r,warning=F}
+hist(EU.stations$PM10)
+```
+
+Logtransformation hat in solchen Fällen den Einfluss, die Daten einer Normalverteilung näher zu bringen, was viele statistische Analyseverfahren vereinfacht.
+
+```{r,warning=F}
+hist(EU.stations$logPM10)
+```

@@ -1,0 +1,339 @@
+---
+title: "Einführung in die Modellierung dynamischer räumlicher Prozesse, Weihnachtsaufgabe - Lösung Teil 1"
+editor: source
+---
+
+
+##  Modellierung von Zeitreihen: Analyse bodennaher Ozon- und Temperaturmessungen {.unnumbered}
+
+
+
+### Daten {.unnumbered}
+Die Datei `ex01_AABU.Rdata` beinhaltet einen data.frame `AABU.obs` mit stündlichen (!) Messungen  bodennaher Ozonkonzentration in der Luft  (`O3`, in $\mu$g/m$^3$) und Lufttemperatur (`TEMP`, in celsius) von Januar 2007 bis Dezember 2014 an einer Messstation in Aachen. Der folgende Abschnitt zeigt eine kurze Zusammenfassung der Daten:
+
+```{r, fig.align='center', warning=F}
+load("./data/ex01_AABU.Rdata")
+summary(AABU.obs)
+plot(AABU.obs$time,AABU.obs$O3, type="l")
+plot(AABU.obs$time,AABU.obs$TEMP, type="l")
+```
+
+Die Spalten `AABU.obs$HOURS` und  `AABU.obs$time` enthalten vergangene Stunden seit 2007-01-01-00:00:00 bzw. exakte Datums- und Zeitangaben. 
+Das Problem ist, dass es in der Ozon-Zeitreihe relativ viele Lücken gibt, also Zeitpunkte, an denen keine Messdaten vorhanden sind. Dies könnt ihr herausfinden, indem ihr den Befehl `any(is.na(AABU.obs$O3))` ausführt. Außerdem lässt sich die Saisonalität der Ozonwerte schwieriger in einem Modell beschreiben, als die der Temperatur (siehe Übungen 1 und 2).
+
+Wir haben jedoch eine vollständige Zeitreihe der Temperaturdaten (teste: `any(is.na(AABU.obs$TEMP))`). Wenn es also eine ausreichende Korrelation zwischen Temperatur und Ozonbelastung gäbe, könnte man die Temperaturdaten verwenden, um 
+
+* die fehlenden Werte in der Ozon-Zeitreihe zu füllen
+und
+* Vorhersagen über Ozonwerte in der Zukunft (abgeleitet aus Vorhersagen der Temperatur) zu treffen
+
+
+### _Aufgabe 1.1_ {.unnumbered}
+Zunächst wollen wir uns daher die Daten genauer anschauen. Für eine erste explorative Analyse betrachte die Zeitreihendarstellung der O$_3$ und der Temperatur-Messungen und thematisiere die folgenden Punkte:
+
+
+---------------------------------------
+
+1. Gibt es saisonale / periodische Komponenten in den Daten?
+
+Eine Jährliche periodische Komponte ist direkt in den Zeitreihen für Ozon und Temperatur sichtbar. Zusätzlich gibt es auch tageszeitliche Schwankungen:
+
+```{r, fig.align='center'}
+# Berechne einzelne Mittelwerte und Quartile für jede Stunde des Tages
+AABU.obs$HOUROFDAY =  as.integer(format(AABU.obs$time,"%H")) # 
+
+# Berechne mittlere Konzentration für alle Stunden
+O3.hourly.mean = aggregate(AABU.obs,by = list(HOUROFDAY=as.factor(AABU.obs$HOUROFDAY)), FUN=function(x) {mean(x,na.rm = T)})
+
+# Berechne oberes Quartil für alle Stunden
+O3.hourly.q75 = aggregate(AABU.obs,by = list(HOUROFDAY=as.factor(AABU.obs$HOUROFDAY)), FUN=function(x) {quantile(x,probs=0.75,na.rm = T)})
+
+# Berechne unteres Quartil für alle Stunden
+O3.hourly.q25 = aggregate(AABU.obs,by = list(HOUROFDAY=as.factor(AABU.obs$HOUROFDAY)), FUN=function(x) {quantile(x,probs=0.25,na.rm = T)})
+
+# Visualisiere Ergebnis
+plot(as.numeric(O3.hourly.mean$HOUROFDAY),O3.hourly.mean$O3, col="red",type="o",pch=19,ylim=c(0,100), main="Mittlerer O3 Tagesgang und Quartile", ylab="Ozonkonzentration", xlab="Stunde des Tages")
+lines(as.numeric(O3.hourly.q75$HOUROFDAY),O3.hourly.q75$O3, col="black",type="o",pch=19)
+lines(as.numeric(O3.hourly.q25$HOUROFDAY),O3.hourly.q25$O3, col="black",type="o",pch=19)
+```
+
+Der gemittelte Tagesgang über alle Beobachtungstage zeigt eindeutig, dass es einen Anstieg der Ozonkonzentration im Verlaufe des Vormittags gibt, der maximale Wert nachmittags zwischen 14 und 17 Uhr erreicht wird und danach wieder sinkt. Nachts bleibt die Konzentration typischerweise relativ konstant. Dieselbe Analyse führen wir nun für die Temperaturdaten aus.
+
+```{r, fig.align='center'}
+# Berechne mittlere Temperatur für alle Stunden
+TEMP.hourly.mean = aggregate(AABU.obs,by = list(HOUROFDAY=as.factor(AABU.obs$HOUROFDAY)), FUN=function(x) {mean(x,na.rm = T)})
+
+# Berechne oberes Quartil für alle Stunden
+TEMP.hourly.q75 = aggregate(AABU.obs,by = list(HOUROFDAY=as.factor(AABU.obs$HOUROFDAY)), FUN=function(x) {quantile(x,probs=0.75,na.rm = T)})
+
+# Berechne unteres Quartil für alle Stunden
+TEMP.hourly.q25 = aggregate(AABU.obs,by = list(HOUROFDAY=as.factor(AABU.obs$HOUROFDAY)), FUN=function(x) {quantile(x,probs=0.25,na.rm = T)})
+
+# Visualisiere Ergebnis
+plot(as.numeric(TEMP.hourly.mean$HOUROFDAY),TEMP.hourly.mean$TEMP, col="red",type="o",pch=19,ylim=c(0,25), main="Mittlerer Temperaturtagesgang und Quartile", ylab="Temperatur", xlab="Stunde des Tages")
+lines(as.numeric(TEMP.hourly.q75$HOUROFDAY),TEMP.hourly.q75$TEMP, col="black",type="o",pch=19)
+lines(as.numeric(TEMP.hourly.q25$HOUROFDAY),TEMP.hourly.q25$TEMP, col="black",type="o",pch=19)
+```
+
+Der typische Temperaturtagesgang der Temperatur verhält sich sehr ähnlich zum Ozontagesgang. Es gibt also in beiden Zeitreihen sowohl tages- als auch jahreszeitliche periodische Komponenten.
+
+
+---------------------------------------
+
+2. Sind die Ozonmessungen zeitlich autokorreliert?
+
+Eine Einfache Berechnung der Autokorrelationskoeffizienten mit ansteigendem zeitlichem Lag ergibt für die Ozon- beziehungsweise Temperaturzeitreihe folgende Plots.
+
+```{r, fig.align='center'}
+acf(AABU.obs$O3,na.action = na.pass, main="Ozon ACF für kurze zeitliche Abstände")
+acf(AABU.obs$TEMP,na.action = na.pass, main="Temperatur ACF für kurze zeitliche Abstände")
+```
+
+Wir können eindeutig sehen, dass die Zeitreihen autokorreliert sind. Auch sehen wir, dass die Autokorrelation für Lags, die Vielfache von 24 sind, tendentiell größer ist, was erneut die tägliche Periodizität zeigt.
+
+Betrachten wir die ACF für größere Lags (bis 1 Jahr, siehe unten), so zeigt sich, dass es fast für alle Lags signifikante Autokorrelationen gibt. Für Lags um ein halbes Jahr werden Autokorrelationen auch negativ, was vor allem in der Temperaturzeitreihe auffällt.
+
+```{r, fig.align='center'}
+acf(AABU.obs$O3,na.action = na.pass,lag.max = 8760, main="Ozon ACF für große zeitliche Abstände")
+acf(AABU.obs$TEMP,na.action = na.pass,lag.max = 8760, main="Temperatur ACF für große zeitliche Abstände")
+```
+
+
+---------------------------------------
+
+3. Wie stark ist die Korrelation zwischen den Ozon- und den Temperaturmessungen?
+
+Wir berechnen den Korrelationskoeffizienten durch folgenden Befehl:
+
+```{r}
+cor(AABU.obs$O3,AABU.obs$TEMP,use = "complete.obs")
+```
+
+Das Ergebnis motiviert durchaus den Versuch, Temperatur für die Vorhersage von Ozonkonzentrationen zu benutzen.
+
+---------------------------------------
+
+
+
+### _Aufgabe 1.2_ {.unnumbered}
+Im Folgenden wollen wir zwei Modelle anpassen, um den Temperaturprozess zu verstehen und Vorhersagen machen zu können. 
+
+
+---------------------------------------
+
+
+
+1. Passe an die Temperaturzeitreihe einen Trend für jährliche und tägliche Schwankungen an. Betrachte also das Modell $\textrm{TEMP} = \beta_0 + \beta_1 \sin(\frac{2 \pi (\textrm{HOURS}+ \beta_2)}{8766} ) + \beta_3 \sin(\frac{2 \pi (\textrm{HOURS} + \beta_4)}{24} )$ und passe die Parameter mit einem geeigneten Optimierungsverfahren an die Daten an. Analysiere die Residuen erneut auf Autokorrelation und saisonale Komponenten. 
+
+
+Zunächst definieren wir die Modellfunktion und die Zielfunktion zur Optimierung, die beide von den Modellparametern abhängen:
+
+```{r}
+# Funktion zur Auswertung der Modellfunktion, bekommt Stunden, an denen das Modell ausgewertet werden soll und Modellparameter als Eingabe und liefert einen Vektor mit Modellvorhersagen für hours zurück.
+TEMP.per.modelfunc <- function(hours,x) {
+  return(x[1] + x[2] * sin(2*pi* (hours + x[3]) / 8766) + x[4] * sin(2*pi* (hours + x[5]) / 24 ))
+}
+
+# Zielfunktion, die Modellparameter als Eingabe bekommt, das Modell für bekannte Daten auswertet und anschließend die Summe der quadratischen Vorhersagefehler zurückgibt.
+TEMP.per.objfunc <- function(x) {
+  return (sum((AABU.obs$TEMP - TEMP.per.modelfunc(AABU.obs$HOURS,x))^2,na.rm = T))
+}
+```
+
+Da die Zielfunktion nicht linear in den Parametern `x[3]` und `x[5]` ist, benutzen wir nun den Gauß-Newton Algorithmus zum Finden des Minimums.
+
+```{r}
+TEMP.per.model = nlm(TEMP.per.objfunc,c(0,1,0,1,0))
+TEMP.per.model # print Gauss-Newton results
+TEMP.per.pars =  TEMP.per.model$estimate # store fitted parameters
+```
+
+Die angepassten Parameter benutzen wir nun, um die Residuen des periodischen Trends zu berechnen.
+
+```{r,fig.align='center'}
+TEMP.per.prediction = TEMP.per.modelfunc(AABU.obs$HOURS,x=TEMP.per.pars)
+TEMP.per.residuals = AABU.obs$TEMP -  TEMP.per.prediction 
+```
+
+```{r,fig.align='center'}
+# Auswertung des periodischen Modells an allen Datenpunkten
+TEMP.per.prediction = TEMP.per.modelfunc(AABU.obs$HOURS,x=TEMP.per.pars)
+
+# Berechnung der Residuen
+TEMP.per.residuals = AABU.obs$TEMP -  TEMP.per.prediction 
+
+# Plotten der Originaltemperaturdaten und des angepassten periodischen Modells.
+plot(AABU.obs$time,AABU.obs$TEMP, type="l",main="Temperaturzeitreihe und angepasster Trend",xlab="Datum",ylab="Temperatur")
+lines(AABU.obs$time,TEMP.per.prediction,col="red")
+
+# Visualisieren der Residuen
+plot(AABU.obs$time,TEMP.per.residuals, type="l",main="Trendresiduen",xlab="Datum",ylab="Temperaturdifferenz")
+```
+
+Die Visualisierung der Residuen zeigt nun keine offensichtlichen (jährlichen) Periodizitäten mehr. Eine einfache Rechnung zeigt, dass etwa 65% der Temperaturvariabilität durch den Trend erklärt wird.
+
+```{r}
+1 - var(TEMP.per.residuals,na.rm = T) / var(AABU.obs$TEMP - mean(AABU.obs$TEMP,na.rm = T),na.rm = T)
+```
+
+Zur Analyse der Residuen auf Autokorrelation betrachten wir erneut die ACF und partielle ACF. 
+
+```{r,fig.align='center'}
+acf(TEMP.per.residuals,na.action = na.pass)
+acf(TEMP.per.residuals,na.action = na.pass,lag.max = 8700)
+
+pacf(TEMP.per.residuals,na.action = na.pass)
+pacf(TEMP.per.residuals,na.action = na.pass,lag.max = 8700)
+```
+
+Die Residuen sind nun über deutlich geringere Zeitabstände autokorreliert, als die Originaltemperaturdaten, auch wenn durchaus nicht die gesamte Periodizität durch das Modell entfernt werden konnte.
+
+
+
+---------------------------------------
+
+
+2. Wende nun ein AR Modell auf die Residuen von 1. an und analysiere dabei das AIC, um eine passende AR Ordung zu wählen. 
+
+
+Die PACF deutet bereits darauf hin, dass ein AR(2) Modell nützlich sein könnte.
+Für die weitere Analyse berechnen wir den AIC index für unterschiedliche AR Ordnungen bis 10, da ansonsten die Rechenzeiten zeitintensiv werden:
+
+```{r artest,fig.align='center',cache=1}
+p = 1:10
+AIC = sapply(p,function(x) {arima(TEMP.per.residuals,order = c(x,0,0))$aic})
+plot(AIC[1:10],xlab="AR Ordnung", ylab="AIC")
+```
+
+Wir sehen, dass Ordnungen 2-10 vergleichsweise ähnliche AIC Werte ergeben, wobei das tatsächliche Minimum bei 10 liegt. Wir wählen trotzdem ein AR(2) Modell, welches wir im folgenden anpassen und benutzen, um Werte vorherzusagen.
+
+```{r,fig.align='center'}
+TEMP.per.residuals.ar2 = arima(TEMP.per.residuals,order = c(2,0,0))
+TEMP.per.residuals.ar2
+
+```
+
+
+Benutzt man das AR Modell, um die Originaldaten (Residuen des periodischen Trends) vorherzusagen indem ein Wert $y_t$ durch $(1.4902,-0.5251) (y_{t-1}, y_{t-2})^T$ geschätzt wird, ergibt sich, dass 96% der Variabilität (der Residuen des angepassten Trends) erklärt wird:
+
+```{r}
+1- var(TEMP.per.residuals.ar2$residuals) / var(TEMP.per.residuals)
+```
+
+
+
+---------------------------------------
+
+
+
+3. Wähle nun ein finales Modell (Kombination aus Trend und AR-Modell der Residuen) und benutze es, um die Temperaturwerte für zwei Monate über den Betrachtungszeitraum hinaus (also für Januar und Februar 2015) vorherzusagen.
+
+```{r,fig.align='center'}
+par(mar=c(5, 5, 4, 2))
+h0 = AABU.obs$HOURS[nrow(AABU.obs)] + 1 # Startstunde
+hours = h0:(h0+(31+28)*24) # Alle Stunden, an denen Vorhersagen berechnet werden sollen
+TEMP.per.residuals.ar2.pred = predict(TEMP.per.residuals.ar2,n.ahead=length(hours))$pred
+
+# Plotte Trendvorhersage
+plot(AABU.obs$TEMP,col="black",xlim=c(68000,71700),type="l",ylim=c(-10,30), main="Vorhersage über 2 Monate: Trend",xlab="Stunden nach 2007-01-01 00:00 CET",ylab="Temperatur")
+lines(hours,TEMP.per.modelfunc(hours,x=TEMP.per.pars), type="l",col="red" )
+lines(TEMP.per.prediction, type="l",col="gray50" )
+lines(AABU.obs$TEMP,col="black")
+
+
+# Plotte Residuenvorhersage
+plot(TEMP.per.residuals,type="l",col="black",xlim=c(68000,71700), ylab="Residuen des periodischen\n Trendmodells", main="Vorhersage über 2 Monate: Trendresiduen",xlab="Stunden nach 2007-01-01 00:00 CET")
+lines(TEMP.per.residuals.ar2.pred,col="red")
+
+
+# Plotte finales (additives) Modell
+plot(AABU.obs$TEMP,col="black",xlim=c(68000,71700),type="l",ylim=c(-10,30), main="Vorhersage über 2 Monate: Trend + AR(2)",xlab="Stunden nach 2007-01-01 00:00 CET",ylab="Temperatur")
+lines(hours,TEMP.per.modelfunc(hours,x=TEMP.per.pars) + TEMP.per.residuals.ar2.pred, type="l",col="red" )
+```
+
+---------------------------------------
+
+
+4. Welche Komponente des Modells ist die wichtigste (reduziert Vorhersagefehler am meisten)?
+
+Wir haben herausgefunden, dass das periodische Trendmodell bereits 65% der Variabilität in den Temperaturdaten erklärt, während von den Residuen wiederum 96% durch ein AR2 Modell erklärt werden konnten. Wir Vergleichen die Wurzeln der mittleren quadratischen Fehler für die einfache Schätzung durch den Mittelwert, für die Schätzung durch den Trend und für die kombinierte Schätzung des Trends und eines AR2 Modells der Residuen.
+
+```{r}
+sqrt(mean((AABU.obs$TEMP - mean(AABU.obs$TEMP,na.rm = T))^2)) # RMSE Mittelwertschätzung
+sqrt(mean(TEMP.per.residuals^2)) # RMSE Periodisches Trendmodell
+sqrt(mean(TEMP.per.residuals.ar2$residuals^2)) # RMSE Periodisches Trendmodell + AR2 Residuenmodell
+```
+
+
+Beachte: Wir haben bei der Berechnung der AR2 Residuen jedoch implizit angenommen, dass wir immer nur einen Schritt vorhersagen müssen, was das AR Modell natürlich favorisiert. Deshalb lässt sich die Frage nicht einfach beantworten. Eine detailliertere Analyse könnte die Anzahl der Vorhersageschritte variieren und prüfen, ab welchem Zeitunterschied der Trend den Fehler stärker reduziert. 
+
+Dies entspricht auch der einfachen Vorstellung: Kurzfristige Vorhersagen werden oft durch das AR Modell dominiert während langfristige Vorhersagen gegen den Trend gehen.
+
+---------------------------------------
+
+
+### _Aufgabe 1.3_ {.unnumbered}
+Als nächstes wollen wir den Zusammenhang zwischen Ozon-Werten und der Temperatur modellieren und diesen nutzen, um die fehlenden Werte in der Ozon-Zeitreihe zu fülllen und ebenfalls Vorhersagen für Januar und Februar 2015 zu treffen. 
+
+---------------------------------------
+
+1. Passe ein einfaches lineares Regressionsmodell  $\textrm{O}_3 = \beta_0 + \beta_1 \textrm{TEMP}$ an die Daten an und erläutere das Ergebnis. 
+
+Wir benutzen die `lm` Funktion von R:
+
+```{r}
+O3.model = lm(O3 ~ TEMP, data = AABU.obs)
+summary(O3.model)
+```
+
+Als Ergebnis für die Regressionsgerade erhalten wir als y-Achsenabschnitt ungefähr 28. Steigt die Temperatur um 1 Grad, so steigt die Ozonkonzentration durchschnittlich um 2.06 Mikrogramm pro Kubikmeter. Dieses Model erklärt etwa 31 % der Variabilität in den Ozondaten. 
+
+
+
+---------------------------------------
+
+2. Nutze das Regressionsmodell, um die fehlenden Werte in der Ozon-Zeitreihe zu füllen.
+
+Wir suchen die Indizes der Zeitreihe, an denen der Ozonwert NA ist und benutzen anschließend die predict Funktion für die Vorhersage. Abschließend ersetzen wir die NA Werte in der Zeitreihe.
+
+```{r}
+idx = which(is.na(AABU.obs$O3))
+pred = predict(O3.model,newdata = AABU.obs[idx,])
+AABU.obs$O3[idx] = pred
+any(is.na(AABU.obs$O3)) # ergibt false, da keine NAs mehr vorhanden sind
+```
+
+
+
+---------------------------------------
+
+
+3. Nutze das Regressionsmodell und die Vorhersage der Temperatur, um die Ozonwerte für Januar und Februar 2015 vorherzusagen.
+
+Wir haben bereits die Temperatur für zwei Monate vorhergesagt. Diese Temperaturwerte brauchen wir einfach in die Regressionsgerade "einsetzen" und erhalten (sehr einfache) Ozonvorhersagen.
+
+```{r,fig.align='center'}
+TEMP.pred = TEMP.per.modelfunc(hours,x=TEMP.per.pars) + TEMP.per.residuals.ar2.pred
+O3.pred = predict(O3.model,newdata = data.frame(TEMP=TEMP.pred))
+
+# 
+plot(AABU.obs$O3,col="black",xlim=c(68000,71700),type="l", main="Ozonvorhersagen basierend auf Temperaturmodellierung", xlab="Stunden nach 2007-01-01 00:00 CET",ylab="O3")
+lines(hours,O3.pred, type="l",col="red" )
+```
+
+
+
+
+---------------------------------------
+
+4. Diskutiere: Zur Vorhersage zukünftiger Ozonwerte ist das Vorgehen unvorteilhaft. Warum
+
+Es gibt mehrere Gründe, warum das Vorgehen unvorteilhaft ist. Hauptgründe sind unter anderem:
+
+- $R^2$ des linearen Modells mit 0.31 relativ gering.
+- Modellfehler werden akkumuliert, da es eine "Vorhersage einer Vorhersage" ist
+- Auch die Ozondaten sind autokorelliert, diese Autokorrelation wird aber nicht benutzt, obwohl sie viel besser für nahe Vorhersagen ist.
+- Jahresperiodizitäten haben unterschiedliche Form
+
+
+---------------------------------------
