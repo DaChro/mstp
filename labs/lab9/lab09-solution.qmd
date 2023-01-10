@@ -1,6 +1,6 @@
 ---
 title: "Spatio-temporal Modelling, Lab 9, YYYY-MM-DD"
-editor: visual
+editor: source
 ---
 
 
@@ -404,7 +404,7 @@ The standard errors are smaller because zinc and lead are strongly correlated. T
 
 
 
-## Kriging errors and confidence intervals
+# Kriging errors and confidence intervals
 
 Given that we are not certain about zinc levels at locations where we did not measure it (i.e., interpolated grid cells) we can classify them according to their approximate confidence intervals, formed by using mean and standard error (here: on the log scale).
 

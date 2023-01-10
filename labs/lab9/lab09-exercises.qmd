@@ -1,9 +1,9 @@
 ---
-title: "Spatio-temporal Modelling, Lab 9, YYYY-MM-DD"
-editor: visual
+title: "Spatio-temporal Modelling, Lab 9, 2023-01-11"
+editor: source
 ---
 
-**This exercise will be discussed on YYY-MM-DD.**
+**This exercise will be discussed on 2023-01-18.**
 
 # Cokriging
 
@@ -271,7 +271,7 @@ tm_shape(v12.pr.stars) +
 :::
 
 
-## Kriging errors and confidence intervals
+# Kriging errors and confidence intervals
 
 Given that we are not certain about zinc levels at locations where we did not measure it (i.e., interpolated grid cells) we can classify them according to their approximate confidence intervals, formed by using mean and standard error (here: on the log scale).
 
