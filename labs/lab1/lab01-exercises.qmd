@@ -1,5 +1,5 @@
 ---
-title: "Spatio-temporal Modelling, Lab 1, 2022-10-12"
+title: "Spatio-temporal Modelling, Lab 1, 2023-10-18"
 format: html
 editor: visual
 ---
@@ -76,14 +76,16 @@ plot(cumsum(rnorm(10000)),type='l')
 ```
 
 #### *Übung 1* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Übung 1
 
 *Steigt der Random Walk Prozess generell an, fällt er ab oder hat er keine dominante Richtung?*
 :::
 
 #### *Übung 2* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Übung 2
 
 ```{r}
@@ -127,21 +129,24 @@ plot(generate.ar(1000, c(0.5,0.2)), type="l")
 ```
 
 #### *Übung 3* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Übung 3
 
 *Welche Werte für `beta` kann man nutzen, um (i) weißes Rauschen (white noise) und (ii) 'random walk'- Prozesse zu erstellen?*
 :::
 
 #### *Übung 4* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Übung 4
 
 *Betrachtet den AR(2) Prozess oben: Steigt seine Varianz mit der Länge an?*
 :::
 
 #### *Übung 5* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Übung 5
 
 Die R-Funktionen `acf()` und `pacf()` erstellen einen Plot der empirischen (partiellen) Autokorrelation einer gegebenen Zeitreihe (siehe `?acf` und `?pacf` für mehr Details).

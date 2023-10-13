@@ -1,5 +1,5 @@
 ---
-title: "Spatio-temporal Modelling, Lab 1, 2022-10-19"
+title: "Spatio-temporal Modelling, Lab 1, 2023-10-25"
 format: html
 editor: visual
 ---
@@ -74,13 +74,14 @@ plot(cumsum(rnorm(10000)),type='l')
 ```
 
 #### *Übung 1* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Übung 1
 
 *Steigt der Random Walk Prozess generell an, fällt er ab oder hat er keine dominante Richtung?*
 :::
 
-::: {.callout-tip}
+::: callout-tip
 ## Lösung
 
 Es gibt keine dominante Richtung, der Mittelwert der Innovationen ist 0. Beachte als Beispiel die folgenden drei random walks.
@@ -98,7 +99,8 @@ lines(h, col = "blue")
 :::
 
 #### *Übung 2* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Übung 2
 
 ```{r}
@@ -113,7 +115,7 @@ var(cumsum(rnorm(1000000)))
 *Erklärt warum ein Random Walk eine Varianz hat, die mit der Zeit zunimmt!*
 :::
 
-::: {.callout-tip}
+::: callout-tip
 ## Lösung
 
 Random walk Prozesse können als Summen **unabhängiger** Zufallsvariablen $\epsilon_t, t=1,...n$ gesehen werden. Die Varianz ist per Definition immer positiv. Dadurch nimmt die Varianz der Zufallsvariablen $y_t = \sum_{i=1}^{t} \epsilon_i$ immer mit der Länge der Serie zu. Die empirische Varianz der kompletten Zeitreihe steigt daher ebenfalls mit der Länge der Serie.
@@ -148,15 +150,15 @@ Der folgende Aufruf generiert und plottet einen AR(2)-Prozess mit den Koeffizien
 plot(generate.ar(1000, c(0.5,0.2)), type="l")
 ```
 
-
 #### *Übung 3* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Übung 3
 
 *Welche Werte für `beta` kann man nutzen, um (i) weißes Rauschen (white noise) und (ii) 'random walk'- Prozesse zu erstellen?*
 :::
 
-::: {.callout-tip}
+::: callout-tip
 ## Lösung
 
 Wenn man für `beta` einen Vektor mit nur einer Zahl "0" einsetzt, erhält man einen AR-Prozess mit $\phi_1 = 0$ und damit: $y_t = 0*y_{t-1} + e_t$, also nichts anderes als weißes Rauschen: $y_t = e_t$
@@ -173,13 +175,14 @@ plot(generate.ar(1000, 1), type="l", main="Random walk")
 :::
 
 #### *Übung 4* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Übung 4
 
 *Betrachtet den AR(2) Prozess oben: Steigt seine Varianz mit der Länge an?*
 :::
 
-::: {.callout-tip}
+::: callout-tip
 ## Lösung
 
 ```{r}
@@ -201,7 +204,8 @@ Nein. Prozesse mit dieser Eigenschaft werden auch manchmal als "(ko)-varianzstat
 :::
 
 #### *Übung 5* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Übung 5
 
 Die R-Funktionen `acf()` und `pacf()` erstellen einen Plot der empirischen (partiellen) Autokorrelation einer gegebenen Zeitreihe (siehe `?acf` und `?pacf` für mehr Details).
@@ -211,7 +215,7 @@ Die R-Funktionen `acf()` und `pacf()` erstellen einen Plot der empirischen (part
 **Beachte:** Die Koeffizienten müssen vorsichtig gewählt werden um valide Prozesse zu generieren. Als Faustregel kann die Formel genutzt werden $\sum |\beta_i| < 1$.
 :::
 
-::: {.callout-tip}
+::: callout-tip
 ## Lösung
 
 **Beispiel 1: AR1 mit beta = 0.1:**
