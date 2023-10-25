@@ -1,5 +1,7 @@
 ---
-title: "Spatio-temporal Modelling, Lab 1, 2023-10-25"
+title: |
+  | Spatio-temporal Modelling, Lab 1
+  | 2023-10-25
 format: html
 editor: visual
 ---

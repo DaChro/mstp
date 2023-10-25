@@ -1,5 +1,7 @@
 ---
-title: "Spatio-temporal Modelling, Lab 3, 2022-10-26"
+title: |
+  | Spatio-temporal Modelling, Lab 3
+  | 2022-10-26
 format: html
 editor: visual
 ---
@@ -94,13 +96,13 @@ and try to find the coefficients $b_0$, $b_1$ and $b_2$ of the linear regression
 
 $$y = b_0 + b_1 x_1 + b_2 x_2 + e$$
 
-(a trend surface in three dimensions), using the step-by-step example in the course slides. 
+(a trend surface in three dimensions), using the step-by-step example in the course slides.
 
-::: {.callout-note}
+::: callout-note
 ## Hint
+
 Try to define the matrices X and the vector y and use the`solve()` function for computing $b_0$, $b_1$, and $b_2$.
 :::
-
 
 #### *Exercise 6* {.unnumbered}
 

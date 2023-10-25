@@ -1,10 +1,12 @@
 ---
-title: "Spatio-temporal Modelling, Lab 2, 2022-10-19"
+title: |
+  | Spatio-temporal Modelling, Lab 2
+  | 2023-10-25
 format: html
 editor: visual
 ---
 
-**This excercise will be discussed on 2022-10-26.**
+**This excercise will be discussed on 2023-11-08.**
 
 This exercise is about exploratory time series analysis, fitting periodic components, and AR models. You will need to download the R data file `meteo.Rdata` from the Learnweb and put it into your workspace directory.
 
@@ -18,7 +20,7 @@ class(meteo)
 summary(meteo)
 ```
 
-::: {.callout-note}
+::: callout-note
 ## Hint
 
 In case the RData file is not in working directory, you may have to specify the absolute path (e.g. C:/myDirectory/meteo.RData in Windows), but we recommend you to set the working directory properly using the `setwd` function or an R Studio project.
@@ -78,7 +80,8 @@ nlm(f,c(0,0,0))
 ```
 
 #### *Exercise 1* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 1
 
 *How many parameters were fitted?*
@@ -98,7 +101,8 @@ lines(T.per~date,meteo,col='red')
 ```
 
 #### *Exercise 2* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 2
 
 *What is the interpretation of the fitted parameters? (if you need to guess, modify them and replot)*
@@ -139,7 +143,8 @@ an.ar5
 ```
 
 #### *Exercise 3* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 3
 
 ```{r}
@@ -150,7 +155,8 @@ acf(an, type = "partial")
 :::
 
 #### *Exercise 4* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 4
 
 ```{r}
@@ -161,14 +167,16 @@ acf(residuals(an.ar5), type = "partial")
 :::
 
 #### *Exercise 5* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 5
 
 *What is the class of the object returned by `arima`?*
 :::
 
 #### *Exercise 6* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 6
 
 Let us see what we can do with such an object.
@@ -191,26 +199,30 @@ We can use the `$aic` suffix to directly retrieve the AIC from an AR model.
 temp = meteo$T.outside
 ```
 
-    arima(temp, c(1, 0, 0))$aic
-    arima(temp, c(2, 0, 0))$aic
-    arima(temp, c(3, 0, 0))$aic
-    arima(temp, c(4, 0, 0))$aic
-    arima(temp, c(5, 0, 0))$aic
-    arima(temp, c(6, 0, 0))$aic
-    arima(temp, c(7, 0, 0))$aic
-    arima(temp, c(8, 0, 0))$aic
-    arima(temp, c(9, 0, 0))$aic
-    arima(temp, c(10, 0, 0))$aic
+```         
+arima(temp, c(1, 0, 0))$aic
+arima(temp, c(2, 0, 0))$aic
+arima(temp, c(3, 0, 0))$aic
+arima(temp, c(4, 0, 0))$aic
+arima(temp, c(5, 0, 0))$aic
+arima(temp, c(6, 0, 0))$aic
+arima(temp, c(7, 0, 0))$aic
+arima(temp, c(8, 0, 0))$aic
+arima(temp, c(9, 0, 0))$aic
+arima(temp, c(10, 0, 0))$aic
+```
 
 #### *Exercise 7* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 7
 
 *Which model has the smallest AIC?*
 :::
 
 #### *Exercise 8* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 8
 
 *Do a similar analysis for the humidity variable in the meteo data set:*
@@ -262,7 +274,8 @@ title("predicting 1 week")
 ```
 
 #### *Exercise 9* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 9
 
 *Where does, for long-term forecasts, the predicted value converge to?*
@@ -288,14 +301,16 @@ title("predicting 1 week")
 ```
 
 #### *Exercise 10* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 10
 
 *Where does now, for long-term forecasts, the predicted value converge to? Explain the difference to the upper model.*
 :::
 
 #### *Exercise 11* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 11
 
 *Fit a periodic trend and an AR(3) model to the humidity data. Plot predictions for one week.*

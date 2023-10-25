@@ -1,5 +1,7 @@
 ---
-title: "Spatio-temporal Modelling, Lab 2, 2022-10-26"
+title: |
+  | Spatio-temporal Modelling, Lab 2
+  | 2023-11-08
 format: html
 editor: visual
 ---
@@ -249,16 +251,18 @@ We can use the `$aic` suffix to directly retrieve the AIC from an AR model.
 temp = meteo$T.outside
 ```
 
-    arima(temp, c(1, 0, 0))$aic
-    arima(temp, c(2, 0, 0))$aic
-    arima(temp, c(3, 0, 0))$aic
-    arima(temp, c(4, 0, 0))$aic
-    arima(temp, c(5, 0, 0))$aic
-    arima(temp, c(6, 0, 0))$aic
-    arima(temp, c(7, 0, 0))$aic
-    arima(temp, c(8, 0, 0))$aic
-    arima(temp, c(9, 0, 0))$aic
-    arima(temp, c(10, 0, 0))$aic
+```         
+arima(temp, c(1, 0, 0))$aic
+arima(temp, c(2, 0, 0))$aic
+arima(temp, c(3, 0, 0))$aic
+arima(temp, c(4, 0, 0))$aic
+arima(temp, c(5, 0, 0))$aic
+arima(temp, c(6, 0, 0))$aic
+arima(temp, c(7, 0, 0))$aic
+arima(temp, c(8, 0, 0))$aic
+arima(temp, c(9, 0, 0))$aic
+arima(temp, c(10, 0, 0))$aic
+```
 
 #### *Exercise 7* {.unnumbered}
 
