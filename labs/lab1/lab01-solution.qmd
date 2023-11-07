@@ -130,11 +130,10 @@ Seht Euch die folgende Funktion zur Generierung eines AR-Prozesses an.
 ```{r}
 generate.ar <- function(n, beta, sd=1)
 {
-  innov<-rnorm(n,0,sd)
-  ar = innov[1:length(beta)]
-  for (i in (length(beta)+1):n) {
-    v <- sum(ar[(i-1):(i-length(beta))] * beta) + innov[i]
-    ar = c(ar,v)
+  ar = rnorm(length(beta),0,sd)
+  for (t in (length(beta)+1):n) {
+    y <- sum(ar[(t-1):(t-length(beta))] * beta) + rnorm(1,0,sd)
+    ar = c(ar,y)
   }
   return(ar)
 }

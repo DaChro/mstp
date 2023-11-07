@@ -1,5 +1,7 @@
 ---
-title: "Spatio-temporal Modelling, Lab 3, 2022-11-09"
+title: |
+  | Spatio-temporal Modelling, Lab 3
+  | 2023-11-15
 format: html
 editor: visual
 ---
@@ -131,7 +133,6 @@ SPI computes approximations and thus works best (less iterations) for smooth obj
 
 As a preparation, go through the course slides; if you missed the lecture you may want to go through the Gauss-Newton algorithm, e.g. on [English wikipedia](http://en.wikipedia.org/wiki/Gauss%E2%80%93Newton_algorithm).
 
-
 ### Linear least squares: Step-By-Step
 
 First, we will try a step by step example using R. Consider the following data set:
@@ -147,8 +148,9 @@ and try to find the coefficients $b_0$, $b_1$ and $b_2$ of the linear regression
 
 $$y = b_0 + b_1 x_1 + b_2 x_2 + e$$
 
-::: {.callout-note}
+::: callout-note
 ## Hint
+
 Try to define the matrices X and the vector y and use the`solve()` function for computing $b_0$, $b_1$, and $b_2$.
 :::
 
@@ -310,16 +312,14 @@ J=
 \vdots & \vdots & \vdots \\
 \frac{\partial r_n}{\partial a} & \frac{\partial r_n}{\partial b} & \frac{\partial r_n}{\partial c}
 \end{pmatrix}
-$$
-$$
+$$ $$
 =
 \begin{pmatrix}
 -1 & - \sin(\pi (x_1+c)/12) & \frac{-b \pi}{12} \cos\left(\frac{\pi (x_1+c)}{12}\right) \\
 \vdots & \vdots & \vdots \\
 -1 & - \sin(\pi (x_n+c)/12) & \frac{-b \pi}{12} \cos\left(\frac{\pi (x_n+c)}{12}\right)
 \end{pmatrix} 
-$$
-$$
+$$ $$
 =
 \begin{pmatrix}
 -1 & - \sin(\pi (x_1+c)/12) & 0 \\

@@ -1,12 +1,12 @@
 ---
 title: |
   | Spatio-temporal Modelling, Lab 3
-  | 2022-10-26
+  | 2023-11-8
 format: html
 editor: visual
 ---
 
-**This excercise will be discussed on 2022-11-09**
+**This excercise will be discussed on 2023-11-15**
 
 ------------------------------------------------------------------------
 
