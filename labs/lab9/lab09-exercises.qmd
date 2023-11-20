@@ -1,9 +1,12 @@
 ---
-title: "Spatio-temporal Modelling, Lab 9, 2023-01-11"
-editor: source
+title: |
+  | Spatio-temporal Modelling, Lab 9
+  | 2024-01-10
+format: html
+editor: visual
 ---
 
-**This exercise will be discussed on 2023-01-18.**
+**This exercise will be discussed on 2024-01-17.**
 
 # Cokriging
 

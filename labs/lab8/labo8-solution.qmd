@@ -1,11 +1,12 @@
 ---
-title: "Spatio-temporal Modelling, Lab 8, 2022-12-21"
+title: |
+  | Spatio-temporal Modelling, Lab 8
+  | 2023-12-20
+format: html
 editor: visual
 ---
 
 # Universal kriging
-
-
 
 Universal kriging
 
@@ -92,10 +93,9 @@ plot(variogram(g.sf, cross = F), scales = list(relation = "same"), layout = c(2,
 ```
 :::
 
-
-
 #### *Exercise 1* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 1
 
 *How is the residual standard error from the regression model above (`lzn.lm`) related to the variogram of the residuals?*
@@ -108,16 +108,15 @@ e)  it equals the nugget of the residual variogram
 f)  the residual variance (approximately) equals the nugget of the variogram
 :::
 
-::: {.callout-tip}
+::: callout-tip
 ## Solution
 
 The correct answer is b). The squared residual error is the residual variance. The variance of a process can be derived from the variogram as the sill. When looking at the variogram of the residuals, the sill is the variance of the residuals, which equals the squared residual standard error.
 :::
 
-
-
 #### *Exercise 2* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 2
 
 *Why is the sill of the residual variogram much lower than the sill of the variogram for the raw data?*
@@ -128,13 +127,11 @@ c)  the residuals have little in common with the (log) zinc data
 d)  residuals allways have much smaller variability than raw data
 :::
 
-::: {.callout-tip}
+::: callout-tip
 ## Solution
 
 The correct answer is b). The sill of the variogram of residuals (showing the variance) is lower than the sill of the raw data, because the regression model (modelling the trend/mean) already explains part of the variability. The residuals are the remaining, unexplained variability. If both variograms had the same sill (variance), it would mean that the regression model explains no variability. In this case universal kriging would not be needed.
 :::
-
-
 
 When a regression model formula is passed to `variogram`, the variogram of the residuals is calculated. When a model formula is passed to `krige`, universal kriging is used.
 
@@ -189,10 +186,9 @@ tm_shape(outuk.stars) +
 ```
 :::
 
-
-
 #### *Exercise 3* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 3
 
 *Where are the differences most prevalent?*
@@ -202,16 +198,15 @@ b)  In areas with few data points
 c)  In areas where both (a) and (b) are valid
 :::
 
-::: {.callout-tip}
+::: callout-tip
 ## Solution
 
 The correct answer is c). The differences are most prevalent where values for `dist` are close to 0 or 1 and where threre are few data points.
 :::
 
-
-
 #### *Exercise 4* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 4
 
 *Why are the differences happening exactly there?*
@@ -221,13 +216,11 @@ b)  on locations far from measurements we are most uncertain about the true valu
 c)  on locations where `dist` is close to 0 or 1, it was hard to collect data, because these locations were hard to reach.
 :::
 
-::: {.callout-tip}
+::: callout-tip
 ## Solution
 
 The correct answer is a). At locations where there are only few data points, the estimation relies mainly on the modelled trend value. This value is most different from the mean (which is used in ordinary kriging) at extreme values for `dist`. These extreme values of `dist` are near 0 and 1 (try `summary(meuse.grid$dist)` and check `Min.` and `Max.`).
 :::
-
-
 
 # Block kriging
 
@@ -295,32 +288,30 @@ tm_shape(zn.stars) +
 ```
 :::
 
-
-
 #### *Exercise 5* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 5
 
 *Describe what happens if we change from point prediction to block prediction of size 40, in terms of predictions and in terms of prediction standard errors?*
 :::
 
-::: {.callout-tip}
+::: callout-tip
 ## Solution
 
 The estimated values do not differ much. The standard errors however, are smaller. This is because the variability is cancelled out when predicting block means.
 :::
 
-
 #### *Exercise 6* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 6
 
 *Describe what happens if we change from block prediction for blocks of size 40 m to block prediction for blocks of size 400 m, in terms of predictions and in terms of prediction standard errors?*
 :::
 
-::: {.callout-tip}
+::: callout-tip
 ## Solution
 
 The map of becomes "smoother", the standard error decreases.
 :::
-

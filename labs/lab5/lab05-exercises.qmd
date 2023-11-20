@@ -1,16 +1,18 @@
 ---
-title: "Spatio-temporal Modelling, Lab 5, 2022-11-23"
+title: |
+  | Spatio-temporal Modelling, Lab 5
+  | 2023-11-22
+format: html
 editor: visual
 ---
 
-**This exercise will be discussed on 2022-11-30.**
+**This exercise will be discussed on 2023-11-29.**
 
 # Spatial modelling: introductory matter
 
 ## meuse
 
-The meuse data set is a data set collected from the Meuse floodplain. The heavy metals analyzed are copper, cadmium, lead and zinc concentrations, extracted from the topsoil of a part of the Meuse floodplain, the area around Meers and Maasband (Limburg, The Netherlands). The data were collected during fieldwork in 1990 [@meuse1; @meuse2].
-Let´s have a look at the data. If not done yet, download the data set from learnweb. The code below assumes the data to sit in subdirectory `data` of your working directory. Adapt the path to wherever you have stored the data on your disk.
+The meuse data set is a data set collected from the Meuse floodplain. The heavy metals analyzed are copper, cadmium, lead and zinc concentrations, extracted from the topsoil of a part of the Meuse floodplain, the area around Meers and Maasband (Limburg, The Netherlands). The data were collected during fieldwork in 1990 [@meuse1; @meuse2]. Let´s have a look at the data. If not done yet, download the data set from learnweb. The code below assumes the data to sit in subdirectory `data` of your working directory. Adapt the path to wherever you have stored the data on your disk.
 
 ```{r}
 library(gstat)
@@ -75,10 +77,9 @@ plot(zinc.lm, , c("Residuen ~ Modellierte Werte", "QQ-Plot mit Normalverteilung"
     "Cook's Distanz vs Leverage"))
 ```
 
-
-
 #### *Exercise 1* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 1
 
 *For this regression model, which of the following violated assumptions underlying linear regression are true (if any):*
@@ -92,7 +93,6 @@ d)  residuals are heteroscedastic and not normally distributed
 :::
 
 The example above is a spatial model only to the extent that the explanatory variable `dist` in this case contains some spatial information (distance to the river). We are not using the spatial information contained in the `SpatialPointsDataFrame` with respect to the location (coordinates) of the heavy metal measurements. In the following, we will look at actual spatial data analysis starting with how to handle spatial data in R.
-
 
 ## Spatial data in R (I): the sp package
 
@@ -157,7 +157,9 @@ meuse.grid$ffreq <- as.factor(meuse.grid$ffreq)
 ```{r,warning=F}
 summary(meuse.grid)
 ```
+
 Let´s try to plot the data:
+
 ```{r,warning=F}
 meuse.lt = list(riv = list("sp.polygons", meuse.riv, fill = "grey"), pts = list("sp.points", 
     meuse, pch = 3, cex = 0.5, col = "black"))
@@ -200,11 +202,10 @@ and import it in google earth.
 
 ## Spatial data in R (II): the packages sf and stars
 
-The package **sf** [@R-sf], which first appeared on CRAN in 2016, is intended to replace the vector parts of **sp** (among others). It was developed "to move spatial data analysis in R closer to standards-based approaches seen in the industry and open source projects, to build upon more modern versions of the open source geospatial software stack [...], and to allow for integration of R spatial software with the tidyverse [...]" [@sdsr, chap. 7.1].  
+The package **sf** [@R-sf], which first appeared on CRAN in 2016, is intended to replace the vector parts of **sp** (among others). It was developed "to move spatial data analysis in R closer to standards-based approaches seen in the industry and open source projects, to build upon more modern versions of the open source geospatial software stack \[...\], and to allow for integration of R spatial software with the tidyverse \[...\]" [@sdsr, chap. 7.1].\
 The package **stars** [@R-stars], which first came to CRAN in 2018, was developed for analyzing raster (and vector) data cubes. It is meant to extend current packages for raster data with functionality to represent dynamic raster stacks (e.g. time series) and to scale computations to data beyond local disc sizes [@sdsr, chap. 7.4].
 
 Both packages are developed to work closely together and can be used for all spatial analyses throughout our exercises. In the following, we show how to repeat the examples from above for handling points and grids with **sf** and **stars**.
-
 
 ### Points
 
@@ -213,6 +214,7 @@ library(sf)
 meuse.sf <- st_read("./data/meuse.gpkg")
 
 ```
+
 ```{r}
 class(meuse.sf)
 ```
@@ -239,13 +241,14 @@ plot(meuse.riv.sf,col='grey',add=T)
 
 ### Grids
 
-Try: 
+Try:
 
 ```{r}
 library(stars)
 meuse.grid.stars <- read_stars("./data/meuse_grid.tif")
 meuse.grid.stars
 ```
+
 The bands of our data set are automatically interpreted as another dimension of the data (here you can recognize the characteristic of **stars** to naturally support multidimensional raster data). However, in this case our bands do not represent another dimension (like for example having the same measurements at different times in the different bands), so instead we want them to be interpreted as 5 different attributes of a 2-dimensional array. This can be done using the function `split`:
 
 ```{r}
@@ -271,7 +274,7 @@ plot(meuse.grid.stars[3], col=heat.colors(10))
 
 ## Visualizing spatial data with the tmap package
 
-In the previous section, we have used the function `spplot()` to create plots from data handled by the package **sp**, such as `SpatialPointsDataFrame` or `SpatialPixelsDataFrame`. While there are base `plot` methods for `sf` and `stars` objects as well (we have used some of them in the examples above, more examples can be found in the lecture material), we will use the package **tmap** [@R-tmap]  for plotting objects of those classes throughout this exercise. **tmap** allows easy handling of `sf` and `stars` objects combined in one plot and offers a lot of utility for creating and styling maps and other visualizations of spatial data. The syntax for plotting is very simple and straightforward: the basic building blog of a plot is a `tm_shape` element, which defines the spatial data object (raster or vector) to be added to the map plus one or more layer elements, e.g., `tm_raster` or `tm_polygons`, which define how the object is to be plotted (and which aspects of it). Spatial data objects can be, e.g., an `sf` or `stars` object, but also objects from the packages **sp** or **raster**. All these elements are combined via the + operator. The example below creates a plot with one layer showing the "dist" attribute of `meuse.grid.stars` together with the polygon of the Meuse river. 
+In the previous section, we have used the function `spplot()` to create plots from data handled by the package **sp**, such as `SpatialPointsDataFrame` or `SpatialPixelsDataFrame`. While there are base `plot` methods for `sf` and `stars` objects as well (we have used some of them in the examples above, more examples can be found in the lecture material), we will use the package **tmap** [@R-tmap] for plotting objects of those classes throughout this exercise. **tmap** allows easy handling of `sf` and `stars` objects combined in one plot and offers a lot of utility for creating and styling maps and other visualizations of spatial data. The syntax for plotting is very simple and straightforward: the basic building blog of a plot is a `tm_shape` element, which defines the spatial data object (raster or vector) to be added to the map plus one or more layer elements, e.g., `tm_raster` or `tm_polygons`, which define how the object is to be plotted (and which aspects of it). Spatial data objects can be, e.g., an `sf` or `stars` object, but also objects from the packages **sp** or **raster**. All these elements are combined via the + operator. The example below creates a plot with one layer showing the "dist" attribute of `meuse.grid.stars` together with the polygon of the Meuse river.
 
 ```{r}
 library(tmap)
@@ -301,7 +304,6 @@ tm_shape(meuse.grid.stars) +
   tm_layout(legend.outside.size = 0.15, main.title = "distance to river and soil type in one plot", panel.labels = c("distance to river","soil type"))
 ```
 
-
 **tmap** can be used not only for plotting static maps, but also for visualizing spatial data in an interactive viewer. Changing the mode to "view" will cause all visualizations to be shown in an interactive leaflet map including selectable background layers as well as zoom and pan functionality. The following code shows an example (note that after creating the interactive map, we switch back to the mode "plot" for creating static maps in the following sections).
 
 ```{r}
@@ -314,10 +316,9 @@ tmap_mode("plot")
 
 For more information on the use of **tmap** please refer to the [get started!](https://cran.r-project.org/web/packages/tmap/vignettes/tmap-getstarted.html#interactive-maps) vignette.
 
-
 ## sp vs. sf & stars
 
-Whether you prefer to use **sp** or **sf** and **stars**, is up to you. As mentioned above **sf** and **stars** are intended to replace **sp** in the long term. For now, we will always present the code for both alternatives when analyzing spatial data. You can switch between them by selecting the corresponding tabs in the code sections. You will notice that for the most part there are only minor (if any) differences between both alternatives. Most of the functions we will be using can handle objects from **sp**, **sf** and **stars** identically. Main differences occur when plotting the data (`spplot` for **sp**, functions from **tmap** for **sf** & **stars**). 
+Whether you prefer to use **sp** or **sf** and **stars**, is up to you. As mentioned above **sf** and **stars** are intended to replace **sp** in the long term. For now, we will always present the code for both alternatives when analyzing spatial data. You can switch between them by selecting the corresponding tabs in the code sections. You will notice that for the most part there are only minor (if any) differences between both alternatives. Most of the functions we will be using can handle objects from **sp**, **sf** and **stars** identically. Main differences occur when plotting the data (`spplot` for **sp**, functions from **tmap** for **sf** & **stars**).
 
 # Geostatistics
 
@@ -325,14 +326,11 @@ The following practical exercises cover the use of geostatistical applications i
 
 The **gstat** R package [@R-gstat] is used for all geostatistical calculations. See @gstatcg for more info.
 
-
 ## Simple interpolation algorithms
 
 ### Trend surface analysis
 
 Trend surface interpolation is multiple linear regression with polynomials of coordinates as independent, predictor variables. Although we could use `lm` to fit these models and predict them, it would require scaling of coordinates prior to prediction in most cases because higher powers of large coordinate values result in large numerical errors. The `krige` function in library `gstat` scales coordinates and computes trend surface up to order 3 (argument `degree`), using scaled coordinates.
-
-
 
 ::: panel-tabset
 ## sp
@@ -363,19 +361,18 @@ tm_shape(meuse.grid.stars) +
 ```
 :::
 
-::: {.callout-note}
+::: callout-note
 Function `surf.ls` from library `spatial` fits trends up to order 6 with scaled coordinates.
 :::
-
 
 Here is another example of the use of the `...` argument in function definitions. As you can see, `?krige` does not provide help on argument `degree`. However, it tells that any remaining arguments (`...`) are passed to function `gstat`, so look for argument `degree` on `?gstat` to see information on this argument.
 
 In the example above, we have fitted trends up to order 3. The higher the order, the more exactly the surface can be fitted to the data. However...
 
 #### *Exercise 2* {.unnumbered}
-::: {.callout-caution}
-## Exercise 2
 
+::: callout-caution
+## Exercise 2
 
 *The danger of extreme extrapolation values is likely to occur*
 
@@ -385,8 +382,6 @@ c)  for none of these models
 
 *Briefly explain why this is the case.*
 :::
-
-
 
 Local trends, i.e. trends in a local neighbourhood may also be fitted:
 
@@ -467,9 +462,9 @@ tm_shape(meuse.grid.stars) +
 ```
 :::
 
-
 #### *Exercise 3* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 3
 
 *With a larger inverse distance power (`idp`), the weight of the nearest data point*
@@ -480,8 +475,6 @@ c)  does not change
 
 *explain in words why this is the case.*
 :::
-
-
 
 ### Nearest Neighbor / Tiessen (or Voronoi) Polygons
 
@@ -536,8 +529,7 @@ names(meuse.grid.stars)
 ```
 :::
 
-We already demonstrated using `dist` at the beginning of this exercise and we saw that some assumptions underlying linear regression were violated. Often, simple transformations of the input data can help, e.g., to overcome non-linearity or heteroscedastic residuals.
-Try:
+We already demonstrated using `dist` at the beginning of this exercise and we saw that some assumptions underlying linear regression were violated. Often, simple transformations of the input data can help, e.g., to overcome non-linearity or heteroscedastic residuals. Try:
 
 ::: panel-tabset
 ## sp
@@ -589,10 +581,9 @@ tm_shape(meuse.grid.stars)+tm_raster("se.fit", n=10, palette = bpy.palette)
 ```
 :::
 
-
-
 #### *Exercise 4* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 4
 
 *Why are prediction standard errors on the log-scale largest for small and large distance to the river?*
@@ -602,8 +593,6 @@ b)  because the uncertainty in the regression slope is most prevalent when the r
 c)  because we have too few degrees of freedom for regression (i.e., too few observations) overall
 d)  because we have too little data close to the river and far away from the river
 :::
-
-
 
 We can use the prediction errors provided by `lm` to calculate regression prediction intervals:
 
@@ -675,10 +664,9 @@ tm_shape(meuse.grid.stars) +
 
 Note that all these prediction intervals refer to prediction of single observations; confidence intervals for mean values (i.e., the regression line alone) are obtained by specifying interval = `"confidence"`.
 
-
-
 #### *Exercise 5* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 5
 
 *Compared to prediction intervals, the intervals obtained by interval = `"confidence"` are*
@@ -687,8 +675,6 @@ a)  wider
 b)  narrower
 c)  of approximately equal width
 :::
-
-
 
 Another regression model is obtained by relating zinc to flood frequency, try
 
@@ -711,10 +697,9 @@ plot(log(zinc) ~ ffreq, meuse.sf)
 ```
 :::
 
-
-
 #### *Exercise 6* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 6
 
 *Why is a box-and whisker plot drawn for the second plot, and not a scatter plot?*
@@ -724,10 +709,9 @@ b)  `ffreq` has been turned into a variable with only three values, 1, 2 and 3
 c)  flood frequency is always expressed by boxes
 :::
 
-
-
 #### *Exercise 7* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 7
 
 *What do the boxes in a box-and whisker plot refer to?*
@@ -737,10 +721,9 @@ b)  the 95 percent confidence interval for the mean
 c)  the inter-quartile range (from 25-th to 75-th percentiles)
 :::
 
-
-
 #### *Exercise 8* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 8
 
 *What is needed for flood frequency to use it for mapping zinc?*
@@ -749,8 +732,6 @@ a)  it needs to be the number of times a grid cell floods
 b)  it needs to be known at each prediction location (i.e., grid cells in `meuse.grid`)
 c)  it needs to be independent of distance to the river
 :::
-
-
 
 Try the model in prediction mode:
 
@@ -788,13 +769,10 @@ tm_shape(meuse.grid.stars) +
 ```
 :::
 
-
-
 #### *Exercise 9* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 9
 
 *Why is the pattern obtained not smooth?*
 :::
-
-

@@ -1,6 +1,9 @@
 ---
-title: "Spatio-temporal Modelling, Lab 9, 2023-01-18"
-editor: source
+title: |
+  | Spatio-temporal Modelling, Lab 9
+  | 2024-01-17
+format: html
+editor: visual
 ---
 
 

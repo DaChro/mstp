@@ -1,28 +1,26 @@
 ---
-title: "Spatio-temporal Modelling, Lab 6, 2022-11-30"
+title: |
+  | Spatio-temporal Modelling, Lab 6
+  | 2023-11-29
+format: html
 editor: visual
 ---
 
-**This exercise will be discussed on 2022-12-07.**
+**This exercise will be discussed on 2023-12-06.**
 
 # Spatial modelling: introductory matter II - Spatial Correlation
-
-
 
 ## Spatial correlation: the h-scatterplot
 
 Before we jump into h-scatterplots of spatial data, let us first (re-)consider lagged scatterplots for temporal data.
 
-
-
 #### *Exercise 1* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 1
 
 *Create the lagged scatterplots for the T.outside variable in the meteo data set, one for lag 1 and one for lag 10. Compute and report the corresponding correlations. (To do the scatterplot, you simply need to plot each value of T.outside at time* $t$ against its counterpart at time $t-1$ or $t-10$, respectively)
 :::
-
-
 
 Read the help for function `hscat` in package **gstat**.
 
@@ -48,25 +46,21 @@ hscat(log(zinc) ~ 1, meuse.sf, c(0, 30, 80, 100, 200, 300, 500, 1000))
 ```
 :::
 
-
-
 #### *Exercise 2* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 2
 
 *Why is there no distance interval* $0-30$ in the plot?
 :::
 
-
-
 #### *Exercise 3* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 3
 
 *How many point pairs can you form from 155 observations?*
 :::
-
-
 
 ::: panel-tabset
 ## sp
@@ -82,15 +76,13 @@ hscat(log(zinc) ~ 1, meuse.sf, c(0, 80, 120, 250, 500, 1200))
 ```
 :::
 
-
-
 #### *Exercise 4* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 4
 
 *The correlation steadily drops with larger distance. Why?*
 :::
-
 
 ::: panel-tabset
 ## sp
@@ -106,16 +98,13 @@ hscat(log(zinc) ~ 1, meuse.sf, c(0, 120, 300, 600, 1200))
 ```
 :::
 
-
-
 #### *Exercise 5* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 5
 
 *How would you interpret the negative correlation for the largest lag?*
 :::
-
-
 
 ## Spatial correlation: the variogram cloud
 
@@ -141,32 +130,29 @@ plot(variogram(log(zinc) ~ 1, meuse.sf, cloud = TRUE))
 ```
 :::
 
-
-
 #### *Exercise 6* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 6
 
 *Why are both distance and semivariance non-negative?*
 :::
 
-
-
 #### *Exercise 7* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 7
 
 *Why is there so much scatter in this plot?*
 :::
 
-
 #### *Exercise 8* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 8
 
 *How many points does the variogram cloud contain if the separation distance is not limited?*
 :::
-
 
 ## Spatial correlation: the variogram
 
@@ -191,7 +177,8 @@ plot(v)
 :::
 
 #### *Exercise 9* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 9
 
 *How is the variogram computed from the variogram cloud?*
@@ -202,8 +189,6 @@ c)  distance is averaged for each semivariance class
 d)  semivariance and distance are averaged for each distance class
 e)  semivariance and distance are averaged for each semivariance class
 :::
-
-
 
 ## Sample variogram and variogram model
 
@@ -247,10 +232,9 @@ plot(lzn.vgm)
 ```
 :::
 
-
-
 #### *Exercise 10* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 10
 
 *What is the problem if we set width to e.g. a value of 5?*
@@ -261,10 +245,9 @@ c)  the semivariance values are too small
 d)  the variability of the semivariance values is too large
 :::
 
-
-
 #### *Exercise 11* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 11
 
 *What is the problem if we set the cutoff value to e.g. a value of 500 and width to 50?*
@@ -274,8 +257,6 @@ b)  the semivariance values are too large
 c)  the semivariance values are too small
 d)  we cannot see if data are spatially correlated
 :::
-
-
 
 For kriging, we need a suitable, statistically valid model fitted to the sample variogram. The reason for this is that kriging requires the specification of semivariances for any distance value in the spatial domain we work with. Simply connecting sample variogram points, as in
 
@@ -329,10 +310,9 @@ plot(lzn.vgm, lzn.mod)
 ```
 :::
 
-
-
 #### *Exercise 12* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 12
 
 *The range, 1000, relates to*
@@ -342,10 +322,9 @@ b)  the semivariance value reached when the variogram stops increasing
 c)  the distance value at which the variogram stops increasing
 :::
 
-
-
 #### *Exercise 13* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 13
 
 *The sill, 0.6 + 0.05, relates to*
@@ -355,10 +334,9 @@ b)  the semivariance value reached when the variogram stops increasing
 c)  the distance value at which the variogram stops increasing
 :::
 
-
-
 #### *Exercise 14* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 14
 
 *The nugget, 0.05, relates to*
@@ -367,8 +345,6 @@ a)  the semivariance value at distance (nearly) zero
 b)  the semivariance value reached when the variogram stops increasing
 c)  the distance value at which the variogram stops increasing
 :::
-
-
 
 The variogram model (Sph for spherical) and the three parameters were chosen by eye. We can fit the three parameters also automatically:
 
@@ -402,10 +378,9 @@ lzn.misfit = fit.variogram(lzn.vgm, vgm(0.6, "Sph", 10, 0.05))
 plot(lzn.vgm, lzn.misfit)
 ```
 
-
-
 #### *Exercise 15* {.unnumbered}
-::: {.callout-caution}
+
+::: callout-caution
 ## Exercise 15
 
 *Compute the variogram for four different direction ranges (hint: look into argument `alpha` for function variogram) and plot it in a single plot. Is the zinc process anisotropic? Try to explain what you find in terms of what you know about the process.*
