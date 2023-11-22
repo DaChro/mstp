@@ -151,7 +151,7 @@ $$y = b_0 + b_1 x_1 + b_2 x_2 + e$$
 ::: callout-note
 ## Hint
 
-Try to define the matrices X and the vector y and use the`solve()` function for computing $b_0$, $b_1$, and $b_2$.
+Recall from the [lecture](https://edzer.github.io/mstp/op1.html#linear-least-squares-solution) that for finding the coefficients, we need to solve the normal equations $(X^TX)b = X^T y$. Try to define the matrices $X$ and the vector $y$, then you can use the `solve()` function for computing $b_0$, $b_1$, and $b_2$. Check the help of `solve()` to find out in what form you need to supply the equation system to the function in order to get the vector $b$ (corresponds to $x$ on the help page). When defining matrix $X$, keep in mind that the regression equation above includes a coefficient $b_0$, while we do not have any explicit values $x_0$ in our table. How can we include an intercept $b_0$? Think of $b_0$ as $b_0 \cdot 1$ !
 :::
 
 #### *Exercise 6* {.unnumbered}
