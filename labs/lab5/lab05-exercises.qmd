@@ -207,6 +207,8 @@ The package **stars** [@R-stars], which first came to CRAN in 2018, was develope
 
 Both packages are developed to work closely together and can be used for all spatial analyses throughout our exercises. In the following, we show how to repeat the examples from above for handling points and grids with **sf** and **stars**.
 
+An introduction to **sf** and **stars** can be found [here](https://r-spatial.org/book/07-Introsf.html).
+
 ### Points
 
 ```{r}

@@ -5,7 +5,7 @@ editor: visual
 
 ## Hinweis {.unnumbered}
 
-**Die Lösung zu diesem Aufgabenzettel muss bis zum 05.01.2024, 12:00 im Learnweb abgegeben werden. Gruppen mit bis zu zwei Studierenden dürfen die Aufgaben zusammen bearbeiten. Bitte reicht eure Lösungen mit textueller Beschreibung des Vorgehens und erstellten Plots als PDF Datei und zusätzlich euren R Source Code als .R Datei ein. Bitte kennzeichnet eure Abgaben mit Namen und Matrikelnummern.**
+**Die Lösung zu diesem Aufgabenzettel muss bis zum 07.01.2024, 23:59 im Learnweb abgegeben werden. Gruppen mit bis zu zwei Studierenden dürfen die Aufgaben zusammen bearbeiten. Bitte reicht eure Lösungen mit textueller Beschreibung des Vorgehens und erstellten Plots als PDF Datei und zusätzlich euren R Source Code als .R Datei ein. Bitte kennzeichnet eure Abgaben mit Namen und Matrikelnummern.**
 
 Für alle Aufgaben des Zettels: Beschreibt eurer Vorgehen, eure Analys, und die Visualisierungen die ihr nutzt, um Ergebnisse zu finden, Schlüsse zu ziehen und Fragen zu beantworten.
 
