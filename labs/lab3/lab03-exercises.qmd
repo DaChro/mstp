@@ -28,7 +28,7 @@ f = function(x, y, phase) sum((y - sin(x + phase))^2)
 optimize(f, c(0, pi), x = x, y = y)
 ```
 
-The optimization looks quite good, but it approximates.
+The optimization looks quite good, but approximates.
 
 #### *Exercise 1* {.unnumbered}
 

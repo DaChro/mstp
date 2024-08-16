@@ -90,7 +90,7 @@ Wenn man genauer und objektiv untersuchen möchte, wie gut ein angepasstes theor
 ##Funktion zum Testen der Variogrammmodelle für ordinary Kriging
 varmodtest <- function (vtype){
   vgm1 <- variogram(logPM10 ~ 1, EU.stations, cloud=F)
-  v.mod = fit.variogram(vgm1, vgm(0.5,vtype,900000,0.08))
+  v.mod = fit.variogram(vgm1, vgm(0.5,vtype,500000,0.08))
   th = variogramLine(v.mod,dist_vector=vgm1$dist)
   RMSE = sqrt(mean((th$gamma - vgm1$gamma)^2))
   RMSE
