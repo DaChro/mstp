@@ -30,7 +30,7 @@ ABER:
 
 Heute werden wir uns mit einigen Grundlagen von [R Studio](http://www.rstudio.com/ide/) beschäftigen.
 
-Im Anschluss werdet ihr an den ersten Übungen arbeiten, die sich um random walk Prozesse drehen.
+Im Anschluss werdet ihr an den ersten Übungen arbeiten, die sich um random walk und AR-Prozesse drehen.
 
 Wenn Ihr Eure R-Kenntnisse auffrischen oder etwas nachschlagen wollt, könnte dies hier nützlich für Euch sein: [R introduction](http://cran.r-project.org/doc/manuals/r-release/R-intro.html)
 
@@ -40,6 +40,7 @@ Schritte:
 
 1.  Ladet RStudio [hier](http://www.rstudio.com/ide/download/) herunter und installiert es.
 2.  Die Grundlagen von RStudio sind hier beschrieben: [documentation page](http://www.rstudio.com/ide/docs/). Bitte lest sie und pobiert zumindest den Abschnitt **Using RStudio**. Findet heraus wie man das Hilfe-Fenster verwendet.
+3. Zudem findet ihr im Learnweb zwei Videos mit einer Einführung in bzw. Übersicht über R und Rstudio.
 
 ## Generierung von Random Walk Daten
 
